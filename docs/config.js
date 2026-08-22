@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'A Claude skill and a reskinnable template. Extract frames, encode a ladder, fail the build when it gets heavy.',
     cta: { label: 'Read the pipeline', href: '#pipeline' },
     animationDescription:
-      'A brushed-metal device comes apart as you scroll: lid, board, and camera island lift into an exploded view, then seat themselves again.',
+      'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
   },
 
   sections: [

@@ -31,7 +31,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffe
 renderer.setPixelRatio(1);
 renderer.setSize(width, height);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.08;
+renderer.toneMappingExposure = 1.12;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
@@ -39,111 +39,182 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x12150f);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
 
-const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 40);
+const camera = new THREE.PerspectiveCamera(28, width / height, 0.1, 40);
 
-const key = new THREE.DirectionalLight(0xf2efe4, 2.4);
-key.position.set(4.2, 6.5, 3.2);
+const key = new THREE.DirectionalLight(0xf4f0e6, 2.6);
+key.position.set(3.8, 6.2, 4.0);
 scene.add(key);
 
-const rim = new THREE.DirectionalLight(0x3f8f6a, 1.7);
-rim.position.set(-5.5, 2.2, -3.4);
+const rim = new THREE.DirectionalLight(0x3f8f6a, 1.35);
+rim.position.set(-5.2, 2.4, -3.2);
 scene.add(rim);
 
-const fill = new THREE.HemisphereLight(0x9aa7a0, 0x12150f, 0.35);
-scene.add(fill);
+scene.add(new THREE.HemisphereLight(0xb8b4aa, 0x12150f, 0.32));
 
-const metal = () => new THREE.MeshPhysicalMaterial({
-  color: 0xc5c8cc,
-  metalness: 0.92,
-  roughness: 0.22,
-  clearcoat: 0.55,
-  clearcoatRoughness: 0.18,
+const titanium = () => new THREE.MeshPhysicalMaterial({
+  color: 0x9b968f,
+  metalness: 0.96,
+  roughness: 0.28,
+  clearcoat: 0.35,
+  clearcoatRoughness: 0.22,
 });
 
+const glassBack = new THREE.MeshPhysicalMaterial({
+  color: 0x2a2826,
+  metalness: 0.15,
+  roughness: 0.22,
+  clearcoat: 1,
+  clearcoatRoughness: 0.08,
+});
+
+const glassScreen = new THREE.MeshPhysicalMaterial({
+  color: 0x070708,
+  metalness: 0.05,
+  roughness: 0.06,
+  clearcoat: 1,
+  clearcoatRoughness: 0.04,
+});
+
+const lensGlass = new THREE.MeshPhysicalMaterial({
+  color: 0x12141a,
+  metalness: 0.2,
+  roughness: 0.05,
+  transmission: 0.22,
+  thickness: 0.25,
+  ior: 1.5,
+});
+
+const W = 1.18;
+const L = 2.42;
+const T = 0.11;
+const R = 0.16;
+
 const device = new THREE.Group();
-device.rotation.y = 0.22;
+device.rotation.y = 0.38;
 scene.add(device);
 
-const base = new THREE.Mesh(new RoundedBoxGeometry(2.2, 0.2, 3.4, 8, 0.14), metal());
-base.position.y = -0.11;
-device.add(base);
+const chassis = new THREE.Mesh(new RoundedBoxGeometry(W, T, L, 6, R), titanium());
+device.add(chassis);
+
+const action = new THREE.Mesh(
+  new RoundedBoxGeometry(0.018, 0.07, 0.16, 2, 0.006),
+  titanium(),
+);
+action.position.set(W / 2 + 0.008, 0.01, -0.55);
+chassis.add(action);
+
+const volume = new THREE.Mesh(
+  new RoundedBoxGeometry(0.018, 0.05, 0.38, 2, 0.006),
+  titanium(),
+);
+volume.position.set(W / 2 + 0.008, 0.01, 0.15);
+chassis.add(volume);
+
+const power = new THREE.Mesh(
+  new RoundedBoxGeometry(0.018, 0.05, 0.22, 2, 0.006),
+  titanium(),
+);
+power.position.set(-W / 2 - 0.008, 0.01, -0.2);
+chassis.add(power);
+
+const screen = new THREE.Mesh(new RoundedBoxGeometry(W - 0.06, 0.018, L - 0.06, 6, R - 0.03), glassScreen);
+screen.position.y = -T / 2 + 0.004;
+device.add(screen);
+
+const island = new THREE.Mesh(
+  new RoundedBoxGeometry(0.42, 0.012, 0.1, 4, 0.05),
+  new THREE.MeshPhysicalMaterial({ color: 0x050505, roughness: 0.2 }),
+);
+island.position.set(0, 0.01, -L / 2 + 0.22);
+screen.add(island);
+
+const back = new THREE.Mesh(new RoundedBoxGeometry(W - 0.05, 0.018, L - 0.05, 6, R - 0.03), glassBack);
+back.position.y = T / 2 - 0.004;
+device.add(back);
+
+const battery = new THREE.Mesh(
+  new RoundedBoxGeometry(W - 0.22, 0.045, L - 0.55, 4, 0.06),
+  new THREE.MeshPhysicalMaterial({
+    color: 0xddd6c8,
+    metalness: 0.35,
+    roughness: 0.4,
+  }),
+);
+battery.position.set(0, 0.0, 0.12);
+device.add(battery);
 
 const board = new THREE.Mesh(
-  new THREE.BoxGeometry(1.92, 0.05, 3.05),
-  new THREE.MeshPhysicalMaterial({
-    color: 0x173328,
-    metalness: 0.25,
-    roughness: 0.42,
-  }),
+  new THREE.BoxGeometry(W - 0.28, 0.03, 0.72),
+  new THREE.MeshPhysicalMaterial({ color: 0x173328, metalness: 0.25, roughness: 0.42 }),
 );
-board.position.y = 0.015;
+board.position.set(0, 0.012, -0.72);
 device.add(board);
 
-function chip(w, d, x, z) {
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(w, 0.06, d),
-    new THREE.MeshPhysicalMaterial({ color: 0x161916, metalness: 0.35, roughness: 0.38 }),
-  );
-  mesh.position.set(x, 0.055, z);
-  board.add(mesh);
-  return mesh;
+const chip = new THREE.Mesh(
+  new THREE.BoxGeometry(0.34, 0.04, 0.34),
+  new THREE.MeshPhysicalMaterial({ color: 0x1a1c1a, metalness: 0.4, roughness: 0.35 }),
+);
+chip.position.set(-0.12, 0.035, 0.02);
+board.add(chip);
+
+const bump = new THREE.Group();
+bump.position.set(-0.28, T / 2 + 0.028, -0.78);
+device.add(bump);
+
+const plateau = new THREE.Mesh(
+  new RoundedBoxGeometry(0.64, 0.05, 0.64, 5, 0.14),
+  glassBack,
+);
+bump.add(plateau);
+
+function lens(x, z, r) {
+  const group = new THREE.Group();
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.02, 40), titanium());
+  const glass = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.72, r * 0.72, 0.024, 40), lensGlass);
+  ring.position.y = 0.03;
+  glass.position.y = 0.034;
+  group.add(ring, glass);
+  group.position.set(x, 0, z);
+  bump.add(group);
 }
-chip(0.42, 0.52, -0.55, -0.35);
-chip(0.28, 0.28, 0.62, 0.55);
-chip(0.22, 0.7, 0.15, -0.95);
 
-const lid = new THREE.Mesh(new RoundedBoxGeometry(2.2, 0.17, 3.4, 8, 0.14), metal());
-lid.position.y = 0.125;
-device.add(lid);
+lens(-0.13, -0.13, 0.125);
+lens(0.13, -0.13, 0.125);
+lens(-0.13, 0.13, 0.125);
 
-const island = new THREE.Group();
-island.position.set(-0.55, 0.24, -0.95);
-device.add(island);
-
-const lens = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.28, 0.28, 0.08, 48),
+const flash = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.045, 0.045, 0.016, 24),
   new THREE.MeshPhysicalMaterial({
-    color: 0x1a1e1c,
-    metalness: 0.4,
-    roughness: 0.08,
-    transmission: 0.35,
-    thickness: 0.4,
-    ior: 1.5,
+    color: 0xf2ead2,
+    emissive: 0xf2ead2,
+    emissiveIntensity: 0.4,
+    roughness: 0.2,
   }),
 );
-lens.rotation.x = Math.PI / 2;
-island.add(lens);
+flash.position.set(0.13, 0.032, 0.13);
+bump.add(flash);
 
-const ring = new THREE.Mesh(
-  new THREE.TorusGeometry(0.34, 0.035, 16, 64),
-  new THREE.MeshPhysicalMaterial({
-    color: 0x3f8f6a,
-    metalness: 0.85,
-    roughness: 0.28,
-    emissive: 0x3f8f6a,
-    emissiveIntensity: 0.35,
-  }),
-);
-ring.rotation.x = Math.PI / 2;
-ring.position.y = 0.02;
-island.add(ring);
-
-window.renderFrame = (frame) => {
-  const t = count <= 1 ? 0 : frame / (count - 1);
-  // 0 assembled, 1 fully exploded at mid-scroll, 0 seated again.
+window.renderFrame = (index) => {
+  const t = count <= 1 ? 0 : index / (count - 1);
   const explode = Math.sin(t * Math.PI);
 
-  base.position.y = -0.11 - 0.18 * explode;
-  board.position.y = 0.015 + 0.52 * explode;
-  lid.position.y = 0.125 + 1.05 * explode;
-  island.position.y = 0.24 + 1.55 * explode;
+  screen.position.y = -T / 2 + 0.004 - 0.42 * explode;
+  chassis.position.y = -0.06 * explode;
+  battery.position.y = 0.32 * explode;
+  board.position.y = 0.012 + 0.62 * explode;
+  back.position.y = T / 2 - 0.004 + 1.05 * explode;
+  bump.position.y = T / 2 + 0.028 + 1.55 * explode;
 
-  const yaw = t * Math.PI * 0.32;
-  const radius = 6.55;
-  camera.position.set(Math.sin(yaw) * radius, 1.2 + 0.35 * explode, Math.cos(yaw) * radius);
-  camera.lookAt(0, 0.08 + 0.45 * explode, 0);
+  const yaw = 0.55 + t * 0.4;
+  const radius = 3.55;
+  camera.position.set(
+    Math.sin(yaw) * radius,
+    4.55 + 0.55 * explode,
+    Math.cos(yaw) * radius,
+  );
+  camera.lookAt(0, 0.12 + 0.5 * explode, 0);
   renderer.render(scene, camera);
 };
 
