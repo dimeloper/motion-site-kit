@@ -30,11 +30,12 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 1. Frames written to `template/public/frames` while the page requested `/frames`. Output path is `template/frames`, served from `template/`.
 2. `check_budget.py` exited 2 when no manifest existed, so CI was red on every fresh clone (frames are gitignored). It now skips cleanly; `--strict` opts into failing.
 3. Hero stuck on a permanent "Loading" bar when modules failed to load. See the loader invariant above.
+4. `extract_frames.py` used `-vsync 0`, which FFmpeg 9 removed. It now prefers `-fps_mode passthrough` and falls back to `-vsync 0` on older builds.
 
 ## What's stubbed
 
-- **`docs/`** — GitHub Pages site. It should be built *by the skill*, using this repo's README and reference docs as content. The documentation being the demo is the whole pitch; a text article about motion can't make that argument.
-- **`examples/`** — three demos (SaaS, e-commerce, local business), each a copy of `template/` with its own `config.js` and frame ladder. If the second one takes as long as the first, something leaked out of `config.js`.
+- **Example live deploys.** `examples/saas`, `commerce`, and `local` are config-only reskins in the repo. Serve them locally; production URLs are still pending. Swap the shared verification clip for a real source per demo.
+- **A source clip that is not `testsrc2`.** `docs/` currently scrolls the README verification pattern. That is honest. It is not a product film. Replace it when a real clip exists.
 
 ## Verifying a change
 

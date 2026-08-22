@@ -45,9 +45,9 @@ path = pathlib.Path(sys.argv[1])
 html = path.read_text()
 local = '''  {
     "imports": {
-      "lenis": "/vendor/lenis/lenis.mjs",
-      "gsap": "/vendor/gsap/index.js",
-      "gsap/ScrollTrigger": "/vendor/gsap/ScrollTrigger.js"
+      "lenis": "vendor/lenis/lenis.mjs",
+      "gsap": "vendor/gsap/index.js",
+      "gsap/ScrollTrigger": "vendor/gsap/ScrollTrigger.js"
     }
   }
   '''

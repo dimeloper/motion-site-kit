@@ -61,17 +61,25 @@ def extract(src: Path, out_dir: Path, count: int, width: int, duration: float) -
 
     # Ask for slightly more than needed; reconciliation below trims to exact count.
     rate = f"{count + 2}/{duration:.6f}"
-    subprocess.run(
-        [
-            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
-            "-i", str(src),
-            "-vf", f"fps={rate},scale={width}:-2:flags=lanczos",
-            "-vsync", "0",
-            "-pix_fmt", "rgb24",
-            str(out_dir / f"tmp_%0{PAD}d.png"),
-        ],
-        check=True,
+    out_pattern = str(out_dir / f"tmp_%0{PAD}d.png")
+    base = [
+        "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+        "-i", str(src),
+        "-vf", f"fps={rate},scale={width}:-2:flags=lanczos",
+    ]
+    # FFmpeg 9 removed -vsync; 4.4–6.x accept both. Prefer -fps_mode, fall back.
+    result = subprocess.run(
+        [*base, "-fps_mode", "passthrough", "-pix_fmt", "rgb24", out_pattern],
+        capture_output=True, text=True,
     )
+    if result.returncode != 0:
+        result = subprocess.run(
+            [*base, "-vsync", "0", "-pix_fmt", "rgb24", out_pattern],
+            capture_output=True, text=True,
+        )
+    if result.returncode != 0:
+        sys.stderr.write(result.stderr)
+        die("ffmpeg failed to extract frames")
     return sorted(out_dir.glob("tmp_*.png"))
 
 

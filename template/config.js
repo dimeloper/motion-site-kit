@@ -56,7 +56,7 @@ export const CONFIG = {
    * Engine parameters. Defaults are tuned; change them only with a reason.
    */
   motion: {
-    framesBase: '/frames',
+    framesBase: 'frames',
 
     // Screen heights of scroll to play the sequence once. 3-4 is the usable
     // range: below 2 it flies past, above 5 the page feels stuck.

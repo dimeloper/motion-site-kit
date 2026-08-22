@@ -5,6 +5,7 @@ out/
 __pycache__/
 *.pyc
 .venv/
+.netlify/
 
 # Generated per project — regenerate with optimize_frames.py
 template/frames/

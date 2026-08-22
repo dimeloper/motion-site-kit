@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - "template/frames/**"
+      - "docs/frames/**"
       - "motion.config.json"
       - "skills/motion-website/scripts/**"
   pull_request:
     paths:
       - "template/frames/**"
+      - "docs/frames/**"
       - "motion.config.json"
       - "skills/motion-website/scripts/**"
 
@@ -27,6 +29,10 @@ jobs:
           python3 skills/motion-website/scripts/check_budget.py \
             --config motion.config.json \
             --verbose
+          python3 skills/motion-website/scripts/check_budget.py \
+            --config motion.config.json \
+            --frames docs/frames \
+            --verbose
 
       - name: Summarize
         if: always()
@@ -36,5 +42,7 @@ jobs:
             echo '```'
             python3 skills/motion-website/scripts/check_budget.py \
               --config motion.config.json --verbose 2>&1 || true
+            python3 skills/motion-website/scripts/check_budget.py \
+              --config motion.config.json --frames docs/frames --verbose 2>&1 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"

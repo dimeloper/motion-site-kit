@@ -24,7 +24,7 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 ## Quick start
 
 ```bash
-git clone https://github.com/<you>/motion-site-kit
+git clone https://github.com/dimeloper/motion-site-kit
 cd motion-site-kit
 pip install "Pillow>=11.3"          # AVIF + WebP encoding
 # ffmpeg must be on PATH for extraction
