@@ -31,7 +31,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffe
 renderer.setPixelRatio(1);
 renderer.setSize(width, height);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.08;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
@@ -47,25 +47,60 @@ const key = new THREE.DirectionalLight(0xf2efe4, 2.4);
 key.position.set(4.2, 6.5, 3.2);
 scene.add(key);
 
-const rim = new THREE.DirectionalLight(0x3f8f6a, 1.6);
+const rim = new THREE.DirectionalLight(0x3f8f6a, 1.7);
 rim.position.set(-5.5, 2.2, -3.4);
 scene.add(rim);
 
 const fill = new THREE.HemisphereLight(0x9aa7a0, 0x12150f, 0.35);
 scene.add(fill);
 
-const body = new THREE.Mesh(
-  new RoundedBoxGeometry(2.2, 0.42, 3.4, 8, 0.16),
+const metal = () => new THREE.MeshPhysicalMaterial({
+  color: 0xc5c8cc,
+  metalness: 0.92,
+  roughness: 0.22,
+  clearcoat: 0.55,
+  clearcoatRoughness: 0.18,
+});
+
+const device = new THREE.Group();
+device.rotation.y = 0.22;
+scene.add(device);
+
+const base = new THREE.Mesh(new RoundedBoxGeometry(2.2, 0.2, 3.4, 8, 0.14), metal());
+base.position.y = -0.11;
+device.add(base);
+
+const board = new THREE.Mesh(
+  new THREE.BoxGeometry(1.92, 0.05, 3.05),
   new THREE.MeshPhysicalMaterial({
-    color: 0xc5c8cc,
-    metalness: 0.92,
-    roughness: 0.22,
-    clearcoat: 0.55,
-    clearcoatRoughness: 0.18,
+    color: 0x173328,
+    metalness: 0.25,
+    roughness: 0.42,
   }),
 );
-body.rotation.y = 0.18;
-scene.add(body);
+board.position.y = 0.015;
+device.add(board);
+
+function chip(w, d, x, z) {
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(w, 0.06, d),
+    new THREE.MeshPhysicalMaterial({ color: 0x161916, metalness: 0.35, roughness: 0.38 }),
+  );
+  mesh.position.set(x, 0.055, z);
+  board.add(mesh);
+  return mesh;
+}
+chip(0.42, 0.52, -0.55, -0.35);
+chip(0.28, 0.28, 0.62, 0.55);
+chip(0.22, 0.7, 0.15, -0.95);
+
+const lid = new THREE.Mesh(new RoundedBoxGeometry(2.2, 0.17, 3.4, 8, 0.14), metal());
+lid.position.y = 0.125;
+device.add(lid);
+
+const island = new THREE.Group();
+island.position.set(-0.55, 0.24, -0.95);
+device.add(island);
 
 const lens = new THREE.Mesh(
   new THREE.CylinderGeometry(0.28, 0.28, 0.08, 48),
@@ -79,8 +114,7 @@ const lens = new THREE.Mesh(
   }),
 );
 lens.rotation.x = Math.PI / 2;
-lens.position.set(-0.55, 0.24, -0.95);
-scene.add(lens);
+island.add(lens);
 
 const ring = new THREE.Mesh(
   new THREE.TorusGeometry(0.34, 0.035, 16, 64),
@@ -88,19 +122,28 @@ const ring = new THREE.Mesh(
     color: 0x3f8f6a,
     metalness: 0.85,
     roughness: 0.28,
+    emissive: 0x3f8f6a,
+    emissiveIntensity: 0.35,
   }),
 );
 ring.rotation.x = Math.PI / 2;
-ring.position.copy(lens.position);
-ring.position.y = 0.26;
-scene.add(ring);
+ring.position.y = 0.02;
+island.add(ring);
 
 window.renderFrame = (frame) => {
   const t = count <= 1 ? 0 : frame / (count - 1);
-  const yaw = t * Math.PI * 0.5;
-  const radius = 6.4;
-  camera.position.set(Math.sin(yaw) * radius, 1.15, Math.cos(yaw) * radius);
-  camera.lookAt(0, 0.05, 0);
+  // 0 assembled, 1 fully exploded at mid-scroll, 0 seated again.
+  const explode = Math.sin(t * Math.PI);
+
+  base.position.y = -0.11 - 0.18 * explode;
+  board.position.y = 0.015 + 0.52 * explode;
+  lid.position.y = 0.125 + 1.05 * explode;
+  island.position.y = 0.24 + 1.55 * explode;
+
+  const yaw = t * Math.PI * 0.32;
+  const radius = 6.55;
+  camera.position.set(Math.sin(yaw) * radius, 1.2 + 0.35 * explode, Math.cos(yaw) * radius);
+  camera.lookAt(0, 0.08 + 0.45 * explode, 0);
   renderer.render(scene, camera);
 };
 

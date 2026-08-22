@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'A Claude skill and a reskinnable template. Extract frames, encode a ladder, fail the build when it gets heavy.',
     cta: { label: 'Read the pipeline', href: '#pipeline' },
     animationDescription:
-      'A brushed-metal device rotates a quarter-turn against a dark studio, revealing its camera island and green accent ring.',
+      'A brushed-metal device comes apart as you scroll: lid, board, and camera island lift into an exploded view, then seat themselves again.',
   },
 
   sections: [
