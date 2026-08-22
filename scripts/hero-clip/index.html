@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>hero clip</title>
+  <style>
+    html, body { margin: 0; background: #12150f; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.170.0",
+      "three/addons/": "https://esm.sh/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const params = new URLSearchParams(location.search);
+const width = Number(params.get('w') || 1600);
+const height = Number(params.get('h') || 900);
+const count = Number(params.get('count') || 120);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(width, height);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x12150f);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 40);
+
+const key = new THREE.DirectionalLight(0xf2efe4, 2.4);
+key.position.set(4.2, 6.5, 3.2);
+scene.add(key);
+
+const rim = new THREE.DirectionalLight(0x3f8f6a, 1.6);
+rim.position.set(-5.5, 2.2, -3.4);
+scene.add(rim);
+
+const fill = new THREE.HemisphereLight(0x9aa7a0, 0x12150f, 0.35);
+scene.add(fill);
+
+const body = new THREE.Mesh(
+  new RoundedBoxGeometry(2.2, 0.42, 3.4, 8, 0.16),
+  new THREE.MeshPhysicalMaterial({
+    color: 0xc5c8cc,
+    metalness: 0.92,
+    roughness: 0.22,
+    clearcoat: 0.55,
+    clearcoatRoughness: 0.18,
+  }),
+);
+body.rotation.y = 0.18;
+scene.add(body);
+
+const lens = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.28, 0.28, 0.08, 48),
+  new THREE.MeshPhysicalMaterial({
+    color: 0x1a1e1c,
+    metalness: 0.4,
+    roughness: 0.08,
+    transmission: 0.35,
+    thickness: 0.4,
+    ior: 1.5,
+  }),
+);
+lens.rotation.x = Math.PI / 2;
+lens.position.set(-0.55, 0.24, -0.95);
+scene.add(lens);
+
+const ring = new THREE.Mesh(
+  new THREE.TorusGeometry(0.34, 0.035, 16, 64),
+  new THREE.MeshPhysicalMaterial({
+    color: 0x3f8f6a,
+    metalness: 0.85,
+    roughness: 0.28,
+  }),
+);
+ring.rotation.x = Math.PI / 2;
+ring.position.copy(lens.position);
+ring.position.y = 0.26;
+scene.add(ring);
+
+window.renderFrame = (frame) => {
+  const t = count <= 1 ? 0 : frame / (count - 1);
+  const yaw = t * Math.PI * 0.5;
+  const radius = 6.4;
+  camera.position.set(Math.sin(yaw) * radius, 1.15, Math.cos(yaw) * radius);
+  camera.lookAt(0, 0.05, 0);
+  renderer.render(scene, camera);
+};
+
+window.renderFrame(0);
+document.documentElement.dataset.ready = '1';
+</script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 
 A Claude skill and a reskinnable template for building scroll-driven motion websites — a pinned `<canvas>` playing a decoded image sequence, scrubbed by scroll position.
 
+Live demo: [dimeloper.github.io/motion-site-kit](https://dimeloper.github.io/motion-site-kit/)
+
 The technique is not the hard part. Shipping it without a 200 MB hero, a stuttering canvas, or a page that abandons phone visitors is the hard part. That's what's in here.
 
 ```

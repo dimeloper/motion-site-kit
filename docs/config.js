@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'A Claude skill and a reskinnable template. Extract frames, encode a ladder, fail the build when it gets heavy.',
     cta: { label: 'Read the pipeline', href: '#pipeline' },
     animationDescription:
-      'A 120-frame sequence extracted from the README verification clip, played on a pinned canvas and scrubbed by scroll position.',
+      'A brushed-metal device rotates a quarter-turn against a dark studio, revealing its camera island and green accent ring.',
   },
 
   sections: [

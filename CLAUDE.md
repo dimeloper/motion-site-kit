@@ -34,8 +34,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## What's stubbed
 
-- **Example live deploys.** `examples/saas`, `commerce`, and `local` are config-only reskins in the repo. Serve them locally; production URLs are still pending. Swap the shared verification clip for a real source per demo.
-- **A source clip that is not `testsrc2`.** `docs/` currently scrolls the README verification pattern. That is honest. It is not a product film. Replace it when a real clip exists.
+- **Example live deploys.** `examples/saas`, `commerce`, and `local` are config-only reskins in the repo. Serve them locally; production URLs are still pending. Swap in a real source clip per demo.
 
 ## Verifying a change
 

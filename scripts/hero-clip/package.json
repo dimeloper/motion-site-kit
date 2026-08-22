@@ -1,0 +1,8 @@
+{
+  "name": "hero-clip",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "24.22.0"
+  }
+}
