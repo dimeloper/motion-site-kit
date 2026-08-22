@@ -1,0 +1,40 @@
+name: frame budget
+
+on:
+  push:
+    paths:
+      - "template/frames/**"
+      - "motion.config.json"
+      - "skills/motion-website/scripts/**"
+  pull_request:
+    paths:
+      - "template/frames/**"
+      - "motion.config.json"
+      - "skills/motion-website/scripts/**"
+
+jobs:
+  budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check frame budget
+        run: |
+          python3 skills/motion-website/scripts/check_budget.py \
+            --config motion.config.json \
+            --verbose
+
+      - name: Summarize
+        if: always()
+        run: |
+          {
+            echo "### Frame budget"
+            echo '```'
+            python3 skills/motion-website/scripts/check_budget.py \
+              --config motion.config.json --verbose 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

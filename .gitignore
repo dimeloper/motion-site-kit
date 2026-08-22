@@ -1,0 +1,12 @@
+frames/raw/
+node_modules/
+out/
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+
+# Generated per project — regenerate with optimize_frames.py
+template/frames/
+examples/*/frames/
+template/vendor/
