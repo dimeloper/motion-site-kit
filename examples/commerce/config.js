@@ -18,7 +18,7 @@ export const CONFIG = {
     sub: 'A 32-litre carry-on that holds a jacket, two outfits, and a laptop without a second bag.',
     cta: { label: 'See the spec', href: '#what' },
     animationDescription:
-      'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
+      'A charcoal weekender comes apart as you scroll: the shell lifts, the laptop sleeve slides out, and the skid plate drops, then they seat themselves again.',
   },
 
   sections: [

@@ -1,6 +1,6 @@
 /**
- * Single-product commerce demo, GitHub Pages copy. Shares ../../frames with the docs site.
- * Only this file differs from the other two reskins.
+ * Single-product commerce demo, GitHub Pages copy. Own frame ladder under ./frames.
+ * Only this file differs from the other two reskins — plus its sequence.
  */
 
 export const CONFIG = {
@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'A 32-litre carry-on that holds a jacket, two outfits, and a laptop without a second bag.',
     cta: { label: 'See the spec', href: '#what' },
     animationDescription:
-      'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
+      'A charcoal weekender comes apart as you scroll: the shell lifts, the laptop sleeve slides out, and the skid plate drops, then they seat themselves again.',
   },
 
   sections: [
@@ -45,7 +45,7 @@ export const CONFIG = {
   },
 
   motion: {
-    framesBase: '../../frames',
+    framesBase: 'frames',
     scrollLengthVh: 3.5,
     scrub: 0.5,
     lenisDuration: 1.1,

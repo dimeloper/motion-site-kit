@@ -18,7 +18,7 @@ export const CONFIG = {
     sub: 'Ledgerline pulls every entity into one close checklist, with owners and blockers visible before month-end.',
     cta: { label: 'How the close works', href: '#what' },
     animationDescription:
-      'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
+      'Three close-task cards fan apart as you scroll: North America, AP close, and Cash rec, each with an owner and a status.',
   },
 
   sections: [

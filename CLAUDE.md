@@ -34,7 +34,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## What's stubbed
 
-- **Per-demo source clips.** `examples/saas`, `commerce`, and `local` are live on GitHub Pages as config-only reskins sharing `docs/frames`. Unique source clips per vertical are still a swap away.
+- **Photoreal source clips.** The three live examples use studio captures (close cards, weekender, tart) rather than filmed product. Swap in a photographed or rendered clip per vertical with the same pipeline.
 
 ## Verifying a change
 

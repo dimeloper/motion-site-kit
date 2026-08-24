@@ -18,7 +18,7 @@ export const CONFIG = {
     sub: 'A neighbourhood oven. Sourdough, seasonal tarts, and a short lunch menu that changes with the market.',
     cta: { label: 'See this week', href: '#what' },
     animationDescription:
-      'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
+      'A fruit tart on a wooden board lifts apart as you scroll: pastry, cream, and two rings of fruit rise, then settle back onto the peel.',
   },
 
   sections: [

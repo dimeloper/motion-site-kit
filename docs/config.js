@@ -49,9 +49,9 @@ export const CONFIG = {
     },
     {
       id: 'examples',
-      kicker: 'Same sequence, different config.js',
+      kicker: 'Same engine, different sequence',
       title: 'Three reskins, live',
-      body: '<a href="examples/saas/">Ledgerline</a> (SaaS), <a href="examples/commerce/">Kiln Carry</a> (commerce), and <a href="examples/local/">Harbor Oven</a> (local) each change config.js only. They share this teardown sequence — unique source clips per vertical are the next swap.',
+      body: '<a href="examples/saas/">Ledgerline</a> fans a close checklist. <a href="examples/commerce/">Kiln Carry</a> teardowns a weekender. <a href="examples/local/">Harbor Oven</a> lifts a tart. Each changes config.js and swaps the clip — src/motion.js stays identical.',
     },
   ],
 

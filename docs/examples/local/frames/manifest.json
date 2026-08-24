@@ -1,0 +1,30 @@
+{
+  "count": 120,
+  "formats": [
+    "avif",
+    "webp"
+  ],
+  "widths": [
+    640,
+    960,
+    1600
+  ],
+  "aspect": 1.777778,
+  "pattern": "{width}/{format}/{index}.{format}",
+  "padding": 4,
+  "poster": "960/webp/0039.webp",
+  "bytes": {
+    "640": {
+      "avif": 527452,
+      "webp": 647120
+    },
+    "960": {
+      "avif": 888255,
+      "webp": 1067178
+    },
+    "1600": {
+      "avif": 1736307,
+      "webp": 2114130
+    }
+  }
+}
