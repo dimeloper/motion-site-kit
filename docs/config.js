@@ -47,6 +47,12 @@ export const CONFIG = {
       title: 'The second site is a reskin',
       body: 'Copy template/, edit config.js, run the pipeline. src/motion.js stays identical between projects. If building the second example takes as long as the first, something leaked out of config and into the engine.',
     },
+    {
+      id: 'examples',
+      kicker: 'Same sequence, different config.js',
+      title: 'Three reskins, live',
+      body: '<a href="examples/saas/">Ledgerline</a> (SaaS), <a href="examples/commerce/">Kiln Carry</a> (commerce), and <a href="examples/local/">Harbor Oven</a> (local) each change config.js only. They share this teardown sequence — unique source clips per vertical are the next swap.',
+    },
   ],
 
   cta: {

@@ -34,7 +34,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## What's stubbed
 
-- **Example live deploys.** `examples/saas`, `commerce`, and `local` are config-only reskins in the repo. Serve them locally; production URLs are still pending. Swap in a real source clip per demo.
+- **Per-demo source clips.** `examples/saas`, `commerce`, and `local` are live on GitHub Pages as config-only reskins sharing `docs/frames`. Unique source clips per vertical are still a swap away.
 
 ## Verifying a change
 

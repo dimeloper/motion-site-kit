@@ -21,7 +21,7 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 | `motion.config.json` | Frame counts, widths, and the performance budget CI enforces |
 | `.github/workflows/budget.yml` | The gate that refuses a merge when the sequence gets heavy |
 | `scripts/vendor.sh` | Optional: vendor GSAP + Lenis locally instead of loading them from a CDN |
-| `examples/` | Deployed demos |
+| `examples/` | Config-only reskins: [Ledgerline](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Kiln Carry](https://dimeloper.github.io/motion-site-kit/examples/commerce/), [Harbor Oven](https://dimeloper.github.io/motion-site-kit/examples/local/) |
 
 ## Quick start
 

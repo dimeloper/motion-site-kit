@@ -1,5 +1,6 @@
 /**
- * SaaS demo. Copy of template/; only this file changed.
+ * SaaS demo, GitHub Pages copy. Shares ../../frames with the docs site.
+ * Only this file differs from the other two reskins.
  */
 
 export const CONFIG = {
@@ -44,7 +45,7 @@ export const CONFIG = {
   },
 
   motion: {
-    framesBase: 'frames',
+    framesBase: '../../frames',
     scrollLengthVh: 3.5,
     scrub: 0.5,
     lenisDuration: 1.1,
