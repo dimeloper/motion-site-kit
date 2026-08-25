@@ -1,5 +1,6 @@
 frames/raw/
 frames/raw-*/
+frames/preview-*/
 node_modules/
 out/
 .DS_Store

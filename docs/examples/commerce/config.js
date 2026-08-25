@@ -7,9 +7,9 @@ export const CONFIG = {
   brand: {
     name: 'Kiln Carry',
     primary: '#C45C26',
-    ink: '#1A1718',
-    paper: '#F7F2EC',
-    displayFont: '"Bricolage Grotesque", system-ui, sans-serif',
+    ink: '#050403',
+    paper: '#EDE6DC',
+    displayFont: '"Cormorant Garamond", Georgia, serif',
     bodyFont: 'Figtree, system-ui, -apple-system, sans-serif',
   },
 
@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'A 32-litre carry-on that holds a jacket, two outfits, and a laptop without a second bag.',
     cta: { label: 'See the spec', href: '#what' },
     animationDescription:
-      'A charcoal weekender comes apart as you scroll: the shell lifts, the laptop sleeve slides out, and the skid plate drops, then they seat themselves again.',
+      'A brass D-ring and nylon strap in a black studio: the hardware pulls away as you scroll, then seats itself again.',
   },
 
   sections: [

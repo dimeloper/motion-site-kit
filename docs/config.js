@@ -6,9 +6,9 @@
 export const CONFIG = {
   brand: {
     name: 'motion-site-kit',
-    primary: '#3F8F6A',
-    ink: '#12150F',
-    paper: '#F3F0E8',
+    primary: '#C9C2B2',
+    ink: '#000000',
+    paper: '#EDE8DF',
     displayFont: 'Syne, system-ui, sans-serif',
     bodyFont: '"IBM Plex Sans", system-ui, -apple-system, sans-serif',
   },
@@ -51,7 +51,7 @@ export const CONFIG = {
       id: 'examples',
       kicker: 'Same engine, different sequence',
       title: 'Three reskins, live',
-      body: '<a href="examples/saas/">Ledgerline</a> fans a close checklist. <a href="examples/commerce/">Kiln Carry</a> teardowns a weekender. <a href="examples/local/">Harbor Oven</a> lifts a tart. Each changes config.js and swaps the clip — src/motion.js stays identical.',
+      body: '<a href="examples/saas/">Ledgerline</a> lifts stacked glass. <a href="examples/commerce/">Kiln Carry</a> is a brass D-ring. <a href="examples/local/">Harbor Oven</a> raises a cloche. Each changes config.js and swaps the clip — src/motion.js stays identical.',
     },
   ],
 

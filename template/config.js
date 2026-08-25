@@ -11,8 +11,8 @@ export const CONFIG = {
     name: 'Acme',
     // Primary drives the accent, the glow behind the canvas, and the CTA.
     primary: '#0B5FFF',
-    ink: '#0A0A0B',
-    paper: '#FFFFFF',
+    ink: '#000000',
+    paper: '#EDE8DF',
     // Any Google Font family name, or a local @font-face you add in styles.css.
     displayFont: '"Instrument Serif", Georgia, serif',
     bodyFont: '"Inter", system-ui, -apple-system, sans-serif',

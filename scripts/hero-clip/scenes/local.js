@@ -1,119 +1,87 @@
 import * as THREE from 'three';
-import { createStudio, slab, orbitCamera, finishClip, readClipParams } from '../studio.js';
+import {
+  createStudio,
+  addDust,
+  addFloor,
+  slab,
+  orbitCamera,
+  finishClip,
+  readClipParams,
+} from '../studio.js';
 
 const { width, height, count } = readClipParams();
 const { renderer, scene, camera } = createStudio({
   width,
   height,
-  background: 0x1c1916,
-  accent: 0x2f6b4f,
+  background: 0x000000,
+  accent: 0xd4a574,
+});
+addDust(scene, { color: 0xf0e0c8, opacity: 0.22, count: 2000 });
+addFloor(scene, -0.82);
+
+const stone = new THREE.MeshPhysicalMaterial({
+  color: 0x1c1612,
+  metalness: 0.12,
+  roughness: 0.52,
+  envMapIntensity: 0.55,
 });
 
-const wood = new THREE.MeshPhysicalMaterial({
-  color: 0x6b4a2e,
-  metalness: 0.04,
-  roughness: 0.62,
-  envMapIntensity: 0.45,
+const glass = new THREE.MeshPhysicalMaterial({
+  color: 0xf7f4ee,
+  metalness: 0,
+  roughness: 0.04,
+  transmission: 1,
+  thickness: 0.5,
+  ior: 1.48,
+  clearcoat: 1,
+  clearcoatRoughness: 0.03,
+  envMapIntensity: 1.7,
+  attenuationColor: new THREE.Color(0xe8c9a0),
+  attenuationDistance: 2.2,
 });
 
-const pastry = new THREE.MeshPhysicalMaterial({
-  color: 0x8a5a2b,
-  metalness: 0.02,
-  roughness: 0.68,
-  envMapIntensity: 0.4,
+const brass = new THREE.MeshPhysicalMaterial({
+  color: 0xc4a574,
+  metalness: 1,
+  roughness: 0.16,
+  envMapIntensity: 1.5,
 });
 
-const cream = new THREE.MeshPhysicalMaterial({
-  color: 0xe7d3a8,
-  metalness: 0.0,
-  roughness: 0.55,
-  envMapIntensity: 0.3,
-});
+const plate = slab(1.55, 1.55, 0.04, 0.45, stone, 0.004);
+plate.position.y = -0.42;
+scene.add(plate);
 
-const fruitDark = new THREE.MeshPhysicalMaterial({
-  color: 0x6b2a24,
-  metalness: 0.04,
-  roughness: 0.42,
-  clearcoat: 0.45,
-  clearcoatRoughness: 0.28,
-});
+const dome = new THREE.Mesh(new THREE.SphereGeometry(0.62, 64, 48, 0, Math.PI * 2, 0, Math.PI * 0.52), glass);
+dome.position.y = -0.08;
 
-const fruitMid = new THREE.MeshPhysicalMaterial({
-  color: 0xb84332,
-  metalness: 0.03,
-  roughness: 0.38,
-  clearcoat: 0.55,
-  clearcoatRoughness: 0.22,
-});
+const rim = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.018, 12, 64), brass);
+rim.rotation.x = Math.PI / 2;
+rim.position.y = -0.38;
+scene.add(rim);
 
-const glaze = new THREE.MeshPhysicalMaterial({
-  color: 0xd9a05a,
-  metalness: 0.05,
-  roughness: 0.22,
-  clearcoat: 0.8,
-  clearcoatRoughness: 0.12,
-  transparent: true,
-  opacity: 0.92,
-});
+const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.022, 0.11, 16), brass);
+stem.position.y = 0.58;
 
-const board = slab(2.4, 1.15, 0.07, 0.06, wood, 0.004);
-board.position.y = -0.28;
-scene.add(board);
+const knob = new THREE.Mesh(new THREE.SphereGeometry(0.055, 24, 16), brass);
+knob.position.y = 0.66;
 
-const crust = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.78, 0.08, 48), pastry);
-crust.position.y = -0.18;
-scene.add(crust);
-
-const crimp = new THREE.Mesh(new THREE.TorusGeometry(0.74, 0.045, 10, 48), pastry);
-crimp.rotation.x = Math.PI / 2;
-crimp.position.y = -0.14;
-scene.add(crimp);
-
-const filling = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.05, 40), cream);
-filling.position.y = -0.12;
-scene.add(filling);
-
-function fruitRing(radius, countPts, size, material) {
-  const group = new THREE.Group();
-  for (let i = 0; i < countPts; i++) {
-    const a = (i / countPts) * Math.PI * 2;
-    const slice = new THREE.Mesh(new THREE.SphereGeometry(size, 14, 10), material);
-    slice.scale.set(1.25, 0.22, 1.35);
-    slice.position.set(Math.cos(a) * radius, 0, Math.sin(a) * radius);
-    group.add(slice);
-  }
-  scene.add(group);
-  return group;
-}
-
-const outer = fruitRing(0.5, 14, 0.09, fruitDark);
-const mid = fruitRing(0.3, 9, 0.085, fruitMid);
-const core = new THREE.Mesh(new THREE.SphereGeometry(0.16, 18, 12), glaze);
-core.scale.y = 0.38;
-scene.add(core);
-
-outer.position.y = -0.08;
-mid.position.y = -0.06;
-core.position.y = -0.04;
+const cloche = new THREE.Group();
+cloche.add(dome, stem, knob);
+scene.add(cloche);
 
 finishClip((index) => {
   const t = count <= 1 ? 0 : index / (count - 1);
   const explode = Math.sin(t * Math.PI);
 
-  crust.position.y = -0.18 - 0.06 * explode;
-  crimp.position.y = -0.14 - 0.06 * explode;
-  filling.position.y = -0.12 + 0.18 * explode;
-  outer.position.y = -0.08 + 0.42 * explode;
-  mid.position.y = -0.06 + 0.72 * explode;
-  core.position.y = -0.04 + 1.02 * explode;
-  board.position.y = -0.28 - 0.04 * explode;
+  cloche.position.y = 0.38 * explode;
+  cloche.rotation.y = 0.15 * explode;
+  plate.rotation.y = t * 0.12;
 
-  const elev = THREE.MathUtils.degToRad(28 + 6 * explode);
   orbitCamera(camera, {
     yaw: 0.35 + t * 0.5,
-    dist: 4.15 + 0.7 * explode,
-    elev,
-    target: new THREE.Vector3(0, 0.05 + 0.38 * explode, 0),
+    dist: 3.7 + 0.45 * explode,
+    elev: THREE.MathUtils.degToRad(18 + 8 * explode),
+    target: new THREE.Vector3(0, 0.08 + 0.18 * explode, 0),
   });
   renderer.render(scene, camera);
 });

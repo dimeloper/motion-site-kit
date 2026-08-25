@@ -1,13 +1,14 @@
 /**
- * Local-business demo. Copy of template/; only this file changed.
+ * Local-business demo, GitHub Pages copy. Own frame ladder under ./frames.
+ * Only this file differs from the other two reskins — plus its sequence.
  */
 
 export const CONFIG = {
   brand: {
     name: 'Harbor Oven',
-    primary: '#2F6B4F',
-    ink: '#1C1916',
-    paper: '#FBF6EE',
+    primary: '#C4A574',
+    ink: '#070504',
+    paper: '#F3EBDD',
     displayFont: 'Literata, Georgia, serif',
     bodyFont: 'Figtree, system-ui, -apple-system, sans-serif',
   },
@@ -18,7 +19,7 @@ export const CONFIG = {
     sub: 'A neighbourhood oven. Sourdough, seasonal tarts, and a short lunch menu that changes with the market.',
     cta: { label: 'See this week', href: '#what' },
     animationDescription:
-      'A fruit tart on a wooden board lifts apart as you scroll: pastry, cream, and two rings of fruit rise, then settle back onto the peel.',
+      'A glass cloche with a brass finial lifts off a dark stone plate in a black studio as you scroll, then settles again.',
   },
 
   sections: [

@@ -6,10 +6,10 @@
 export const CONFIG = {
   brand: {
     name: 'Ledgerline',
-    primary: '#2A6CEB',
-    ink: '#0E1116',
-    paper: '#F4F6F8',
-    displayFont: 'Outfit, system-ui, sans-serif',
+    primary: '#6EA0FF',
+    ink: '#000000',
+    paper: '#EDE8DF',
+    displayFont: '"Instrument Serif", Georgia, serif',
     bodyFont: '"IBM Plex Sans", system-ui, -apple-system, sans-serif',
   },
 
@@ -19,7 +19,7 @@ export const CONFIG = {
     sub: 'Ledgerline pulls every entity into one close checklist, with owners and blockers visible before month-end.',
     cta: { label: 'How the close works', href: '#what' },
     animationDescription:
-      'Three close-task cards fan apart as you scroll: North America, AP close, and Cash rec, each with an owner and a status.',
+      'Three transmissive glass plates with a gold edge lift apart in a black studio as you scroll, then seat themselves again.',
   },
 
   sections: [

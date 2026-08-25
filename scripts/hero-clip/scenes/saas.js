@@ -1,130 +1,74 @@
 import * as THREE from 'three';
-import { createStudio, orbitCamera, finishClip, readClipParams } from '../studio.js';
+import {
+  createStudio,
+  addDust,
+  addFloor,
+  slab,
+  orbitCamera,
+  finishClip,
+  readClipParams,
+} from '../studio.js';
 
 const { width, height, count } = readClipParams();
 const { renderer, scene, camera } = createStudio({
   width,
   height,
-  background: 0x0e1116,
-  accent: 0x2a6ceb,
+  background: 0x000000,
+  accent: 0x6ea0ff,
 });
-
-function cardFace(title, owner, status, statusColor) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1280;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#141a24';
-  ctx.fillRect(0, 0, 1024, 1280);
-  ctx.fillStyle = '#2a6ceb';
-  ctx.fillRect(0, 0, 28, 1280);
-  ctx.fillStyle = '#7f8aa3';
-  ctx.font = '600 48px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText('CLOSE TASK', 80, 160);
-  ctx.fillStyle = '#f4f6f8';
-  ctx.font = '700 108px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText(title, 80, 320);
-  ctx.fillStyle = '#9aa3b5';
-  ctx.font = '500 52px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText(owner, 80, 430);
-  ctx.fillStyle = '#2a3140';
-  ctx.fillRect(80, 520, 864, 2);
-  ctx.fillStyle = statusColor;
-  roundRect(ctx, 80, 600, 340, 88, 44);
-  ctx.fill();
-  ctx.fillStyle = '#0e1116';
-  ctx.font = '700 46px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText(status, 118, 658);
-  ctx.fillStyle = '#7f8aa3';
-  ctx.font = '500 42px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText('Due  28 Aug  ·  17:00 UTC', 80, 780);
-  ctx.fillText('Source  NetSuite', 80, 860);
-  const map = new THREE.CanvasTexture(canvas);
-  map.colorSpace = THREE.SRGBColorSpace;
-  map.needsUpdate = true;
-  return map;
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
+addDust(scene, { color: 0xc9d6ee, opacity: 0.22 });
+addFloor(scene, -0.88);
 
 const glass = new THREE.MeshPhysicalMaterial({
-  color: 0x1c2433,
-  metalness: 0.12,
-  roughness: 0.28,
-  clearcoat: 0.7,
-  clearcoatRoughness: 0.12,
-  envMapIntensity: 0.9,
+  color: 0xf4f7fb,
+  metalness: 0,
+  roughness: 0.035,
+  transmission: 1,
+  thickness: 0.55,
+  ior: 1.5,
+  clearcoat: 1,
+  clearcoatRoughness: 0.02,
+  envMapIntensity: 1.85,
+  attenuationColor: new THREE.Color(0x6ea8ff),
+  attenuationDistance: 1.15,
 });
 
-const metal = new THREE.MeshPhysicalMaterial({
-  color: 0xb7c0ce,
+const gold = new THREE.MeshPhysicalMaterial({
+  color: 0xc4a574,
   metalness: 1,
-  roughness: 0.22,
+  roughness: 0.18,
+  envMapIntensity: 1.4,
 });
 
-function panel(w, h, thick) {
+const plates = [0, 1, 2].map((i) => {
   const group = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, thick), glass);
-  const face = new THREE.Mesh(
-    new THREE.PlaneGeometry(w - 0.04, h - 0.04),
-    new THREE.MeshBasicMaterial({ toneMapped: false }),
-  );
-  face.position.z = thick / 2 + 0.002;
-  group.add(body, face);
-  group.userData.face = face;
+  const plate = slab(1.62, 1.62, 0.038, 0.035, glass, 0.003);
+  const rim = slab(1.66, 1.66, 0.006, 0.04, gold, 0.001);
+  rim.position.y = -0.024;
+  group.add(plate, rim);
+  group.userData.restY = i * 0.055;
+  group.userData.restYaw = i * 0.045;
+  group.position.y = group.userData.restY;
+  group.rotation.y = group.userData.restYaw;
+  scene.add(group);
   return group;
-}
-
-const specs = [
-  { title: 'North America', owner: 'Priya  ·  GL', status: 'Ready', color: '#7dcea0' },
-  { title: 'AP close', owner: 'Marcus  ·  AP', status: 'Blocked', color: '#e7b56a' },
-  { title: 'Cash rec', owner: 'Elena  ·  Treasury', status: 'Done', color: '#7dcea0' },
-];
-
-const tasks = specs.map((spec, i) => {
-  const card = panel(1.28, 1.62, 0.05);
-  card.userData.face.material.map = cardFace(spec.title, spec.owner, spec.status, spec.color);
-  card.userData.restX = (i - 1) * 0.18;
-  card.userData.restZ = i * 0.12;
-  card.userData.restRot = (i - 1) * 0.12;
-  card.position.set(card.userData.restX, 0.12, card.userData.restZ);
-  card.rotation.y = card.userData.restRot;
-  scene.add(card);
-  return card;
 });
-
-const rail = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.03, 0.08), metal);
-rail.position.set(0, -0.78, 0.2);
-scene.add(rail);
 
 finishClip((index) => {
   const t = count <= 1 ? 0 : index / (count - 1);
   const explode = Math.sin(t * Math.PI);
 
-  tasks.forEach((card, i) => {
-    const spread = (i - 1) * 0.82 * explode;
-    card.position.set(
-      card.userData.restX + spread,
-      0.12 + (i === 1 ? 0.08 : 0.02) * explode,
-      card.userData.restZ - (1 - i) * 0.22 * explode,
-    );
-    card.rotation.y = card.userData.restRot + (i - 1) * 0.22 * explode;
+  plates.forEach((plate, i) => {
+    plate.position.y = plate.userData.restY + i * 0.28 * explode;
+    plate.rotation.y = plate.userData.restYaw + (i - 1) * 0.12 * explode;
+    plate.rotation.x = -0.08 * explode;
   });
-  rail.position.y = -0.78 - 0.06 * explode;
 
   orbitCamera(camera, {
-    yaw: 0.22 + t * 0.28,
-    dist: 4.8 + 0.55 * explode,
-    elev: THREE.MathUtils.degToRad(8 + 4 * explode),
-    target: new THREE.Vector3(0, 0.12, 0.1),
+    yaw: 0.42 + t * 0.38,
+    dist: 4.35 + 0.55 * explode,
+    elev: THREE.MathUtils.degToRad(22 + 6 * explode),
+    target: new THREE.Vector3(0, 0.12 + 0.22 * explode, 0),
   });
   renderer.render(scene, camera);
 });
