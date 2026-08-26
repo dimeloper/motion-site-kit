@@ -72,20 +72,19 @@ function buildControllerKit(THREE) {
     root.add(mesh);
   };
 
-  // Central shell
-  const shell = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.42, 0.95), bodyMat);
-  shell.geometry.translate(0, 0, 0);
-  add(shell, new THREE.Vector3(0, 0, 0), 0.9);
+  // Central shell — dominant mass so the assemble reads at a glance.
+  const shell = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.5, 1.1), bodyMat);
+  add(shell, new THREE.Vector3(0, 0, 0), 0.75);
 
   // Left / right grips
-  const gripGeo = new THREE.CapsuleGeometry(0.22, 0.55, 6, 12);
+  const gripGeo = new THREE.CapsuleGeometry(0.28, 0.65, 6, 14);
   const leftGrip = new THREE.Mesh(gripGeo, darkMat);
   leftGrip.rotation.z = 0.35;
-  add(leftGrip, new THREE.Vector3(-0.82, -0.28, 0.05), 1.35);
+  add(leftGrip, new THREE.Vector3(-0.95, -0.32, 0.06), 1.45);
 
   const rightGrip = new THREE.Mesh(gripGeo, darkMat);
   rightGrip.rotation.z = -0.35;
-  add(rightGrip, new THREE.Vector3(0.82, -0.28, 0.05), 1.35);
+  add(rightGrip, new THREE.Vector3(0.95, -0.32, 0.06), 1.45);
 
   // Sticks
   const stickShaft = new THREE.CylinderGeometry(0.07, 0.09, 0.16, 16);
@@ -141,7 +140,7 @@ function buildControllerKit(THREE) {
   root.position.set(0.62, 0.12, 0);
   root.rotation.y = -0.42;
   root.rotation.x = 0.22;
-  root.scale.setScalar(1.35);
+  root.scale.setScalar(1.55);
 
   return { root, parts, busMat };
 }
@@ -224,7 +223,7 @@ export async function createVortexScene(canvas, opts = {}) {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(BG);
-  scene.fog = new THREE.FogExp2(BG, 0.045);
+  scene.fog = new THREE.FogExp2(BG, 0.022);
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 40);
 

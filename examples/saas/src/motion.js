@@ -6,7 +6,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
-import { createVortexScene } from './scene.js?v=2';
+import { createVortexScene } from './scene.js?v=3';
 
 gsap.registerPlugin(ScrollTrigger);
 
