@@ -1,7 +1,6 @@
 /**
- * Binds config.js into the markup and applies brand tokens as CSS custom
- * properties. Small on purpose — this exists so config.js is the only file that
- * changes per project, not so the template becomes a framework.
+ * Harbor Oven page chrome: nav, board lists, card carousel data.
+ * Sequence playback stays in motion.js.
  */
 
 import { CONFIG } from '../config.js';
@@ -34,7 +33,7 @@ function loadFonts() {
     .filter((name, index, all) => name && !SYSTEM_FONTS.has(name.toLowerCase()) && all.indexOf(name) === index);
   if (!families.length) return;
   const params = families
-    .map((name) => `family=${encodeURIComponent(name)}:ital,wght@0,400;0,600;0,700;1,400`)
+    .map((name) => `family=${encodeURIComponent(name)}:ital,wght@0,400;0,500;0,600;0,700;1,400`)
     .join('&');
   const link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -50,7 +49,7 @@ function applyBrand() {
   style.setProperty('--brand-paper', brand.paper);
   style.setProperty('--font-display', brand.displayFont);
   style.setProperty('--font-body', brand.bodyFont);
-  document.title = `${brand.name} - ${CONFIG.hero.headline}`;
+  document.title = `${brand.name} — ${CONFIG.hero.headline}`;
   const description = document.querySelector('meta[name="description"]');
   if (description) description.setAttribute('content', CONFIG.hero.sub);
 }
@@ -66,27 +65,118 @@ function bindText() {
   }
 }
 
-function renderSections() {
-  const host = document.querySelector('[data-sections]');
-  if (!host) return;
-  host.innerHTML = CONFIG.sections
-    .map((section) => {
-      const kicker = section.kicker
-        ? `<p class="panel__kicker">${section.kicker}</p>`
-        : '';
-      return `
-      <section class="panel" id="${section.id}">
-        <div class="panel__card">
-          ${kicker}
-          <h2 class="panel__title">${section.title}</h2>
-          <p class="panel__body">${section.body}</p>
-        </div>
-      </section>`;
-    })
-    .join('');
+function renderList(selector, rows, html) {
+  const host = document.querySelector(selector);
+  if (!host || !rows?.length) return;
+  host.innerHTML = rows.map(html).join('');
+}
+
+function renderNav() {
+  const items = CONFIG.nav || [];
+  renderList(
+    '[data-nav]',
+    items,
+    (item) => `<li><a href="${item.href}">${item.label}</a></li>`,
+  );
+  renderList(
+    '[data-nav-mobile]',
+    items,
+    (item, index) =>
+      `<li><a href="${item.href}"><span class="nav-menu__idx">${String(index + 1).padStart(2, '0')}</span><span class="nav-menu__label">${item.label}</span></a></li>`,
+  );
+}
+
+function renderBoard() {
+  renderList('[data-hours]', CONFIG.board?.hours, (row) =>
+    `<li><span>${row.day}</span><span>${row.time}</span></li>`);
+  renderList('[data-menu]', CONFIG.board?.items, (row) =>
+    `<li><span>${row.name}</span><span>${row.note}</span></li>`);
+}
+
+function renderTrusted() {
+  renderList('[data-trusted]', CONFIG.trusted?.names, (name) =>
+    `<li>${name}</li>`);
+}
+
+function renderServices() {
+  renderList('[data-services]', CONFIG.services?.items, (item) =>
+    `<li class="services__item">
+      <a class="services__link" href="${item.href}">
+        <span class="services__num">${item.num}</span>
+        <span class="services__title">${item.title}</span>
+        <span class="services__body">${item.body}</span>
+        <span class="services__arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </span>
+      </a>
+    </li>`);
+}
+
+function renderStats() {
+  renderList('[data-stats]', CONFIG.stats?.items, (item) =>
+    `<li class="stats__item reveal">
+      <span class="stats__value">${item.value}</span>
+      <span class="stats__label">${item.label}</span>
+    </li>`);
+}
+
+function renderStudio() {
+  const statement = document.querySelector('[data-studio-statement]');
+  const studio = CONFIG.studio;
+  if (statement && studio?.statement) {
+    const accent = studio.accent;
+    if (accent && studio.statement.includes(accent)) {
+      statement.innerHTML = studio.statement.replace(
+        accent,
+        `<span class="studio__accent">${accent}</span>`,
+      );
+    } else {
+      statement.textContent = studio.statement;
+    }
+  }
+
+  renderList('[data-studio-pills]', studio?.pills, (pill) =>
+    `<span class="word-pill word-pill--${pill.tone}">${
+      pill.tone === 'ink'
+        ? `<span class="word-pill__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>`
+        : pill.label
+    }</span>`);
+}
+
+function renderSelected() {
+  renderList('[data-selected]', CONFIG.selected?.items, (item) =>
+    `<article class="selected__card reveal">
+      <figure class="selected__media">
+        <img src="${item.image}" alt="${item.alt || ''}" width="800" height="1000" loading="lazy" />
+      </figure>
+      <div class="selected__meta">
+        <h3>${item.title}</h3>
+        <p>${item.note}</p>
+      </div>
+    </article>`);
+}
+
+function renderCta() {
+  renderList('[data-cta-meta]', CONFIG.cta?.aside?.lines, (row) =>
+    `<li><span>${row.k}</span><span>${row.v}</span></li>`);
+  renderList('[data-cta-steps]', CONFIG.cta?.steps, (step) =>
+    `<li class="cta__step">
+      <span class="cta__num">${step.num}</span>
+      <div>
+        <h3>${step.title}</h3>
+        <p>${step.body}</p>
+      </div>
+    </li>`);
 }
 
 loadFonts();
 applyBrand();
 bindText();
-renderSections();
+renderNav();
+renderBoard();
+renderTrusted();
+renderServices();
+renderStats();
+renderStudio();
+renderSelected();
+renderCta();

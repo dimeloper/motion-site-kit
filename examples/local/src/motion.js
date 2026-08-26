@@ -1,107 +1,36 @@
 /**
- * Scroll-driven frame sequence engine.
+ * Harbor Oven — live WebGL hero driven by ScrollTrigger.
  *
- * This file is the engine. It should not need editing between projects — copy,
- * colors, and section order live in config.js. That separation is what makes the
- * second build a reskin instead of a rebuild.
+ * Harbor-only proof of sculptural 3D motion (Lumora-adjacent). Other demos keep
+ * the frame-sequence engine. Fallbacks still honor reduced-motion / Save-Data / 2G.
  */
 
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
+import { createHarborScene } from './scene.js?v=16';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** 1x1 AVIF, used as a decode probe instead of user-agent sniffing. */
-const AVIF_PROBE =
-  'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQAMAAAAABNjb2xybmNseAACAAIABoAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEDQgMgkQAAAAB8dSLfI=';
-
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
-async function supportsAvif() {
-  try {
-    const blob = await (await fetch(AVIF_PROBE)).blob();
-    const bitmap = await createImageBitmap(blob);
-    bitmap.close?.();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Reasons to serve the static poster instead of the sequence.
- *
- * Note what is deliberately absent: viewport width. The usual advice is to skip
- * the animation under 768px, but the 640 rung is a few hundred kilobytes and
- * phones are most of the traffic. Serve them the narrow ladder, not a JPEG.
- */
 function shouldUseStaticFallback() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'reduced-motion';
   const connection = navigator.connection;
   if (connection?.saveData) return 'save-data';
   if (['slow-2g', '2g'].includes(connection?.effectiveType)) return 'slow-connection';
-  if (typeof createImageBitmap !== 'function') return 'no-imagebitmap';
+  if (!hasWebGL()) return 'no-webgl';
   return null;
 }
 
-function pickWidth(manifest) {
-  const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
-  const target = window.innerWidth * dpr;
-  return manifest.widths.find((w) => w >= target) ?? manifest.widths.at(-1);
-}
-
-function frameUrl(manifest, base, width, format, index) {
-  const padded = String(index).padStart(manifest.padding, '0');
-  return `${base}/${width}/${format}/${padded}.${format}`;
-}
-
-/** Fetch and decode with a concurrency window — 120 parallel requests starve the first frames. */
-async function preload(urls, concurrency, onProgress) {
-  const bitmaps = new Array(urls.length);
-  let cursor = 0;
-  let done = 0;
-
-  async function worker() {
-    while (cursor < urls.length) {
-      const index = cursor++;
-      const response = await fetch(urls[index]);
-      if (!response.ok) throw new Error(`frame ${index} failed: ${response.status}`);
-      bitmaps[index] = await createImageBitmap(await response.blob());
-      onProgress(++done / urls.length);
-    }
+function hasWebGL() {
+  try {
+    const probe = document.createElement('canvas');
+    return Boolean(probe.getContext('webgl2') || probe.getContext('webgl'));
+  } catch {
+    return false;
   }
-
-  await Promise.all(Array.from({ length: Math.min(concurrency, urls.length) }, worker));
-  return bitmaps;
-}
-
-/** Draw with cover semantics, computed in JS — CSS-only scaling blurs canvas on retina. */
-function makeRenderer(canvas, bitmaps) {
-  const ctx = canvas.getContext('2d', { alpha: false });
-  let current = -1;
-
-  function resize() {
-    const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
-    if (current >= 0) draw(current, true);
-  }
-
-  function draw(index, force = false) {
-    if (index === current && !force) return;
-    current = index;
-    const bitmap = bitmaps[index];
-    if (!bitmap) return;
-    const scale = Math.max(canvas.width / bitmap.width, canvas.height / bitmap.height);
-    const w = bitmap.width * scale;
-    const h = bitmap.height * scale;
-    ctx.drawImage(bitmap, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-  }
-
-  return { draw, resize };
 }
 
 function initSmoothScroll() {
@@ -110,17 +39,77 @@ function initSmoothScroll() {
     smoothWheel: true,
     syncTouch: false,
   });
-  // One RAF loop, not two. Independent loops desynchronize and the canvas trails
-  // the page by a frame or so — legible as "cheap" without looking broken.
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
-  // Default lag smoothing jumps the timeline after a stall, which on a scrubbed
-  // sequence shows as a frame skip right after the preloader finishes.
   gsap.ticker.lagSmoothing(0);
+  // page.js uses this for in-page anchors (native hash + Lenis otherwise fight).
+  window.__harborLenis = lenis;
   return lenis;
 }
 
-function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
+function wireInPageAnchors(lenis) {
+  document.addEventListener(
+    'click',
+    (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const hash = link.getAttribute('href');
+      if (!hash || hash.length < 2) return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+      event.preventDefault();
+      if (lenis) lenis.scrollTo(target, { offset: -8 });
+      else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    { capture: true },
+  );
+}
+
+function setLoaderProgress(bar, progress) {
+  if (bar) bar.style.setProperty('--progress', clamp(progress, 0, 1).toFixed(3));
+}
+
+function showStaticFallback(root, reason) {
+  root.dataset.motion = 'static';
+  root.dataset.fallbackReason = reason;
+  root.querySelector('[data-loader]')?.remove();
+  updateProximity(root, 1);
+}
+
+function dismissLoader(loader) {
+  if (!loader) return;
+  if (!loader.hasAttribute('data-exit')) {
+    loader.remove();
+    return;
+  }
+  loader.classList.add('is-leaving');
+  const finish = () => loader.remove();
+  loader.addEventListener('animationend', finish, { once: true });
+  window.setTimeout(finish, 900);
+}
+
+function updateProximity(hero, progress) {
+  const items = hero.querySelectorAll('[data-proximity]');
+  if (!items.length) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = window.matchMedia('(max-width: 1023px)').matches;
+  items.forEach((el) => {
+    const index = Number(el.dataset.proximity) || 0;
+    // Mobile: reveal earlier so meta reads while loaf fills the lower half.
+    const start = (mobile ? 0.12 : 0.28) + index * (mobile ? 0.16 : 0.2);
+    const end = start + (mobile ? 0.14 : 0.16);
+    const t = reduce
+      ? 1
+      : Math.min(1, Math.max(0, (progress - start) / (end - start)));
+    const eased = t * t * (3 - 2 * t);
+    el.style.opacity = String(eased);
+    el.style.transform = `translateY(${((1 - eased) * 10).toFixed(2)}px)`;
+  });
+}
+
+function bindScrollScene({ hero, canvas, scene }) {
+  let progress = 0;
+
   ScrollTrigger.create({
     trigger: hero,
     start: 'top top',
@@ -130,24 +119,22 @@ function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
     scrub: CONFIG.motion.scrub,
     invalidateOnRefresh: true,
     onUpdate: (self) => {
-      // onUpdate fires far more often than the frame index changes; the renderer
-      // guards on that internally so this stays at `frameCount` draws, not thousands.
-      renderer.draw(Math.round(self.progress * (frameCount - 1)));
+      progress = self.progress;
+      scene.render(progress);
+      updateProximity(hero, progress);
     },
   });
 
+  updateProximity(hero, 0);
+
   const onResize = () => {
-    renderer.resize();
+    scene.resize();
+    scene.render(progress);
+    updateProximity(hero, progress);
     ScrollTrigger.refresh();
   };
   window.addEventListener('resize', onResize, { passive: true });
   canvas.classList.add('is-ready');
-}
-
-function showStaticFallback(root, reason) {
-  root.dataset.motion = 'static';
-  root.dataset.fallbackReason = reason;
-  root.querySelector('[data-loader]')?.remove();
 }
 
 export async function initMotion() {
@@ -164,48 +151,37 @@ export async function initMotion() {
     return;
   }
 
-  const base = CONFIG.motion.framesBase;
-  let manifest;
+  // Reveal loader only after we commit to running — never before.
+  root.dataset.motion = 'preloading';
+  setLoaderProgress(bar, 0.08);
+
+  let scene;
   try {
-    manifest = await (await fetch(`${base}/manifest.json`)).json();
-  } catch {
-    showStaticFallback(root, 'manifest-unavailable');
-    return;
-  }
-
-  const width = pickWidth(manifest);
-  const format =
-    manifest.formats.includes('avif') && (await supportsAvif()) ? 'avif' : manifest.formats.at(-1);
-
-  const urls = Array.from({ length: manifest.count }, (_, i) =>
-    frameUrl(manifest, base, width, format, i),
-  );
-
-  let bitmaps;
-  try {
-    // Reveal the loader only now — everything above this point can bail to the
-    // poster, and a loader shown before that is one the visitor may watch forever.
-    root.dataset.motion = 'preloading';
-    // The loading state gates ScrollTrigger.create, not just the visuals. Gating
-    // only the visuals is what produces the blank-canvas flash on first scroll.
-    bitmaps = await preload(urls, CONFIG.motion.concurrency, (progress) => {
-      if (bar) bar.style.setProperty('--progress', progress.toFixed(3));
+    setLoaderProgress(bar, 0.12);
+    scene = await createHarborScene(canvas, {
+      maxDpr: CONFIG.motion.maxDpr,
+      modelUrl: CONFIG.motion.modelUrl,
+      onProgress: (n) => setLoaderProgress(bar, 0.12 + 0.78 * n),
     });
+    setLoaderProgress(bar, 0.92);
+    scene.resize();
+    scene.render(0);
+    scene.resize();
+    scene.render(0);
+    setLoaderProgress(bar, 1);
   } catch (error) {
-    console.warn('[motion] preload failed, falling back to poster', error);
-    showStaticFallback(root, 'preload-failed');
+    console.warn('[motion] WebGL hero failed, falling back to poster', error);
+    scene?.dispose?.();
+    showStaticFallback(root, 'webgl-failed');
     return;
   }
 
-  const renderer = makeRenderer(canvas, bitmaps);
-  renderer.resize();
-  renderer.draw(0, true);
-
-  initSmoothScroll();
-  bindScrollTrigger({ hero: root, canvas, renderer, frameCount: manifest.count });
+  const lenis = initSmoothScroll();
+  wireInPageAnchors(lenis);
+  bindScrollScene({ hero: root, canvas, scene });
 
   root.dataset.motion = 'ready';
-  loader?.remove();
+  dismissLoader(loader);
 }
 
 if (document.readyState === 'loading') {

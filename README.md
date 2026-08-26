@@ -17,11 +17,11 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 | Path | What it is |
 |---|---|
 | `skills/motion-website/` | The Claude skill: build recipe, reference docs, pipeline scripts |
-| `template/` | The site. Edit `config.js`; `src/motion.js` stays identical between projects |
+| `template/` | Default site (frame scrub). Edit `config.js`; keep `src/motion.js` for frame projects |
 | `motion.config.json` | Frame counts, widths, and the performance budget CI enforces |
 | `.github/workflows/budget.yml` | The gate that refuses a merge when the sequence gets heavy |
 | `scripts/vendor.sh` | Optional: vendor GSAP + Lenis locally instead of loading them from a CDN |
-| `examples/` | Config-only reskins: [Ledgerline](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Kiln Carry](https://dimeloper.github.io/motion-site-kit/examples/commerce/), [Harbor Oven](https://dimeloper.github.io/motion-site-kit/examples/local/) |
+| `examples/` | Three verticals with **distinct** engines: [Ledgerline particles](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Kiln Carry float](https://dimeloper.github.io/motion-site-kit/examples/commerce/), [Harbor WebGL](https://dimeloper.github.io/motion-site-kit/examples/local/) |
 
 ## Quick start
 

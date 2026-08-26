@@ -1,9 +1,6 @@
 /**
- * Scroll-driven frame sequence engine.
- *
- * This file is the engine. It should not need editing between projects — copy,
- * colors, and section order live in config.js. That separation is what makes the
- * second build a reskin instead of a rebuild.
+ * Ledgerline particle engine — scroll densifies a signal field.
+ * Distinct from Harbor's WebGL orbit and the template's frame scrub.
  */
 
 import Lenis from 'lenis';
@@ -13,203 +10,140 @@ import { CONFIG } from '../config.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** 1x1 AVIF, used as a decode probe instead of user-agent sniffing. */
-const AVIF_PROBE =
-  'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQAMAAAAABNjb2xybmNseAACAAIABoAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEDQgMgkQAAAAB8dSLfI=';
-
 const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
-async function supportsAvif() {
-  try {
-    const blob = await (await fetch(AVIF_PROBE)).blob();
-    const bitmap = await createImageBitmap(blob);
-    bitmap.close?.();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Reasons to serve the static poster instead of the sequence.
- *
- * Note what is deliberately absent: viewport width. The usual advice is to skip
- * the animation under 768px, but the 640 rung is a few hundred kilobytes and
- * phones are most of the traffic. Serve them the narrow ladder, not a JPEG.
- */
 function shouldUseStaticFallback() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'reduced-motion';
   const connection = navigator.connection;
   if (connection?.saveData) return 'save-data';
   if (['slow-2g', '2g'].includes(connection?.effectiveType)) return 'slow-connection';
-  if (typeof createImageBitmap !== 'function') return 'no-imagebitmap';
   return null;
 }
 
-function pickWidth(manifest) {
-  const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
-  const target = window.innerWidth * dpr;
-  return manifest.widths.find((w) => w >= target) ?? manifest.widths.at(-1);
+function createParticles(count, width, height) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    z: Math.random(),
+    r: 0.6 + Math.random() * 1.8,
+    drift: (Math.random() - 0.5) * 0.35,
+  }));
 }
 
-function frameUrl(manifest, base, width, format, index) {
-  const padded = String(index).padStart(manifest.padding, '0');
-  return `${base}/${width}/${format}/${padded}.${format}`;
-}
+function paintParticles(ctx, particles, progress, width, height) {
+  ctx.clearRect(0, 0, width, height);
 
-/** Fetch and decode with a concurrency window — 120 parallel requests starve the first frames. */
-async function preload(urls, concurrency, onProgress) {
-  const bitmaps = new Array(urls.length);
-  let cursor = 0;
-  let done = 0;
+  const bandY = height * (0.42 + progress * 0.08);
+  const bandH = height * (0.08 + progress * 0.12);
+  const pull = progress * progress;
 
-  async function worker() {
-    while (cursor < urls.length) {
-      const index = cursor++;
-      const response = await fetch(urls[index]);
-      if (!response.ok) throw new Error(`frame ${index} failed: ${response.status}`);
-      bitmaps[index] = await createImageBitmap(await response.blob());
-      onProgress(++done / urls.length);
+  const grd = ctx.createLinearGradient(0, bandY - bandH, 0, bandY + bandH);
+  grd.addColorStop(0, 'rgba(110, 160, 255, 0)');
+  grd.addColorStop(0.5, `rgba(110, 160, 255, ${0.08 + pull * 0.22})`);
+  grd.addColorStop(1, 'rgba(110, 160, 255, 0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, bandY - bandH, width, bandH * 2);
+
+  for (const p of particles) {
+    const targetY = bandY + (p.z - 0.5) * bandH * 1.6;
+    const y = p.y + (targetY - p.y) * pull;
+    const x = (p.x + p.drift * progress * width + width) % width;
+    const alpha = 0.12 + p.z * 0.35 + pull * 0.35;
+    const radius = p.r * (0.7 + pull * 1.1);
+
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(237, 232, 223, ${alpha})`;
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (pull > 0.35 && p.z > 0.55) {
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(110, 160, 255, ${(pull - 0.35) * 0.45})`;
+      ctx.lineWidth = 0.6;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (0.5 - p.z) * 40 * pull, targetY);
+      ctx.stroke();
     }
   }
-
-  await Promise.all(Array.from({ length: Math.min(concurrency, urls.length) }, worker));
-  return bitmaps;
 }
 
-/** Draw with cover semantics, computed in JS — CSS-only scaling blurs canvas on retina. */
-function makeRenderer(canvas, bitmaps) {
-  const ctx = canvas.getContext('2d', { alpha: false });
-  let current = -1;
+async function boot() {
+  const hero = document.querySelector('[data-hero]');
+  const canvas = document.querySelector('[data-canvas]');
+  if (!hero || !canvas) return;
 
-  function resize() {
-    const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
-    if (current >= 0) draw(current, true);
+  const reason = shouldUseStaticFallback();
+  if (reason) {
+    hero.dataset.motion = 'static';
+    hero.dataset.fallback = reason;
+    return;
   }
 
-  function draw(index, force = false) {
-    if (index === current && !force) return;
-    current = index;
-    const bitmap = bitmaps[index];
-    if (!bitmap) return;
-    const scale = Math.max(canvas.width / bitmap.width, canvas.height / bitmap.height);
-    const w = bitmap.width * scale;
-    const h = bitmap.height * scale;
-    ctx.drawImage(bitmap, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+  hero.dataset.motion = 'preloading';
+  const bar = document.querySelector('[data-loader-bar]');
+  if (bar) bar.style.setProperty('--progress', '0.15');
+
+  const ctx = canvas.getContext('2d', { alpha: true });
+  if (!ctx) {
+    hero.dataset.motion = 'static';
+    hero.dataset.fallback = 'no-canvas';
+    return;
   }
 
-  return { draw, resize };
-}
+  const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr ?? 2);
+  let width = 0;
+  let height = 0;
+  let particles = [];
 
-function initSmoothScroll() {
+  const resize = () => {
+    width = canvas.clientWidth;
+    height = canvas.clientHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    particles = createParticles(CONFIG.motion.particleCount ?? 220, width, height);
+  };
+  resize();
+
+  if (bar) bar.style.setProperty('--progress', '1');
+
+  const state = { progress: 0 };
+  paintParticles(ctx, particles, 0, width, height);
+  canvas.classList.add('is-ready');
+  hero.dataset.motion = 'ready';
+
   const lenis = new Lenis({
-    duration: CONFIG.motion.lenisDuration,
+    duration: CONFIG.motion.lenisDuration ?? 1.1,
     smoothWheel: true,
-    syncTouch: false,
   });
-  // One RAF loop, not two. Independent loops desynchronize and the canvas trails
-  // the page by a frame or so — legible as "cheap" without looking broken.
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
-  // Default lag smoothing jumps the timeline after a stall, which on a scrubbed
-  // sequence shows as a frame skip right after the preloader finishes.
   gsap.ticker.lagSmoothing(0);
-  return lenis;
-}
 
-function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
   ScrollTrigger.create({
     trigger: hero,
     start: 'top top',
-    end: () => `+=${window.innerHeight * CONFIG.motion.scrollLengthVh}`,
+    end: () => `+=${window.innerHeight * (CONFIG.motion.scrollLengthVh ?? 3.2)}`,
     pin: true,
-    anticipatePin: 1,
-    scrub: CONFIG.motion.scrub,
-    invalidateOnRefresh: true,
+    scrub: CONFIG.motion.scrub ?? 0.55,
     onUpdate: (self) => {
-      // onUpdate fires far more often than the frame index changes; the renderer
-      // guards on that internally so this stays at `frameCount` draws, not thousands.
-      renderer.draw(Math.round(self.progress * (frameCount - 1)));
+      state.progress = self.progress;
+      paintParticles(ctx, particles, state.progress, width, height);
     },
   });
 
-  const onResize = () => {
-    renderer.resize();
+  window.addEventListener('resize', () => {
+    resize();
+    paintParticles(ctx, particles, state.progress, width, height);
     ScrollTrigger.refresh();
-  };
-  window.addEventListener('resize', onResize, { passive: true });
-  canvas.classList.add('is-ready');
+  });
 }
 
-function showStaticFallback(root, reason) {
-  root.dataset.motion = 'static';
-  root.dataset.fallbackReason = reason;
-  root.querySelector('[data-loader]')?.remove();
-}
-
-export async function initMotion() {
-  const root = document.querySelector('[data-hero]');
-  if (!root) return;
-
-  const canvas = root.querySelector('[data-canvas]');
-  const loader = root.querySelector('[data-loader]');
-  const bar = root.querySelector('[data-loader-bar]');
-
-  const fallbackReason = shouldUseStaticFallback();
-  if (fallbackReason) {
-    showStaticFallback(root, fallbackReason);
-    return;
+boot().catch((error) => {
+  console.error('[ledgerline particles]', error);
+  const hero = document.querySelector('[data-hero]');
+  if (hero) {
+    hero.dataset.motion = 'static';
+    hero.dataset.fallback = 'boot-failed';
   }
-
-  const base = CONFIG.motion.framesBase;
-  let manifest;
-  try {
-    manifest = await (await fetch(`${base}/manifest.json`)).json();
-  } catch {
-    showStaticFallback(root, 'manifest-unavailable');
-    return;
-  }
-
-  const width = pickWidth(manifest);
-  const format =
-    manifest.formats.includes('avif') && (await supportsAvif()) ? 'avif' : manifest.formats.at(-1);
-
-  const urls = Array.from({ length: manifest.count }, (_, i) =>
-    frameUrl(manifest, base, width, format, i),
-  );
-
-  let bitmaps;
-  try {
-    // Reveal the loader only now — everything above this point can bail to the
-    // poster, and a loader shown before that is one the visitor may watch forever.
-    root.dataset.motion = 'preloading';
-    // The loading state gates ScrollTrigger.create, not just the visuals. Gating
-    // only the visuals is what produces the blank-canvas flash on first scroll.
-    bitmaps = await preload(urls, CONFIG.motion.concurrency, (progress) => {
-      if (bar) bar.style.setProperty('--progress', progress.toFixed(3));
-    });
-  } catch (error) {
-    console.warn('[motion] preload failed, falling back to poster', error);
-    showStaticFallback(root, 'preload-failed');
-    return;
-  }
-
-  const renderer = makeRenderer(canvas, bitmaps);
-  renderer.resize();
-  renderer.draw(0, true);
-
-  initSmoothScroll();
-  bindScrollTrigger({ hero: root, canvas, renderer, frameCount: manifest.count });
-
-  root.dataset.motion = 'ready';
-  loader?.remove();
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMotion, { once: true });
-} else {
-  initMotion();
-}
+});

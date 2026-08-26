@@ -1,28 +1,25 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="harbor">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Harbor Oven - Bread in the morning. Soup by noon.</title>
-  <meta name="description" content="A neighbourhood oven. Sourdough, seasonal tarts, and a short lunch menu that changes with the market." />
+  <title>Harbor Oven — Bread in the morning. Soup by noon.</title>
+  <meta name="description" content="A neighbourhood oven. Sourdough, a short lunch, and a board on the door that changes with the market." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <link rel="preload" as="image" href="frames/960/webp/0039.webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="images/loaf.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="src/styles.css" />
 
-  <!--
-    Zero-build setup: an import map against a CDN, so the template runs from any
-    static host with no toolchain. To move to npm + a bundler, delete this block,
-    run `npm i lenis gsap`, and point your bundler at src/motion.js.
-  -->
   <script type="importmap">
   {
     "imports": {
       "lenis": "https://esm.sh/lenis@1.3.26",
       "gsap": "https://esm.sh/gsap@3.15.0",
-      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.15.0/ScrollTrigger"
+      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.15.0/ScrollTrigger",
+      "three": "https://esm.sh/three@0.170.0",
+      "three/addons/": "https://esm.sh/three@0.170.0/examples/jsm/"
     }
   }
   </script>
@@ -30,56 +27,387 @@
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
 
-  <!--
-    The hero renders complete without JavaScript. The poster is a real <img> so
-    it is the LCP element; if the canvas were the LCP candidate, LCP would be
-    measured at the end of preload, scoring a page that felt instant as slow.
-  -->
-  <!--
-    Initial state is `static`: poster only, no loader. The loader appears only
-    once motion.js has confirmed it is going to run. If JavaScript is disabled,
-    or the module fails to load, the visitor gets a finished hero rather than a
-    progress bar that never fills.
-  -->
-  <header class="hero" data-hero data-motion="static" id="top">
-    <img class="hero__poster" src="frames/960/webp/0039.webp" alt="" fetchpriority="high" decoding="async" />
-    <canvas class="hero__canvas" data-canvas aria-hidden="true"></canvas>
-    <div class="hero__grain" aria-hidden="true"></div>
-    <div class="hero__vignette" aria-hidden="true"></div>
-    <div class="hero__frame" aria-hidden="true"></div>
-    <p class="hero__mark" data-bind="brand.name"></p>
+  <div class="shell">
+    <header class="topbar" data-topbar>
+      <a class="topbar__brand" href="#top">
+        <span class="topbar__mark" aria-hidden="true"></span>
+        <span data-bind="brand.name"></span>
+      </a>
+      <nav class="topbar__nav" aria-label="Primary">
+        <ul data-nav></ul>
+      </nav>
+      <div class="topbar__actions">
+        <div class="clock" data-clock>
+          <span class="clock__label">Local time</span>
+          <span class="clock__time" data-clock-time>8:00am</span>
+          <span class="clock__sep" aria-hidden="true">·</span>
+          <span class="clock__date" data-clock-date>Tuesday</span>
+        </div>
+        <button class="menu-btn" type="button" data-menu-open aria-expanded="false" aria-controls="nav-menu">
+          <span class="menu-btn__icon" aria-hidden="true"></span>
+          Menu
+        </button>
+      </div>
+    </header>
 
-    <div class="hero__copy">
-      <p class="hero__eyebrow" data-bind="hero.eyebrow"></p>
-      <h1 class="hero__headline" data-bind="hero.headline"></h1>
-      <p class="hero__sub" data-bind="hero.sub"></p>
-      <a class="button" data-bind-href="hero.cta.href" data-bind="hero.cta.label"></a>
-      <p class="visually-hidden" data-bind="hero.animationDescription"></p>
-    </div>
+    <section class="hero" data-hero data-motion="static" id="top">
+      <div class="hero__media">
+        <img class="hero__poster" src="images/loaf.jpg" alt="A flour-dusted country loaf at Harbor Oven." fetchpriority="high" decoding="async" />
+        <canvas class="hero__canvas" data-canvas aria-hidden="true"></canvas>
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__scrim" aria-hidden="true"></div>
+        <div class="hero__vignette" aria-hidden="true"></div>
+        <p class="hero__watermark" data-bind="hero.watermark" aria-hidden="true"></p>
+      </div>
 
-    <div class="loader" data-loader>
-      <div class="loader__bar" data-loader-bar></div>
-      <p class="loader__label">Loading</p>
-    </div>
+      <div class="hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__headline">
+            <span class="hero__line hero__line--keep" data-bind="hero.line1">Bread in the morning.</span>
+            <span class="hero__line" data-bind="hero.line2">Soup by noon.</span>
+          </h1>
+          <p class="hero__sub" data-bind="hero.sub"></p>
+          <div class="hero__ctas">
+            <a class="pill pill--ink" data-bind-href="hero.cta.href">
+              <span data-bind="hero.cta.label"></span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+            <a class="pill pill--ghost" href="#board" data-bind-href="hero.secondary.href" data-bind="hero.secondary.label">See the board</a>
+          </div>
+          <p class="visually-hidden" data-bind="hero.animationDescription"></p>
+        </div>
 
-    <div class="hero__scroll-hint" aria-hidden="true">Scroll</div>
-  </header>
+        <aside class="hero__aside">
+          <article class="feature-card" data-card>
+            <figure class="feature-card__thumb">
+              <img data-card-image src="images/loaf.jpg" alt="" width="480" height="480" />
+            </figure>
+            <div class="feature-card__body">
+              <p class="feature-card__caption" data-card-caption></p>
+              <p class="feature-card__title" data-card-title></p>
+              <p class="feature-card__note" data-card-note></p>
+              <div class="feature-card__footer">
+                <div class="feature-card__dots" data-card-dots aria-hidden="true"></div>
+                <div class="feature-card__controls">
+                  <button type="button" class="icon-btn" data-card-prev aria-label="Previous item">←</button>
+                  <button type="button" class="icon-btn" data-card-next aria-label="Next item">→</button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="trusted">
+            <p class="trusted__label" data-bind="trusted.label"></p>
+            <ul class="trusted__list" data-trusted></ul>
+          </div>
+        </aside>
+      </div>
+
+      <div class="hero__rail">
+        <div class="hero__proximity" data-hero-proximity aria-live="polite">
+          <p class="hero__proximity-item" data-proximity="0">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-bind="hero.eyebrow">Independent bakery</span>
+          </p>
+          <p class="hero__proximity-item" data-proximity="1" data-bind="hero.opened">Open since 2019</p>
+        </div>
+        <div class="hero__status">
+          <span data-bind="hero.statusLeft"></span>
+          <span class="hero__status-mid" data-bind="hero.statusCenter"></span>
+          <span data-bind="hero.statusRight"></span>
+        </div>
+      </div>
+
+      <div class="intro" data-loader data-exit>
+        <p class="intro__brand" data-bind="brand.name"></p>
+        <p class="intro__tag">Bold bake. Quiet lunch.</p>
+        <div class="intro__track">
+          <div class="intro__fill" data-loader-bar></div>
+        </div>
+        <p class="intro__meta">
+          <span>Loading</span>
+          <span class="intro__count" data-loader-count>000</span>
+        </p>
+      </div>
+    </section>
+  </div>
 
   <main id="content">
-    <!-- Sections are real HTML at a visible resting state. If they only existed
-         to be revealed by GSAP, they would vanish with JavaScript disabled. -->
-    <div class="sections" data-sections></div>
+    <section class="services" id="services">
+      <div class="services__card reveal">
+        <header class="services__head">
+          <h2 data-bind="services.title">What we bake best</h2>
+        </header>
+        <ul class="services__list" data-services>
+          <li class="services__item">
+            <a class="services__link" href="#board">
+              <span class="services__num">01</span>
+              <span class="services__title">Country loaf</span>
+              <span class="services__body">A long ferment. Flour-dusted crust, open crumb, ready from eight.</span>
+              <span class="services__arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+          <li class="services__item">
+            <a class="services__link" href="#board">
+              <span class="services__num">02</span>
+              <span class="services__title">Sesame baguette</span>
+              <span class="services__body">Seeded, scored, and gone when the rack is empty.</span>
+              <span class="services__arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+          <li class="services__item">
+            <a class="services__link" href="#board">
+              <span class="services__num">03</span>
+              <span class="services__title">Market tart</span>
+              <span class="services__body">Whatever the North Shore stalls are carrying that week.</span>
+              <span class="services__arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+          <li class="services__item">
+            <a class="services__link" href="#board">
+              <span class="services__num">04</span>
+              <span class="services__title">Soup and two sandwiches</span>
+              <span class="services__body">Lunch from eleven. The board on the door is the menu.</span>
+              <span class="services__arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="stats" id="stats">
+      <p class="stats__kicker reveal"><span class="dot" aria-hidden="true"></span><span data-bind="stats.kicker">By the numbers</span></p>
+      <ul class="stats__grid" data-stats>
+        <li class="stats__item reveal">
+          <span class="stats__value">2019</span>
+          <span class="stats__label">Open since</span>
+        </li>
+        <li class="stats__item reveal">
+          <span class="stats__value">4</span>
+          <span class="stats__label">Standing cafes</span>
+        </li>
+        <li class="stats__item reveal">
+          <span class="stats__value">1</span>
+          <span class="stats__label">Board on the door</span>
+        </li>
+        <li class="stats__item reveal">
+          <span class="stats__value">0</span>
+          <span class="stats__label">Reservations</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="studio" id="studio">
+      <div class="studio__panel reveal">
+        <div class="studio__aside">
+          <p class="studio__kicker"><span class="dot" aria-hidden="true"></span><span data-bind="studio.kicker">The oven</span></p>
+          <div class="studio__mark" aria-hidden="true">
+            <svg viewBox="0 0 120 120" width="120" height="120" fill="none">
+              <circle cx="60" cy="60" r="52" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+              <ellipse cx="60" cy="60" rx="52" ry="20" stroke="currentColor" stroke-width="1"/>
+              <ellipse cx="60" cy="60" rx="20" ry="52" stroke="currentColor" stroke-width="1"/>
+              <path d="M8 60h104M60 8v104" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+            </svg>
+          </div>
+          <p class="studio__note" data-bind="studio.note">A small team on the North Shore. Walk-in only.</p>
+        </div>
+        <div class="studio__copy">
+          <h2 class="studio__statement" data-studio-statement>
+            We bake for <span class="studio__accent">neighbours</span> who want bread in the morning and something warm by noon — no reservations, no theatre, just the board on the door.
+          </h2>
+          <div class="studio__row">
+            <p class="studio__find">Find us on the North Shore</p>
+            <a class="pill pill--ink pill--compact" data-bind-href="studio.aboutHref" href="#about">
+              <span data-bind="studio.aboutLabel">Meet the oven</span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="studio__pills" data-studio-pills>
+          <span class="word-pill word-pill--soft">We</span>
+          <span class="word-pill word-pill--accent">Bake</span>
+          <span class="word-pill word-pill--ink"><span class="word-pill__arrow" aria-hidden="true">→</span></span>
+          <span class="word-pill word-pill--ghost">Better</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <figure class="about__media reveal">
+        <img src="images/board.jpg" alt="Sliced country loaf on a wooden board, with jam." width="1800" height="2400" />
+      </figure>
+      <div class="about__copy reveal">
+        <p class="kicker" data-bind="about.kicker">The oven</p>
+        <h2 data-bind="about.title">We bake through the morning. Lunch goes on at 11. When a tray is gone, it is gone.</h2>
+        <p data-bind="about.body">Walk in for a loaf. Stay if there is still soup. The board on the door is the menu — we do not take reservations, and we will hold a Saturday loaf if you send a note before 9.</p>
+      </div>
+    </section>
+
+    <section class="selected" id="selected">
+      <header class="selected__head reveal">
+        <p class="kicker" data-bind="selected.kicker">From the counter</p>
+        <h2 data-bind="selected.title">Selected trays</h2>
+      </header>
+      <div class="selected__grid" data-selected>
+        <article class="selected__card reveal">
+          <figure class="selected__media">
+            <img src="images/loaf.jpg" alt="Flour-dusted country loaf" width="800" height="1000" loading="lazy" />
+          </figure>
+          <div class="selected__meta">
+            <h3>Country loaf</h3>
+            <p>On the counter from 8</p>
+          </div>
+        </article>
+        <article class="selected__card reveal">
+          <figure class="selected__media">
+            <img src="images/board.jpg" alt="Sliced loaf and jam on a board" width="800" height="1000" loading="lazy" />
+          </figure>
+          <div class="selected__meta">
+            <h3>Plum market tart</h3>
+            <p>Until the tray is gone</p>
+          </div>
+        </article>
+        <article class="selected__card reveal">
+          <figure class="selected__media">
+            <img src="images/loaf.jpg" alt="Bakery loaf at Harbor Oven" width="800" height="1000" loading="lazy" />
+          </figure>
+          <div class="selected__meta">
+            <h3>Board lunch</h3>
+            <p>Soup from eleven</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="board" id="board">
+      <header class="board__head reveal">
+        <p class="kicker" data-bind="board.kicker">This week</p>
+        <h2 data-bind="board.title">On the door</h2>
+      </header>
+      <div class="board__grid">
+        <div class="board__col reveal">
+          <h3 data-bind="board.hoursLabel">Hours</h3>
+          <ul data-hours>
+            <li><span>Tuesday – Friday</span><span>8:00 – 15:00</span></li>
+            <li><span>Saturday</span><span>8:00 – 15:00</span></li>
+            <li><span>Sunday – Monday</span><span>Closed for the starter</span></li>
+          </ul>
+        </div>
+        <div class="board__col reveal">
+          <h3 data-bind="board.menuLabel">On the counter</h3>
+          <ul data-menu>
+            <li><span>Country loaf</span><span>From 8</span></li>
+            <li><span>Sesame baguette</span><span>Until it is gone</span></li>
+            <li><span>Market tart</span><span>This week: plum</span></li>
+            <li><span>Soup and two sandwiches</span><span>From 11</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <section class="cta" id="cta">
-      <h2 data-bind="cta.title"></h2>
-      <p data-bind="cta.body"></p>
-      <a class="button button--large" data-bind-href="cta.href" data-bind="cta.label"></a>
+      <div class="cta__panel reveal">
+        <div class="cta__copy">
+          <p class="kicker" data-bind="cta.kicker">Saturday hold</p>
+          <h2 data-bind="cta.title">Hold a loaf for Saturday</h2>
+          <p class="cta__body" data-bind="cta.body">Send a note before 9. No reservations for lunch — come when the door is open.</p>
+          <div class="cta__actions">
+            <a class="pill pill--ink" data-bind-href="cta.href" href="https://example.com/harbor-oven">
+              <span data-bind="cta.label">Get this week's hours</span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+            <a class="pill pill--ghost-ink" data-bind-href="cta.secondaryHref" href="#board" data-bind="cta.secondaryLabel">See the board</a>
+          </div>
+        </div>
+
+        <aside class="cta__aside">
+          <p class="cta__aside-label" data-bind="cta.aside.label">This Saturday</p>
+          <ul class="cta__meta" data-cta-meta>
+            <li><span>Hold window</span><span>Note by Fri 9:00</span></li>
+            <li><span>Pickup</span><span>Sat 8:00 – 12:00</span></li>
+            <li><span>What we hold</span><span>Country loaf · baguette</span></li>
+          </ul>
+        </aside>
+
+        <div class="cta__steps">
+          <p class="cta__steps-title" data-bind="cta.stepsTitle">How a hold works</p>
+          <ol class="cta__list" data-cta-steps>
+            <li class="cta__step">
+              <span class="cta__num">01</span>
+              <div>
+                <h3>Note before 9</h3>
+                <p>Name, loaf count, and Saturday pickup. We reply when it is on the rack.</p>
+              </div>
+            </li>
+            <li class="cta__step">
+              <span class="cta__num">02</span>
+              <div>
+                <h3>Collect by noon</h3>
+                <p>Held loaves leave the counter at 12 if you do not come.</p>
+              </div>
+            </li>
+            <li class="cta__step">
+              <span class="cta__num">03</span>
+              <div>
+                <h3>Lunch stays walk-in</h3>
+                <p>Soup and sandwiches are still first-come. The hold is for bread only.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
     </section>
   </main>
 
+  <footer class="site-footer">
+    <p class="site-footer__brand" data-bind="brand.name">Harbor Oven</p>
+    <p data-bind="footer.place">North Shore</p>
+    <p class="site-footer__credit" data-bind="footer.credit">Hero loaf: Higgsfield Meshy GLB from a clean studio still. Supporting photos from Unsplash.</p>
+  </footer>
+
+  <div
+    class="nav-menu"
+    id="nav-menu"
+    data-nav-menu
+    role="dialog"
+    aria-modal="true"
+    aria-label="Site menu"
+    hidden
+  >
+    <div class="nav-menu__wash" aria-hidden="true"></div>
+    <div class="nav-menu__top">
+      <a class="nav-menu__brand topbar__brand" href="#top">
+        <span class="topbar__mark" aria-hidden="true"></span>
+        <span data-bind="brand.name">Harbor Oven</span>
+      </a>
+      <button type="button" class="menu-btn" data-menu-close>Close</button>
+    </div>
+    <nav class="nav-menu__body" aria-label="Site">
+      <p class="nav-menu__kicker">On the door</p>
+      <ul class="nav-menu__list" data-nav-mobile>
+        <li><a href="#services"><span class="nav-menu__idx">01</span><span class="nav-menu__label">Bake</span></a></li>
+        <li><a href="#studio"><span class="nav-menu__idx">02</span><span class="nav-menu__label">Oven</span></a></li>
+        <li><a href="#board"><span class="nav-menu__idx">03</span><span class="nav-menu__label">Board</span></a></li>
+        <li><a href="#cta"><span class="nav-menu__idx">04</span><span class="nav-menu__label">Hold a loaf</span></a></li>
+      </ul>
+    </nav>
+    <p class="nav-menu__foot">
+      <span data-bind="hero.proof">Open since 2019 · North Shore</span>
+      <span class="nav-menu__foot-sep" aria-hidden="true">·</span>
+      <span>Walk-in only</span>
+    </p>
+  </div>
+
   <div class="progress" aria-hidden="true"></div>
 
-  <script type="module" src="src/bind.js"></script>
-  <script type="module" src="src/motion.js"></script>
+  <script type="module" src="src/bind.js?v=16"></script>
+  <script type="module" src="src/page.js?v=16"></script>
+  <script type="module" src="src/motion.js?v=16"></script>
 </body>
 </html>

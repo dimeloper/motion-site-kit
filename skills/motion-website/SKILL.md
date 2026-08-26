@@ -1,16 +1,16 @@
 ---
 name: motion-website
-description: Build scroll-driven motion websites — a pinned canvas that plays an image sequence as the visitor scrolls, driven by GSAP ScrollTrigger with Lenis smooth scroll. Use this skill whenever the user asks for a scroll animation, a scroll-driven or "scrollytelling" site, a pinned hero that animates on scroll, an image-sequence or frame-sequence animation, an Apple-style product page, or wants to turn a video clip or 3D render into a scroll-controlled hero. Also use it when the user mentions GSAP ScrollTrigger, Lenis, frame extraction, or asks why their scroll animation stutters, jumps, or loads slowly — the performance budget and preload sections cover the usual causes.
+description: Build scroll-driven motion websites — pinned heroes driven by GSAP ScrollTrigger with Lenis. Default path is an image-sequence canvas; optional paths are live WebGL (Higgsfield/Meshy GLB), particle fields, and floating still layers. Use this skill for scroll animation, scrollytelling, Apple-style product pages, frame extraction, WebGL product orbits, or when a scroll hero stutters / loads slowly.
 license: MIT
 ---
 
 # Motion Website
 
-Build a scroll-driven site where a pinned `<canvas>` plays a decoded image sequence, with scroll position mapped to frame index.
+Build a scroll-driven site where a pinned hero is owned by scroll progress. The **default** engine plays a decoded image sequence on a `<canvas>`. Optional engines (documented below) cover live GLB orbit, particle fields, and floating still layers — use them when the vertical needs a different motion language, not a second copy of rotate-and-zoom.
 
 The technique is simple. Doing it without shipping a 200 MB hero or a stuttering canvas is the hard part, and that is most of what this skill is about.
 
-## The pipeline
+## The pipeline (default: frames)
 
 ```
 source clip ──▶ extract N frames ──▶ responsive ladder ──▶ budget gate ──▶ site
@@ -19,6 +19,15 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 ```
 
 Each stage has a script in `scripts/`. Run them in order; do not hand-roll the middle two, because getting frame count and encoding wrong is what makes these sites heavy.
+
+### Optional: live WebGL from a still (Higgsfield)
+
+```
+product still ──▶ Higgsfield Meshy generate_3d ──▶ GLB ──▶ Three.js orbit hero
+                     (MCP: motion-kit-higgsfield)           (poster fallback)
+```
+
+Read `references/webgl-model.md` before generating. Prefer a clean cutout still; props in the photo become mesh. If Meshy is unavailable or the GLB fails budget/QA, **fall back to the frame pipeline** with the same poster — do not ship a broken canvas.
 
 ## Build order
 
@@ -39,6 +48,8 @@ Write `motion.config.json` at the project root first. It is the contract the CI 
 **120 frames is the default and it is almost always right.** At scroll speed the eye cannot resolve more. Doubling to 240 doubles the weight and looks identical — verify this yourself once and you will stop being tempted.
 
 8 MB for the whole sequence is the ceiling. That is roughly 4 seconds on a slow 3G connection, which is already at the edge of what someone will wait through with a loading state on screen.
+
+Live GLB weight is a **separate** concern — see `references/webgl-model.md`. Do not "fix" a 15 MB model by relaxing the sequence gate.
 
 ### 2. Get the frames
 
@@ -72,7 +83,9 @@ If it fails, in order of what to try: drop frame count to 90, lower AVIF quality
 
 ### 5. Wire the site
 
-Copy `template/` and edit only `config.js` — copy, colors, fonts, section order. `src/motion.js` is the engine and should not need changes between projects. That separation is the whole point: the second build is a reskin, not a rebuild.
+Copy `template/` and edit only `config.js` — copy, colors, fonts, section order. `src/motion.js` is the **frame** engine and should not need changes between frame-scrub projects.
+
+For live WebGL, particles, or float layers, start from the matching example under `docs/examples/{local,saas,commerce}/` rather than forcing those runtimes into `template/src/motion.js`. That separation keeps the second *frame* build a reskin, while optional engines stay explicit forks.
 
 ### 6. Verify
 
@@ -80,17 +93,19 @@ Read `references/qa.md` and run the checklist. The three that catch real bugs: s
 
 ## The scroll engine
 
-GSAP ScrollTrigger drives frame index; Lenis smooths the scroll input. Both are free — GSAP including ScrollTrigger has been free for commercial use since April 2025, with the only restriction being that you cannot use it to build a competing no-code animation builder.
+GSAP ScrollTrigger drives progress; Lenis smooths the scroll input. Both are free — GSAP including ScrollTrigger has been free for commercial use since April 2025, with the only restriction being that you cannot use it to build a competing no-code animation builder.
 
 Native CSS scroll-driven animations (`animation-timeline: scroll()`) are tempting and **not yet a replacement here**. Chrome and Safari 26+ support them; Firefox does not, which keeps them out of Baseline. Use them for decorative progress bars and reveals where a Firefox visitor losing the effect is acceptable, and keep ScrollTrigger for the hero. `references/scroll-engine.md` has the details and the exact ScrollTrigger config.
 
 ## Fallbacks are a first-class path, not an afterthought
 
-Serve a static hero frame instead of the sequence when any of these hold:
+Serve a static hero frame instead of motion when any of these hold:
 
 - `prefers-reduced-motion: reduce` — this is an accessibility requirement, not a nicety
 - `navigator.connection.saveData` is true
 - Effective connection type is `slow-2g` or `2g`
+
+WebGL adds: missing context, GLB failure → poster. Prefer frame scrub over a broken canvas if the model path is unavailable.
 
 Note what is **not** on that list: small viewports. The common advice is to skip the animation under 768px, but a 640px-wide AVIF ladder at 90 frames is a few hundred kilobytes, and phones are where most visitors are. Serve them the narrow ladder, not a JPEG. Dropping the effect for the majority of your traffic to save bytes you already saved is the wrong trade.
 
@@ -104,6 +119,8 @@ Note what is **not** on that list: small viewports. The common advice is to skip
 
 **Animating decoration instead of the product.** The sequence should show the thing being sold. An abstract shape morphing is expensive screensaver.
 
+**Black ring under a GLB.** Usually props baked into the mesh, or a plinth intersecting the model — see `references/webgl-model.md`.
+
 ## References
 
 Read these as needed rather than upfront:
@@ -111,5 +128,6 @@ Read these as needed rather than upfront:
 - `references/scroll-engine.md` — ScrollTrigger + Lenis config, the pin/scrub math, native CSS scroll timelines
 - `references/frame-pipeline.md` — extraction, encoding, the responsive ladder, manifest format
 - `references/performance-budget.md` — how the numbers were chosen, what to cut first
+- `references/webgl-model.md` — Higgsfield/Meshy GLB path, Harbor craft checklist, Vortex handoff, fallbacks
 - `references/remotion.md` — programmatic frame generation, and the licensing caveat
 - `references/qa.md` — the pre-ship checklist

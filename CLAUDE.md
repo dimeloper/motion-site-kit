@@ -8,7 +8,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## Invariants — don't break these without a deliberate decision
 
-**`template/config.js` is the only file that changes per project.** Copy, colors, fonts, section order. If you find yourself editing `template/src/motion.js` to build a specific site, something has leaked — push it back into config. This separation is the entire value proposition: the second build is a reskin, not a rebuild.
+**`template/config.js` is the only file that changes per frame-scrub project.** Copy, colors, fonts, section order. If you find yourself editing `template/src/motion.js` to build a specific site, something has leaked — push it back into config. Optional engines (WebGL orbit, particles, float layers) live as explicit forks under `docs/examples/` — see `skills/motion-website/references/webgl-model.md`. Do not fold them into the template frame engine.
 
 **The budget gate is load-bearing.** `skills/motion-website/scripts/check_budget.py` exits 1 on breach and CI runs it. Don't relax the numbers in `motion.config.json` to make a build pass — the cut-list the script prints is the intended response.
 
@@ -34,7 +34,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## What's stubbed
 
-- **Photoreal source clips.** The three live examples use studio captures (stacked glass, brass hardware, a cloche) rather than filmed product. Swap in a photographed or rendered clip per vertical with the same pipeline.
+- **Photoreal source clips for the frame path.** Template and some stills still use studio captures. Harbor (`docs/examples/local/`) is the live WebGL craft reference (Meshy GLB + flour motes). Next: **Vortex** (`saas/`, explode→assemble) and **Halo** (`commerce/`, material peel). See `skills/motion-website/references/webgl-model.md` for the Harbor checklist before starting Vortex.
 
 ## Verifying a change
 

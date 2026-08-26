@@ -58,7 +58,8 @@ body {
 }
 
 .hero__poster,
-.hero__canvas {
+.hero__canvas,
+.hero__float {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -67,9 +68,15 @@ body {
   z-index: -2;
 }
 
-/* The canvas fades in over the poster once frames are decoded, so the swap is
-   never a visible pop. Until then the poster is what the visitor (and the LCP
-   measurement) sees. */
+.hero__float {
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.hero__float.is-ready { opacity: 1; }
+
+/* Legacy canvas path kept inert when float engine is active. */
 .hero__canvas {
   z-index: -1;
   opacity: 0;
@@ -77,9 +84,40 @@ body {
 }
 .hero__canvas.is-ready { opacity: 1; }
 
-/* Static fallback path: poster only, and the hero stops eating scroll length. */
 .hero[data-motion="static"] .hero__canvas,
+.hero[data-motion="static"] .hero__float,
 .hero[data-motion="static"] .hero__scroll-hint { display: none; }
+
+.float-layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  width: min(42vw, 22rem);
+  z-index: var(--z, 1);
+  transform:
+    translate(-50%, -50%)
+    translate(var(--x, 0), var(--y, 0))
+    translate(var(--drift-x, 0), var(--drift-y, 0))
+    rotate(calc(var(--rotate, 0deg) + var(--drift-rot, 0deg)))
+    scale(calc(var(--scale, 1) * var(--drift-scale, 1)));
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.45);
+  will-change: transform;
+}
+.float-layer img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.hero[data-motion="ready"] .hero__poster {
+  opacity: 0.35;
+  transition: opacity 0.5s ease;
+}
 
 .hero__grain {
   position: absolute; inset: 0; z-index: 0;
@@ -239,6 +277,64 @@ body {
 .panel__body a {
   color: inherit;
   text-underline-offset: 0.2em;
+}
+
+.capabilities {
+  padding: clamp(2.5rem, 7vw, 4.5rem) clamp(1.25rem, 5vw, 3rem);
+  background: #0a0a0a;
+}
+.capabilities__card {
+  background: #f3eee6;
+  color: #0a0a0a;
+  border-radius: 1.35rem;
+  padding: clamp(1.4rem, 3.5vw, 2.25rem);
+}
+.capabilities__head h2 {
+  margin: 0 0 1rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.cap__list { margin: 0; padding: 0; list-style: none; }
+.cap__link {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  grid-template-areas:
+    "num title arrow"
+    "num body arrow";
+  gap: 0.15rem 1rem;
+  align-items: center;
+  padding: 1.1rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+  transition: background 0.2s ease;
+}
+.cap__item:first-child .cap__link { border-top: 0; }
+.cap__link:hover { background: rgb(0 0 0 / 0.04); }
+@media (min-width: 800px) {
+  .cap__link {
+    grid-template-columns: 2.75rem minmax(9rem, 0.85fr) minmax(12rem, 1.2fr) 2.25rem;
+    grid-template-areas: "num title body arrow";
+    gap: 1rem 1.35rem;
+  }
+}
+.cap__num { grid-area: num; font-size: 0.78rem; color: rgb(0 0 0 / 0.35); }
+.cap__title { grid-area: title; font-weight: 600; font-size: 1.02rem; }
+.cap__body { grid-area: body; font-size: 0.9rem; color: rgb(0 0 0 / 0.55); line-height: 1.45; }
+.cap__arrow {
+  grid-area: arrow;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 0.85rem;
 }
 
 /* ── CTA ──────────────────────────────────────────────────────────────── */

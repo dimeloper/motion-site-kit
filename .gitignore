@@ -1,6 +1,8 @@
 frames/raw/
 frames/raw-*/
 frames/preview-*/
+frames/unsplash-candidates/
+frames/unsplash-hires/
 node_modules/
 out/
 .DS_Store
@@ -12,4 +14,6 @@ __pycache__/
 # Generated per project — regenerate with optimize_frames.py
 template/frames/
 examples/*/frames/
+docs/examples/*/frames/
 template/vendor/
+frames/clips/

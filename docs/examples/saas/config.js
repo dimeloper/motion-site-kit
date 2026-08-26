@@ -1,6 +1,7 @@
 /**
- * SaaS demo, GitHub Pages copy. Own frame ladder under ./frames.
- * Only this file differs from the other two reskins — plus its sequence.
+ * Ledgerline — SaaS demo.
+ * Motion: scroll-driven particle field (not orbit / frame scrub).
+ * Copy and section order live here.
  */
 
 export const CONFIG = {
@@ -17,23 +18,56 @@ export const CONFIG = {
     eyebrow: 'For finance teams',
     headline: 'Close the books without the war room.',
     sub: 'Ledgerline pulls every entity into one close checklist, with owners and blockers visible before month-end.',
-    cta: { label: 'How the close works', href: '#what' },
+    cta: { label: 'How the close works', href: '#capabilities' },
     animationDescription:
-      'Three transmissive glass plates with a gold edge lift apart in a black studio as you scroll, then seat themselves again.',
+      'As you scroll, a field of particles densifies into a clear signal band — presence reading as motion, not a product spin.',
+  },
+
+  capabilities: {
+    title: 'What we do best',
+    items: [
+      {
+        num: '01',
+        title: 'Close checklist',
+        body: 'Owners, due dates, and source systems in one place across every entity.',
+        href: '#proof',
+      },
+      {
+        num: '02',
+        title: 'Blocker radar',
+        body: 'See what is stuck on Tuesday — not on the last Friday of the month.',
+        href: '#proof',
+      },
+      {
+        num: '03',
+        title: 'Entity rollup',
+        body: 'Subsidiaries and currency notes without another status meeting.',
+        href: '#proof',
+      },
+      {
+        num: '04',
+        title: 'Walkthrough',
+        body: 'Map your existing close onto Ledgerline in thirty minutes.',
+        href: '#cta',
+      },
+    ],
+  },
+
+  stats: {
+    kicker: 'By the numbers',
+    items: [
+      { value: '19+', label: 'Entities in one close' },
+      { value: '11%', label: 'Fewer status meetings' },
+      { value: '1', label: 'Checklist to run' },
+    ],
   },
 
   sections: [
     {
-      id: 'what',
-      kicker: 'What it does',
-      title: 'One checklist across every entity',
-      body: 'Each close task has an owner, a due date, and the system it came from. You see what is blocked on Tuesday, not on the last Friday of the month.',
-    },
-    {
       id: 'proof',
-      kicker: '',
-      title: 'Built for teams that already have a stack',
-      body: 'Ledgerline sits on top of the ledger you use today. It does not replace it. The first close you run in it is the one you were going to run anyway, with fewer status meetings.',
+      kicker: 'Built for stacks you already have',
+      title: 'It sits on top of the ledger you use today.',
+      body: 'Ledgerline does not replace your GL. The first close you run in it is the one you were going to run anyway — with fewer war-room slides.',
     },
   ],
 
@@ -45,11 +79,11 @@ export const CONFIG = {
   },
 
   motion: {
-    framesBase: 'frames',
-    scrollLengthVh: 3.5,
-    scrub: 0.5,
+    engine: 'particles',
+    scrollLengthVh: 3.2,
+    scrub: 0.55,
     lenisDuration: 1.1,
-    concurrency: 8,
+    particleCount: 220,
     maxDpr: 2,
   },
 };

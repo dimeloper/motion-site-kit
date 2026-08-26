@@ -1,7 +1,5 @@
 /**
- * Binds config.js into the markup and applies brand tokens as CSS custom
- * properties. Small on purpose — this exists so config.js is the only file that
- * changes per project, not so the template becomes a framework.
+ * Binds config.js into Kiln Carry markup.
  */
 
 import { CONFIG } from '../config.js';
@@ -34,7 +32,7 @@ function loadFonts() {
     .filter((name, index, all) => name && !SYSTEM_FONTS.has(name.toLowerCase()) && all.indexOf(name) === index);
   if (!families.length) return;
   const params = families
-    .map((name) => `family=${encodeURIComponent(name)}:ital,wght@0,400;0,600;0,700;1,400`)
+    .map((name) => `family=${encodeURIComponent(name)}:ital,wght@0,400;0,500;0,600;0,700;1,400`)
     .join('&');
   const link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -66,9 +64,27 @@ function bindText() {
   }
 }
 
+function renderList(selector, rows, html) {
+  const host = document.querySelector(selector);
+  if (!host || !rows?.length) return;
+  host.innerHTML = rows.map(html).join('');
+}
+
+function renderSpec() {
+  renderList('[data-spec]', CONFIG.spec?.items, (item) =>
+    `<li class="cap__item">
+      <a class="cap__link" href="${item.href}">
+        <span class="cap__num">${item.num}</span>
+        <span class="cap__title">${item.title}</span>
+        <span class="cap__body">${item.body}</span>
+        <span class="cap__arrow" aria-hidden="true">↗</span>
+      </a>
+    </li>`);
+}
+
 function renderSections() {
   const host = document.querySelector('[data-sections]');
-  if (!host) return;
+  if (!host || !CONFIG.sections?.length) return;
   host.innerHTML = CONFIG.sections
     .map((section) => {
       const kicker = section.kicker
@@ -89,4 +105,5 @@ function renderSections() {
 loadFonts();
 applyBrand();
 bindText();
+renderSpec();
 renderSections();
