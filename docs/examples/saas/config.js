@@ -1,54 +1,98 @@
 /**
- * Ledgerline — SaaS demo.
- * Motion: scroll-driven particle field (not orbit / frame scrub).
- * Copy and section order live here.
+ * Vortex — DualSense-class console page.
+ * Motion language: parts explode, then seat on scroll (not orbit).
  */
 
 export const CONFIG = {
   brand: {
-    name: 'Ledgerline',
-    primary: '#6EA0FF',
-    ink: '#000000',
-    paper: '#EDE8DF',
-    displayFont: '"Instrument Serif", Georgia, serif',
+    name: 'Vortex',
+    primary: '#3D8BFF',
+    ink: '#07080C',
+    paper: '#E8EAF0',
+    displayFont: '"Syne", system-ui, sans-serif',
     bodyFont: '"IBM Plex Sans", system-ui, -apple-system, sans-serif',
   },
 
+  nav: [
+    { label: 'Spec', href: '#spec' },
+    { label: 'Feel', href: '#feel' },
+    { label: 'Build', href: '#build' },
+    { label: 'Preorder', href: '#cta', action: 'cta' },
+  ],
+
   hero: {
-    eyebrow: 'For finance teams',
-    headline: 'Close the books without the war room.',
-    sub: 'Ledgerline pulls every entity into one close checklist, with owners and blockers visible before month-end.',
-    cta: { label: 'How the close works', href: '#capabilities' },
+    eyebrow: 'Wireless console control',
+    line1: 'Parts in the air.',
+    line2: 'Then one piece.',
+    headline: 'Parts in the air. Then one piece.',
+    sub: 'A DualSense-class controller that seats itself on scroll — grips, sticks, and triggers lock in under your thumb.',
+    proof: 'Adaptive triggers · Haptic bus',
+    opened: 'Ship window Q3',
+    cta: { label: 'Preorder', href: '#cta' },
+    secondary: { label: 'See the build', href: '#build' },
+    watermark: 'VORTEX',
+    statusLeft: 'Exploded view',
+    statusCenter: 'Scroll to assemble',
+    statusRight: 'Pin engaged',
     animationDescription:
-      'As you scroll, a field of particles densifies into a clear signal band — presence reading as motion, not a product spin.',
+      'As you scroll, scattered controller parts fly inward and lock into a finished DualSense-class form.',
   },
 
-  capabilities: {
-    title: 'What we do best',
+  cards: [
+    {
+      caption: 'Module',
+      title: 'Left grip',
+      note: 'Seats at 38% scroll.',
+      image: 'images/controller.jpg',
+      alt: 'Vortex controller grip module',
+    },
+    {
+      caption: 'Module',
+      title: 'Haptic core',
+      note: 'Bus lights after lock.',
+      image: 'images/controller.jpg',
+      alt: 'Vortex haptic core',
+    },
+    {
+      caption: 'Module',
+      title: 'Trigger pair',
+      note: 'Adaptive travel last.',
+      image: 'images/controller.jpg',
+      alt: 'Vortex adaptive triggers',
+    },
+  ],
+
+  trusted: {
+    label: 'In the lab with',
+    names: ['Northline Studio', 'Arc Race', 'Pulse Arcade', 'Kite Games'],
+  },
+
+  services: {
+    title: 'What locks in',
     items: [
       {
         num: '01',
-        title: 'Close checklist',
-        body: 'Owners, due dates, and source systems in one place across every entity.',
-        href: '#proof',
+        title: 'Shell halves',
+        body: 'Graphite shells approach from opposite sides and meet on the midplane.',
+        href: '#build',
       },
       {
         num: '02',
-        title: 'Blocker radar',
-        body: 'See what is stuck on Tuesday — not on the last Friday of the month.',
-        href: '#proof',
+        title: 'Analog sticks',
+        body: 'Caps drop onto their wells with a short overshoot, then settle.',
+        href: '#build',
       },
       {
         num: '03',
-        title: 'Entity rollup',
-        body: 'Subsidiaries and currency notes without another status meeting.',
-        href: '#proof',
+        title: 'Face cluster',
+        body: 'Four face buttons and the touch strip seat as one assembly.',
+        href: '#build',
       },
       {
         num: '04',
-        title: 'Walkthrough',
-        body: 'Map your existing close onto Ledgerline in thirty minutes.',
-        href: '#cta',
+        title: 'Triggers',
+        body: 'L2 / R2 slide home last — adaptive travel engages after lock.',
+        href: '#build',
       },
     ],
   },
@@ -56,34 +100,95 @@ export const CONFIG = {
   stats: {
     kicker: 'By the numbers',
     items: [
-      { value: '19+', label: 'Entities in one close' },
-      { value: '11%', label: 'Fewer status meetings' },
-      { value: '1', label: 'Checklist to run' },
+      { value: '12', label: 'Discrete parts in the explode' },
+      { value: '3.4', label: 'Viewport heights of scroll pin' },
+      { value: '8 ms', label: 'Haptic sample bus' },
+      { value: '48 h', label: 'Battery at mid brightness' },
     ],
   },
 
-  sections: [
-    {
-      id: 'proof',
-      kicker: 'Built for stacks you already have',
-      title: 'It sits on top of the ledger you use today.',
-      body: 'Ledgerline does not replace your GL. The first close you run in it is the one you were going to run anyway — with fewer war-room slides.',
-    },
-  ],
+  studio: {
+    kicker: 'The feel',
+    statement:
+      'We design for the moment the last part seats — resistance in the triggers, a quiet click in the sticks, light on the bus.',
+    aboutHref: '#feel',
+    aboutLabel: 'Read the feel brief',
+    pills: [
+      { label: 'Adaptive triggers', tone: 'soft' },
+      { label: 'Dual haptics', tone: 'accent' },
+      { label: '', tone: 'ink' },
+      { label: 'Hall sticks', tone: 'ghost' },
+    ],
+  },
+
+  about: {
+    kicker: 'Build',
+    title: 'Assembled in view',
+    body: 'No orbit for the sake of orbit. Scroll pulls twelve modules from a scatter field into one controller. Reverse the scroll and they leave again.',
+  },
+
+  board: {
+    kicker: 'Spec sheet',
+    title: 'On the door',
+    hoursLabel: 'Connectivity',
+    menuLabel: 'Modules',
+    hours: [
+      { day: 'Bluetooth', time: '5.2 LE Audio' },
+      { day: 'Wired', time: 'USB-C · 1000 Hz' },
+      { day: 'Dongle', time: 'Optional 2.4 GHz' },
+    ],
+    items: [
+      { name: 'Shell', note: 'Matte graphite ABS' },
+      { name: 'Sticks', note: 'Hall effect' },
+      { name: 'Triggers', note: 'Adaptive dual-stage' },
+      { name: 'Haptics', note: 'L / R voice-coil' },
+    ],
+  },
+
+  selected: {
+    kicker: 'Selected trays',
+    title: 'Builds we ship',
+    items: [
+      {
+        title: 'Vortex Core',
+        note: 'Graphite · cyan bus',
+        image: 'images/controller.jpg',
+        alt: 'Vortex Core controller',
+      },
+      {
+        title: 'Vortex Night',
+        note: 'Blackout · dim bus',
+        image: 'images/controller.jpg',
+        alt: 'Vortex Night controller',
+      },
+    ],
+  },
 
   cta: {
-    title: 'Run next month-end in one place',
-    body: 'Bring the close checklist. We will map it onto Ledgerline in a 30-minute walkthrough.',
-    label: 'Book a walkthrough',
-    href: 'https://example.com/demo',
+    kicker: 'Preorder',
+    title: 'Hold a serial for launch week',
+    body: 'Reserve a unit. We email when the build window opens — no charge until you confirm.',
+    href: 'https://example.com/vortex-preorder',
+    label: 'Preorder Vortex',
+    secondaryLabel: 'See the build',
+    secondaryHref: '#build',
+    steps: [
+      { num: '01', title: 'Hold window', body: 'Note by Friday' },
+      { num: '02', title: 'Confirm', body: 'Email when builds open' },
+      { num: '03', title: 'Ship', body: 'Launch week serial' },
+    ],
+  },
+
+  footer: {
+    place: 'Hardware lab · North Loop',
+    credit: 'Hero: procedural explode/assemble in Three.js. Poster still from Higgsfield Marketing Studio.',
   },
 
   motion: {
-    engine: 'particles',
-    scrollLengthVh: 3.2,
+    engine: 'webgl-explode',
+    scrollLengthVh: 3.6,
     scrub: 0.55,
-    lenisDuration: 1.1,
-    particleCount: 220,
     maxDpr: 2,
+    lenisDuration: 1.1,
   },
 };

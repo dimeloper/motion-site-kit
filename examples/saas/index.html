@@ -1,31 +1,263 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="vortex">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vortex — Assemble the console</title>
-  <meta name="description" content="Coming next: scroll-driven explode-to-assemble hero for a DualSense-class console." />
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100svh; display: grid; place-items: center;
-      padding: 2rem; background: #050505; color: #f2f2f2;
-      font-family: "IBM Plex Sans", system-ui, sans-serif;
+  <title>Vortex — Parts in the air. Then one piece.</title>
+  <meta name="description" content="A DualSense-class controller that seats itself on scroll — grips, sticks, and triggers lock in under your thumb." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="image" href="images/controller.jpg" fetchpriority="high" />
+  <link rel="stylesheet" href="src/styles.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "lenis": "https://esm.sh/lenis@1.3.26",
+      "gsap": "https://esm.sh/gsap@3.15.0",
+      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.15.0/ScrollTrigger",
+      "three": "https://esm.sh/three@0.170.0",
+      "three/addons/": "https://esm.sh/three@0.170.0/examples/jsm/"
     }
-    main { max-width: 36rem; }
-    p { margin: 0.6rem 0 0; color: #9a9a9a; line-height: 1.5; }
-    h1 { margin: 0; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.03em; }
-    .tag { font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: #6ea0ff; }
-    a { color: #fff; }
-  </style>
+  }
+  </script>
 </head>
 <body>
-  <main>
-    <p class="tag">Replacing Ledgerline</p>
-    <h1>Vortex</h1>
-    <p>Console / controller product page. Motion language: parts explode, then seat on scroll — not another orbit.</p>
-    <p>Scaffold only. Harbor craft checklist is locked — start from skills/motion-website/references/webgl-model.md. <a href="../local/">Harbor Oven</a></p>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <div class="shell">
+    <header class="topbar" data-topbar>
+      <a class="topbar__brand" href="#top">
+        <span class="topbar__mark" aria-hidden="true"></span>
+        <span data-bind="brand.name">Vortex</span>
+      </a>
+      <nav class="topbar__nav" aria-label="Primary">
+        <ul data-nav></ul>
+      </nav>
+      <div class="topbar__actions">
+        <div class="clock" data-clock>
+          <span class="clock__label">Local time</span>
+          <span class="clock__time" data-clock-time>8:00am</span>
+          <span class="clock__sep" aria-hidden="true">·</span>
+          <span class="clock__date" data-clock-date>Tuesday</span>
+        </div>
+        <button class="menu-btn" type="button" data-menu-open aria-expanded="false" aria-controls="nav-menu">
+          <span class="menu-btn__icon" aria-hidden="true"></span>
+          Menu
+        </button>
+      </div>
+    </header>
+
+    <section class="hero" data-hero data-motion="static" id="top">
+      <div class="hero__media">
+        <img class="hero__poster" src="images/controller.jpg" alt="Vortex DualSense-class wireless controller on a dark field." fetchpriority="high" decoding="async" />
+        <canvas class="hero__canvas" data-canvas aria-hidden="true"></canvas>
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__scrim" aria-hidden="true"></div>
+        <div class="hero__vignette" aria-hidden="true"></div>
+        <p class="hero__watermark" data-bind="hero.watermark" aria-hidden="true">VORTEX</p>
+      </div>
+
+      <div class="hero__grid">
+        <div class="hero__copy">
+          <h1 class="hero__headline">
+            <span class="hero__line hero__line--keep" data-bind="hero.line1">Parts in the air.</span>
+            <span class="hero__line" data-bind="hero.line2">Then one piece.</span>
+          </h1>
+          <p class="hero__sub" data-bind="hero.sub">A DualSense-class controller that seats itself on scroll — grips, sticks, and triggers lock in under your thumb.</p>
+          <div class="hero__ctas">
+            <a class="pill pill--ink" href="#cta" data-bind-href="hero.cta.href">
+              <span data-bind="hero.cta.label">Preorder</span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+            <a class="pill pill--ghost" href="#build" data-bind-href="hero.secondary.href" data-bind="hero.secondary.label">See the build</a>
+          </div>
+          <p class="visually-hidden" data-bind="hero.animationDescription"></p>
+        </div>
+
+        <aside class="hero__aside">
+          <article class="feature-card" data-card>
+            <figure class="feature-card__thumb">
+              <img data-card-image src="images/controller.jpg" alt="" width="480" height="480" />
+            </figure>
+            <div class="feature-card__body">
+              <p class="feature-card__caption" data-card-caption>Module</p>
+              <p class="feature-card__title" data-card-title>Left grip</p>
+              <p class="feature-card__note" data-card-note>Seats at 38% scroll.</p>
+              <div class="feature-card__footer">
+                <div class="feature-card__dots" data-card-dots aria-hidden="true"></div>
+                <div class="feature-card__controls">
+                  <button type="button" class="icon-btn" data-card-prev aria-label="Previous item">←</button>
+                  <button type="button" class="icon-btn" data-card-next aria-label="Next item">→</button>
+                </div>
+              </div>
+            </div>
+          </article>
+          <div class="trusted">
+            <p class="trusted__label" data-bind="trusted.label">In the lab with</p>
+            <ul class="trusted__list" data-trusted></ul>
+          </div>
+        </aside>
+      </div>
+
+      <div class="hero__rail">
+        <div class="hero__proximity" data-hero-proximity aria-live="polite">
+          <p class="hero__proximity-item" data-proximity="0">
+            <span class="dot" aria-hidden="true"></span>
+            <span data-bind="hero.eyebrow">Wireless console control</span>
+          </p>
+          <p class="hero__proximity-item" data-proximity="1" data-bind="hero.opened">Ship window Q3</p>
+        </div>
+        <div class="hero__status">
+          <span data-bind="hero.statusLeft">Exploded view</span>
+          <span class="hero__status-mid" data-bind="hero.statusCenter">Scroll to assemble</span>
+          <span data-bind="hero.statusRight">Pin engaged</span>
+        </div>
+      </div>
+
+      <div class="intro" data-loader data-exit>
+        <p class="intro__brand" data-bind="brand.name">Vortex</p>
+        <p class="intro__tag">Explode. Seat. Lock.</p>
+        <div class="intro__track">
+          <div class="intro__fill" data-loader-bar></div>
+        </div>
+        <p class="intro__meta">
+          <span>Loading</span>
+          <span class="intro__count" data-loader-count>000</span>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <main id="content">
+    <section class="services" id="spec">
+      <div class="services__card reveal">
+        <header class="services__head">
+          <h2 data-bind="services.title">What locks in</h2>
+        </header>
+        <ul class="services__list" data-services></ul>
+      </div>
+    </section>
+
+    <section class="stats" id="stats">
+      <p class="stats__kicker reveal"><span class="dot" aria-hidden="true"></span><span data-bind="stats.kicker">By the numbers</span></p>
+      <ul class="stats__grid" data-stats></ul>
+    </section>
+
+    <section class="studio" id="feel">
+      <div class="studio__panel reveal">
+        <div class="studio__aside">
+          <p class="studio__kicker"><span class="dot" aria-hidden="true"></span><span data-bind="studio.kicker">The feel</span></p>
+          <div class="studio__mark" aria-hidden="true">
+            <svg viewBox="0 0 120 120" width="120" height="120" fill="none">
+              <circle cx="60" cy="60" r="52" stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+              <path d="M30 70c10-28 50-28 60 0" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="42" cy="58" r="6" stroke="currentColor"/>
+              <circle cx="78" cy="58" r="6" stroke="currentColor"/>
+            </svg>
+          </div>
+        </div>
+        <div class="studio__copy">
+          <h2 class="studio__statement" data-studio-statement data-bind="studio.statement"></h2>
+          <div class="studio__row">
+            <p class="studio__find">Hardware lab · North Loop</p>
+            <a class="pill pill--ink pill--compact" data-bind-href="studio.aboutHref" href="#feel">
+              <span data-bind="studio.aboutLabel">Read the feel brief</span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="studio__pills" data-studio-pills></div>
+      </div>
+    </section>
+
+    <section class="about" id="build">
+      <figure class="about__media reveal">
+        <img src="images/controller.jpg" alt="Vortex controller product still" width="1800" height="1080" />
+      </figure>
+      <div class="about__copy reveal">
+        <p class="kicker" data-bind="about.kicker">Build</p>
+        <h2 data-bind="about.title">Assembled in view</h2>
+        <p data-bind="about.body"></p>
+      </div>
+    </section>
+
+    <section class="board" id="board">
+      <header class="board__head reveal">
+        <p class="kicker" data-bind="board.kicker">Spec sheet</p>
+        <h2 data-bind="board.title">On the door</h2>
+      </header>
+      <div class="board__grid">
+        <div class="board__col reveal">
+          <h3 data-bind="board.hoursLabel">Connectivity</h3>
+          <ul data-hours></ul>
+        </div>
+        <div class="board__col reveal">
+          <h3 data-bind="board.menuLabel">Modules</h3>
+          <ul data-menu></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="cta__card reveal">
+        <div class="cta__copy">
+          <p class="kicker" data-bind="cta.kicker">Preorder</p>
+          <h2 data-bind="cta.title">Hold a serial for launch week</h2>
+          <p data-bind="cta.body"></p>
+          <div class="cta__actions">
+            <a class="pill pill--ink" data-bind-href="cta.href" href="https://example.com/vortex-preorder">
+              <span data-bind="cta.label">Preorder Vortex</span>
+              <span class="pill__arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+            <a class="pill pill--ghost-ink" href="#build" data-bind-href="cta.secondaryHref" data-bind="cta.secondaryLabel">See the build</a>
+          </div>
+        </div>
+        <div class="cta__meta" data-cta-steps></div>
+      </div>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <p class="site-footer__brand" data-bind="brand.name">Vortex</p>
+    <p data-bind="footer.place">Hardware lab · North Loop</p>
+    <p class="site-footer__credit" data-bind="footer.credit"></p>
+  </footer>
+
+  <div class="nav-menu" id="nav-menu" data-nav-menu role="dialog" aria-modal="true" aria-label="Site menu" hidden>
+    <div class="nav-menu__wash" aria-hidden="true"></div>
+    <div class="nav-menu__top">
+      <a class="nav-menu__brand topbar__brand" href="#top">
+        <span class="topbar__mark" aria-hidden="true"></span>
+        <span data-bind="brand.name">Vortex</span>
+      </a>
+      <button type="button" class="menu-btn" data-menu-close>Close</button>
+    </div>
+    <nav class="nav-menu__body" aria-label="Site">
+      <p class="nav-menu__kicker">Jump</p>
+      <ul class="nav-menu__list" data-nav-mobile>
+        <li><a href="#spec"><span class="nav-menu__idx">01</span><span class="nav-menu__label">Spec</span></a></li>
+        <li><a href="#feel"><span class="nav-menu__idx">02</span><span class="nav-menu__label">Feel</span></a></li>
+        <li><a href="#build"><span class="nav-menu__idx">03</span><span class="nav-menu__label">Build</span></a></li>
+        <li><a href="#cta"><span class="nav-menu__idx">04</span><span class="nav-menu__label">Preorder</span></a></li>
+      </ul>
+    </nav>
+    <p class="nav-menu__foot">
+      <span data-bind="hero.proof">Adaptive triggers · Haptic bus</span>
+      <span class="nav-menu__foot-sep" aria-hidden="true">·</span>
+      <span>Scroll to assemble</span>
+    </p>
+  </div>
+
+  <div class="progress" aria-hidden="true"></div>
+
+  <script type="module" src="src/bind.js?v=2"></script>
+  <script type="module" src="src/page.js?v=2"></script>
+  <script type="module" src="src/motion.js?v=2"></script>
 </body>
 </html>
