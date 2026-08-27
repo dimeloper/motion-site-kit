@@ -9,7 +9,7 @@ with `template/`). The demos each fork their own engine:
 | Path | Engine |
 |---|---|
 | `examples/local/` | Live WebGL (Higgsfield Meshy GLB) |
-| `examples/saas/` | Particle field |
+| `examples/saas/` | Live WebGL fitness ring (peel / seat) |
 | `examples/commerce/` | Floating layered stills |
 
 `.nojekyll` is required so GitHub Pages does not run Jekyll on the frames.

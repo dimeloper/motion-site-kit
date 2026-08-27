@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 const BG = 0x100e0c;
 const DEFAULT_MODEL = new URL('../models/loaf.glb', import.meta.url).href;
@@ -188,6 +189,7 @@ export async function createHarborScene(canvas, opts = {}) {
   onProgress(0.35);
 
   const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
   const gltf = await loader.loadAsync(modelUrl, (event) => {
     if (!event.total) return;
     onProgress(0.35 + 0.45 * (event.loaded / event.total));

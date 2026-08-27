@@ -1,13 +1,13 @@
 /**
  * Vortex — fitness-ring WebGL hero driven by ScrollTrigger + Lenis.
- * Scene is one torus: land, puff, seat. No product GLB.
+ * Scene is a CAD titanium band: halo peels off the mesh and reseats.
  */
 
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
-import { createVortexScene } from './scene.js?v=26';
+import { createVortexScene } from './scene.js?v=38';
 
 gsap.registerPlugin(ScrollTrigger);
 

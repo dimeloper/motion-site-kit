@@ -1,5 +1,5 @@
 /**
- * Vortex — a fitness ring you wear. Hero is one torus: land, puff, seat.
+ * Vortex — a fitness ring you wear. Hero is a CAD band: halo peels, then seats.
  */
 
 export const CONFIG = {
@@ -35,7 +35,7 @@ export const CONFIG = {
     statusCenter: 'Scroll to close',
     statusRight: 'On your finger',
     animationDescription:
-      'Cyan motes travel around a fitness ring and seat on the same band. Scroll opens a halo on that tube, then seats it. Scrolling back opens it again.',
+      'A black titanium fitness ring sits in the hero. Cyan motes peel off the band as you scroll, then reseat. Scrolling back opens the halo again.',
   },
 
   tags: [
@@ -146,7 +146,7 @@ export const CONFIG = {
   footer: {
     place: 'Worn in North Loop',
     credit:
-      'Hero: procedural fitness torus in Three.js. Particles spiral one way and seat on the same ring. No product GLB.',
+      'Hero: CAD titanium band (image-to-3D cracks a ring). Cyan motes peel and reseat.',
     links: [
       { label: 'Day', href: '#modules' },
       { label: 'Wear', href: '#feel' },
@@ -162,9 +162,9 @@ export const CONFIG = {
   },
 
   motion: {
-    engine: 'webgl-assemble',
-    scrollLengthVh: 3.6,
-    scrub: 0.55,
+    engine: 'webgl',
+    scrollLengthVh: 3.4,
+    scrub: 0.6,
     maxDpr: 2,
     lenisDuration: 1.1,
   },

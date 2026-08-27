@@ -9,7 +9,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
-import { createHarborScene } from './scene.js?v=16';
+import { createHarborScene } from './scene.js?v=17';
 
 gsap.registerPlugin(ScrollTrigger);
 
