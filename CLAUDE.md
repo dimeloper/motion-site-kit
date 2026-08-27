@@ -34,7 +34,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 
 ## What's stubbed
 
-- **Photoreal source clips for the frame path.** Template and some stills still use studio captures. Harbor (`docs/examples/local/`) is the live WebGL craft reference (Meshy GLB + flour motes). **Vortex** (`saas/`, CAD titanium band: peel and seat). Next: **Halo** (`commerce/`, material peel). See `skills/motion-website/references/webgl-model.md`.
+- **Photoreal source clips for the frame path.** Template and some stills still use studio captures. Harbor (`docs/examples/local/`) is the live WebGL craft reference (Meshy GLB + flour motes). **Vortex** (`saas/`, CAD titanium band: peel and seat). Next: **Halo** (`commerce/`, material peel) — read **Starting Halo** + the **WebGL hero** gate in `skills/motion-website/references/webgl-model.md` and `qa.md` before generating anything. Do not show a WebGL hero until that gate is green.
 
 ## Verifying a change
 

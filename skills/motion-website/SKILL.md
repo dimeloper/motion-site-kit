@@ -27,7 +27,9 @@ product still ──▶ Higgsfield Meshy generate_3d ──▶ GLB ──▶ Thr
                      (MCP: motion-kit-higgsfield)           (poster fallback)
 ```
 
-Read `references/webgl-model.md` before generating. Prefer a clean cutout still; props in the photo become mesh. If Meshy is unavailable or the GLB fails budget/QA, **fall back to the frame pipeline** with the same poster — do not ship a broken canvas.
+Read `references/webgl-model.md` **and** the **WebGL hero** section of `references/qa.md` before generating. Prefer a clean cutout still; props in the photo become mesh. **Do not send rings, DualSense, or hollow cups through Meshy** — the decision tree in `webgl-model.md` says CAD or skip. Check Sketchfab/`isDownloadable` before promising a third-party file. If Meshy is unavailable or the GLB fails the visual gate, **fall back to the frame pipeline** with the same poster — do not ship a broken canvas.
+
+Halo (`docs/examples/commerce/`) is **material peel**, not a third orbit and not Vortex's particle halo. Do not start it until Vortex is accepted; do not show a Halo hero until the WebGL gate is green.
 
 ## Build order
 
@@ -128,6 +130,6 @@ Read these as needed rather than upfront:
 - `references/scroll-engine.md` — ScrollTrigger + Lenis config, the pin/scrub math, native CSS scroll timelines
 - `references/frame-pipeline.md` — extraction, encoding, the responsive ladder, manifest format
 - `references/performance-budget.md` — how the numbers were chosen, what to cut first
-- `references/webgl-model.md` — Higgsfield/Meshy GLB path, Harbor craft checklist, Vortex handoff, fallbacks
+- `references/webgl-model.md` — asset decision tree, visual gate, Harbor / Vortex / Halo handoff, fallbacks
 - `references/remotion.md` — programmatic frame generation, and the licensing caveat
-- `references/qa.md` — the pre-ship checklist
+- `references/qa.md` — pre-ship checklist; **WebGL hero** first when the demo is live Three.js

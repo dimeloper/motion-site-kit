@@ -2,6 +2,24 @@
 
 Run all of it. The items are ordered by how often they catch something.
 
+For a **live WebGL** hero (Harbor / Vortex / Halo), finish **WebGL hero** below *before* asking anyone to look. That list is what Vortex's cracked ring, under-headline framing, and tight halo would have failed — the Motion/Loading items alone would not have caught them.
+
+## WebGL hero
+
+Run in a **visible** browser tab (`data-motion="ready"`, canvas opacity 1). Background tabs throttle `requestAnimationFrame` and GSAP.
+
+- [ ] **Asset path matches the decision tree** in `webgl-model.md`. Genus-1 rings are CAD. DualSense / hollow cups / mixed sticks were not sent through Meshy. A Sketchfab (or other) link was checked for `isDownloadable` + a named license before anyone promised the file.
+- [ ] **Mesh is solid.** No cracked clay, no jagged reconstruction, no z-fighting from extra liner/inlay meshes. If the first GLB fails this, discard it — do not ship and "see what they think."
+- [ ] **Two-lane framing.** Desktop: type left, product in the right third, **not under the headline**. Longest on-screen product axis is about **35–50% of hero height** (close enough to read materials; not a postage stamp; not cropped at the top).
+- [ ] **Supporting field fills the hero after intro.** Particles or peel shards land on the object first, then expand across the hero after a short beat. At rest they are not a noisy shell that makes a good mesh look cracked.
+- [ ] **Motion language is this vertical's.** Harbor = orbit. Vortex = particle peel → seat. Halo = **material peel** on cups. Reverse scroll restores the previous state (orbit back / halo reopen / material reseat).
+- [ ] **Loader invariant.** `data-motion` starts `static`; `preloading` only after JS commits. No `requestAnimationFrame` wait in the loader path.
+- [ ] **Poster is a real `<img>`**; canvas fades in over it. Reduced-motion / Save-Data / 2G / no WebGL still show the poster.
+- [ ] **Weight.** GLB went through `scripts/compress_glb.sh`; loader has `MeshoptDecoder`. Canonical file under `docs/examples/*/models/`; `examples/` is a symlink.
+- [ ] **Phones get the animation** — no width cutoff.
+
+Then continue with Motion / Loading / Fallbacks / Devices below (reverse scroll, Slow 4G, real phone).
+
 ## Motion
 
 - [ ] **Scroll back up.** The sequence must reverse cleanly with no flicker, no reload, no dropped frames. Reverse is where preload bugs surface, because forward playback can mask lazy decoding.

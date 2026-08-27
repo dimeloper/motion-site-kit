@@ -4,7 +4,7 @@
 |---|---|---|---|
 | `local/` | Harbor Oven | Live WebGL loaf orbit + flour motes | Craft reference — reuse patterns for Vortex |
 | `saas/` | **Vortex** | CAD ring: peel → seat | Active — solid torus, inner sensors |
-| `commerce/` | **Halo** | Material peel | Stub — after Vortex |
+| `commerce/` | **Halo** | Material peel | Stub — Kiln Carry float layers until Starting Halo in `webgl-model.md` |
 
 Serve: `python3 -m http.server 8080 --directory docs` → `/examples/local/`, `/examples/saas/`, `/examples/commerce/`.
 
