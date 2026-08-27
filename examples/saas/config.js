@@ -1,6 +1,5 @@
 /**
- * Vortex — DualSense-class console page.
- * Motion language: parts explode, then seat on scroll (not orbit).
+ * Vortex — a fitness ring you wear. Hero is one torus: land, puff, seat.
  */
 
 export const CONFIG = {
@@ -14,178 +13,156 @@ export const CONFIG = {
   },
 
   nav: [
-    { label: 'Spec', href: '#spec' },
-    { label: 'Feel', href: '#feel' },
-    { label: 'Build', href: '#build' },
+    { label: 'Day', href: '#modules' },
+    { label: 'Wear', href: '#feel' },
+    { label: 'Finishes', href: '#builds' },
     { label: 'Preorder', href: '#cta', action: 'cta' },
   ],
 
   hero: {
-    eyebrow: 'Wireless console control',
-    line1: 'Parts in the air.',
-    line2: 'Then one piece.',
-    headline: 'Parts in the air. Then one piece.',
-    sub: 'A DualSense-class controller that seats itself on scroll — grips, sticks, and triggers lock in under your thumb.',
-    proof: 'Adaptive triggers · Haptic bus',
+    eyebrow: 'Fitness ring',
+    line1: 'Wear the ring.',
+    line2: 'Every day.',
+    headline: 'Wear the ring. Every day.',
+    lead: 'Move, strain, and sleep. On one band.',
+    sub: 'Vortex is a fitness ring you wear through the day. Heart, load, and recovery sit on your finger — not on another screen.',
+    proof: '18-hour wear · Daily close',
     opened: 'Ship window Q3',
     cta: { label: 'Preorder', href: '#cta' },
-    secondary: { label: 'See the build', href: '#build' },
+    secondary: { label: 'On the band', href: '#modules' },
     watermark: 'VORTEX',
-    statusLeft: 'Exploded view',
-    statusCenter: 'Scroll to assemble',
-    statusRight: 'Pin engaged',
+    statusLeft: 'Ring open',
+    statusCenter: 'Scroll to close',
+    statusRight: 'On your finger',
     animationDescription:
-      'As you scroll, scattered controller parts fly inward and lock into a finished DualSense-class form.',
+      'Cyan motes travel around a fitness ring and seat on the same band. Scroll opens a halo on that tube, then seats it. Scrolling back opens it again.',
   },
 
-  cards: [
-    {
-      caption: 'Module',
-      title: 'Left grip',
-      note: 'Seats at 38% scroll.',
-      image: 'images/controller.jpg',
-      alt: 'Vortex controller grip module',
-    },
-    {
-      caption: 'Module',
-      title: 'Haptic core',
-      note: 'Bus lights after lock.',
-      image: 'images/controller.jpg',
-      alt: 'Vortex haptic core',
-    },
-    {
-      caption: 'Module',
-      title: 'Trigger pair',
-      note: 'Adaptive travel last.',
-      image: 'images/controller.jpg',
-      alt: 'Vortex adaptive triggers',
-    },
+  tags: [
+    'Heart rate',
+    'Daily close',
+    'Sleep',
+    'Strain',
+    'Recovery',
   ],
 
   trusted: {
-    label: 'In the lab with',
-    names: ['Northline Studio', 'Arc Race', 'Pulse Arcade', 'Kite Games'],
+    label: 'Worn with',
+    names: ['Northline', 'Arc Race', 'Pulse', 'Kite', 'Ledgerly', 'Vaulted'],
   },
 
-  services: {
-    title: 'What locks in',
+  modules: {
+    kicker: 'On the band',
+    title: 'Heart, load, and sleep.',
     items: [
       {
         num: '01',
-        title: 'Shell halves',
-        body: 'Graphite shells approach from opposite sides and meet on the midplane.',
-        href: '#build',
+        title: 'Move',
+        body: 'Walks, rides, and sessions write to the band until you take it off.',
+        href: '#builds',
       },
       {
         num: '02',
-        title: 'Analog sticks',
-        body: 'Caps drop onto their wells with a short overshoot, then settle.',
-        href: '#build',
+        title: 'Strain',
+        body: 'Heart rate and training load, captured while you move.',
+        href: '#builds',
       },
       {
         num: '03',
-        title: 'Face cluster',
-        body: 'Four face buttons and the touch strip seat as one assembly.',
-        href: '#build',
+        title: 'Recover',
+        body: 'Sleep and HRV tell you when to push and when to stop.',
+        href: '#builds',
       },
       {
         num: '04',
-        title: 'Triggers',
-        body: 'L2 / R2 slide home last — adaptive travel engages after lock.',
-        href: '#build',
+        title: 'Tomorrow',
+        body: 'Each morning starts a new day on the same ring.',
+        href: '#builds',
       },
     ],
   },
 
   stats: {
-    kicker: 'By the numbers',
     items: [
-      { value: '12', label: 'Discrete parts in the explode' },
-      { value: '3.4', label: 'Viewport heights of scroll pin' },
-      { value: '8 ms', label: 'Haptic sample bus' },
-      { value: '48 h', label: 'Battery at mid brightness' },
+      { value: '18 h', label: 'Wear time' },
+      { value: '7-day', label: 'Close streak' },
+      { value: '4.9', label: 'Worn rating' },
     ],
   },
 
-  studio: {
-    kicker: 'The feel',
-    statement:
-      'We design for the moment the last part seats — resistance in the triggers, a quiet click in the sticks, light on the bus.',
-    aboutHref: '#feel',
-    aboutLabel: 'Read the feel brief',
-    pills: [
-      { label: 'Adaptive triggers', tone: 'soft' },
-      { label: 'Dual haptics', tone: 'accent' },
-      { label: '', tone: 'ink' },
-      { label: 'Hall sticks', tone: 'ghost' },
+  feel: {
+    kicker: 'On-body',
+    titleBefore: 'Built for the hour',
+    titleAccent: 'you take it off',
+    body: 'Light enough to sleep in. You forget it is on until you take it off.',
+    pills: ['Titanium band', 'SpO₂', 'Skin temp'],
+  },
+
+  builds: {
+    kicker: 'Finishes',
+    title: 'Three finishes. One ring.',
+    items: [
+      {
+        num: '01',
+        title: 'Vortex Core',
+        body: 'Brushed titanium. Gym, desk, and the commute between.',
+        tone: 'paper',
+        links: ['Spec sheet', 'Preorder'],
+      },
+      {
+        num: '02',
+        title: 'Vortex Night',
+        body: 'Blackout band. Lights-out sleep and skin temp.',
+        tone: 'photo',
+        image: 'images/lock-night.jpg',
+        cta: 'Discover',
+      },
+      {
+        num: '03',
+        title: 'Vortex Pulse',
+        body: 'Cyan inlay. The band you can see from across the room.',
+        tone: 'ink',
+        cta: 'Discover',
+      },
     ],
   },
 
   about: {
-    kicker: 'Build',
-    title: 'Assembled in view',
-    body: 'No orbit for the sake of orbit. Scroll pulls twelve modules from a scatter field into one controller. Reverse the scroll and they leave again.',
-  },
-
-  board: {
-    kicker: 'Spec sheet',
-    title: 'On the door',
-    hoursLabel: 'Connectivity',
-    menuLabel: 'Modules',
-    hours: [
-      { day: 'Bluetooth', time: '5.2 LE Audio' },
-      { day: 'Wired', time: 'USB-C · 1000 Hz' },
-      { day: 'Dongle', time: 'Optional 2.4 GHz' },
-    ],
-    items: [
-      { name: 'Shell', note: 'Matte graphite ABS' },
-      { name: 'Sticks', note: 'Hall effect' },
-      { name: 'Triggers', note: 'Adaptive dual-stage' },
-      { name: 'Haptics', note: 'L / R voice-coil' },
-    ],
-  },
-
-  selected: {
-    kicker: 'Selected trays',
-    title: 'Builds we ship',
-    items: [
-      {
-        title: 'Vortex Core',
-        note: 'Graphite · cyan bus',
-        image: 'images/controller.jpg',
-        alt: 'Vortex Core controller',
-      },
-      {
-        title: 'Vortex Night',
-        note: 'Blackout · dim bus',
-        image: 'images/controller.jpg',
-        alt: 'Vortex Night controller',
-      },
-    ],
+    kicker: 'Why a ring',
+    title: 'A watch wants your wrist. This does not.',
+    body: 'Vortex stays on your finger so heart rate, strain, and sleep keep running while you train, type, and sleep. No extra strap. No second screen.',
   },
 
   cta: {
     kicker: 'Preorder',
-    title: 'Hold a serial for launch week',
-    body: 'Reserve a unit. We email when the build window opens — no charge until you confirm.',
+    title: 'Reserve a size.',
+    body: 'We email when your band ships. No charge until you confirm.',
     href: 'https://example.com/vortex-preorder',
     label: 'Preorder Vortex',
-    secondaryLabel: 'See the build',
-    secondaryHref: '#build',
-    steps: [
-      { num: '01', title: 'Hold window', body: 'Note by Friday' },
-      { num: '02', title: 'Confirm', body: 'Email when builds open' },
-      { num: '03', title: 'Ship', body: 'Launch week serial' },
-    ],
+    secondaryLabel: 'On the band',
+    secondaryHref: '#modules',
   },
 
   footer: {
-    place: 'Hardware lab · North Loop',
-    credit: 'Hero: procedural explode/assemble in Three.js. Poster still from Higgsfield Marketing Studio.',
+    place: 'Worn in North Loop',
+    credit:
+      'Hero: procedural fitness torus in Three.js. Particles spiral one way and seat on the same ring. No product GLB.',
+    links: [
+      { label: 'Day', href: '#modules' },
+      { label: 'Wear', href: '#feel' },
+      { label: 'Finishes', href: '#builds' },
+      { label: 'Preorder', href: '#cta' },
+    ],
+    social: [
+      { label: 'Instagram', href: '#' },
+      { label: 'X', href: '#' },
+      { label: 'YouTube', href: '#' },
+      { label: 'LinkedIn', href: '#' },
+    ],
   },
 
   motion: {
-    engine: 'webgl-explode',
+    engine: 'webgl-assemble',
     scrollLengthVh: 3.6,
     scrub: 0.55,
     maxDpr: 2,

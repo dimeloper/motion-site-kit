@@ -1,6 +1,6 @@
 /**
- * Harbor-only page motion: loader numerals, clock, card carousel, menu, reveals.
- * Does not drive the frame sequence.
+ * Vortex page motion — loader, menu dialog, reveals.
+ * Does not drive the WebGL assemble scene.
  */
 
 import { CONFIG } from '../config.js';
@@ -39,99 +39,24 @@ function revealOnView() {
     nodes.forEach((node) => node.classList.add('is-in'));
     return;
   }
-  const io = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.classList.add('is-in');
-      io.unobserve(entry.target);
-    }
-  }, { threshold: 0.18 });
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.16 },
+  );
   nodes.forEach((node) => io.observe(node));
-}
-
-function formatTime(date) {
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const meridiem = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12 || 12;
-  return `${hours}:${minutes}${meridiem}`;
-}
-
-function formatDate(date) {
-  return date.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-
-function initClock() {
-  const timeNode = document.querySelector('[data-clock-time]');
-  const dateNode = document.querySelector('[data-clock-date]');
-  if (!timeNode || !dateNode) return;
-
-  const tick = () => {
-    const now = new Date();
-    timeNode.textContent = formatTime(now);
-    dateNode.textContent = formatDate(now);
-  };
-  tick();
-  window.setInterval(tick, 1000);
-}
-
-function initCard() {
-  const cards = CONFIG.cards || [];
-  if (!cards.length) return;
-
-  const image = document.querySelector('[data-card-image]');
-  const caption = document.querySelector('[data-card-caption]');
-  const title = document.querySelector('[data-card-title]');
-  const note = document.querySelector('[data-card-note]');
-  const dots = document.querySelector('[data-card-dots]');
-  const prev = document.querySelector('[data-card-prev]');
-  const next = document.querySelector('[data-card-next]');
-  if (!image || !caption || !title || !note || !dots) return;
-
-  let index = 0;
-  dots.innerHTML = cards.map(() => '<span></span>').join('');
-  const dotNodes = [...dots.querySelectorAll('span')];
-
-  const paint = () => {
-    const card = cards[index];
-    image.src = card.image;
-    image.alt = card.alt || '';
-    caption.textContent = card.caption;
-    title.textContent = card.title;
-    note.textContent = card.note;
-    dotNodes.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-  };
-
-  const step = (delta) => {
-    index = (index + delta + cards.length) % cards.length;
-    paint();
-  };
-
-  prev?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    step(-1);
-  });
-  next?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    step(1);
-  });
-  document.querySelector('[data-card]')?.addEventListener('click', (event) => {
-    if (event.target.closest('button')) return;
-    step(1);
-  });
-
-  paint();
 }
 
 function scrollToHash(hash) {
   if (!hash || hash.length < 2) return false;
   const target = document.querySelector(hash);
   if (!target) return false;
-  const lenis = window.__harborLenis;
+  const lenis = window.__harborLenis || window.__vortexLenis;
   if (lenis) lenis.scrollTo(target, { offset: -8 });
   else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   return true;
@@ -225,10 +150,14 @@ function initMenu() {
       closing = false;
       restoreFocus();
     };
-    menu.addEventListener('transitionend', (event) => {
-      if (event.target !== menu || event.propertyName !== 'opacity') return;
-      finish();
-    }, { once: true });
+    menu.addEventListener(
+      'transitionend',
+      (event) => {
+        if (event.target !== menu || event.propertyName !== 'opacity') return;
+        finish();
+      },
+      { once: true },
+    );
     window.setTimeout(finish, 420);
   };
 
@@ -248,12 +177,11 @@ function initMenu() {
   });
 }
 
-/** Fallback when motion.js hasn't attached Lenis yet (or static hero). */
 function initInPageAnchors() {
   document.addEventListener(
     'click',
     (event) => {
-      if (window.__harborLenis) return; // motion.js owns Lenis-aware scroll
+      if (window.__harborLenis || window.__vortexLenis) return;
       const link = event.target.closest('a[href^="#"]');
       if (!link || link.closest('[data-nav-menu]')) return;
       const hash = link.getAttribute('href');
@@ -268,7 +196,5 @@ function initInPageAnchors() {
 
 watchHero();
 revealOnView();
-initClock();
-initCard();
 initMenu();
 initInPageAnchors();

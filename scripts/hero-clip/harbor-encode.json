@@ -1,0 +1,14 @@
+{
+  "output": "docs/examples/local/frames",
+  "frames": { "count": 90, "widths": [640, 960, 1600] },
+  "formats": ["avif", "webp"],
+  "quality": { "avif": 36, "webp": 38 },
+  "budget": {
+    "sequenceBytes": 8388608,
+    "singleFrameBytes": 120000,
+    "narrowRungBytes": 1500000,
+    "narrowRungWidth": 640,
+    "frameCountMin": 60,
+    "frameCountMax": 150
+  }
+}

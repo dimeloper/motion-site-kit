@@ -1,12 +1,13 @@
 /**
- * Vortex — explode/assemble WebGL hero driven by ScrollTrigger + Lenis.
+ * Vortex — fitness-ring WebGL hero driven by ScrollTrigger + Lenis.
+ * Scene is one torus: land, puff, seat. No product GLB.
  */
 
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
-import { createVortexScene } from './scene.js?v=3';
+import { createVortexScene } from './scene.js?v=26';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -85,6 +86,8 @@ function updateProximity(hero, progress) {
 function showStaticFallback(root, reason) {
   root.dataset.motion = 'static';
   root.dataset.fallbackReason = reason;
+  const poster = root.querySelector('.hero__poster');
+  if (poster) poster.style.opacity = '';
   root.querySelector('[data-loader]')?.remove();
   updateProximity(root, 1);
 }
@@ -120,6 +123,7 @@ function bindScrollScene({ hero, canvas, scene }) {
   });
 
   updateProximity(hero, 0);
+  scene.render(0);
 
   const onResize = () => {
     scene.resize();
@@ -146,6 +150,8 @@ export async function initMotion() {
   }
 
   root.dataset.motion = 'preloading';
+  const poster = root.querySelector('.hero__poster');
+  if (poster) poster.style.opacity = '0';
   setLoaderProgress(bar, 0.08);
 
   let scene;
@@ -172,6 +178,7 @@ export async function initMotion() {
 
   root.dataset.motion = 'ready';
   dismissLoader(loader);
+  scene.playIntro?.();
 }
 
 if (document.readyState === 'loading') {

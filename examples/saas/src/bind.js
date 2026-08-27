@@ -1,6 +1,6 @@
 /**
- * Harbor Oven page chrome: nav, board lists, card carousel data.
- * Sequence playback stays in motion.js.
+ * Vortex page chrome binders — modules list, builds cards, footer.
+ * Scene playback stays in motion.js / scene.js.
  */
 
 import { CONFIG } from '../config.js';
@@ -86,97 +86,105 @@ function renderNav() {
   );
 }
 
-function renderBoard() {
-  renderList('[data-hours]', CONFIG.board?.hours, (row) =>
-    `<li><span>${row.day}</span><span>${row.time}</span></li>`);
-  renderList('[data-menu]', CONFIG.board?.items, (row) =>
-    `<li><span>${row.name}</span><span>${row.note}</span></li>`);
-}
-
 function renderTrusted() {
-  renderList('[data-trusted]', CONFIG.trusted?.names, (name) =>
-    `<li>${name}</li>`);
-}
-
-function renderServices() {
-  renderList('[data-services]', CONFIG.services?.items, (item) =>
-    `<li class="services__item">
-      <a class="services__link" href="${item.href}">
-        <span class="services__num">${item.num}</span>
-        <span class="services__title">${item.title}</span>
-        <span class="services__body">${item.body}</span>
-        <span class="services__arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
-        </span>
-      </a>
-    </li>`);
+  renderList('[data-trusted]', CONFIG.trusted?.names, (name) => `<li>${name}</li>`);
 }
 
 function renderStats() {
-  renderList('[data-stats]', CONFIG.stats?.items, (item) =>
-    `<li class="stats__item reveal">
-      <span class="stats__value">${item.value}</span>
-      <span class="stats__label">${item.label}</span>
-    </li>`);
+  renderList(
+    '[data-stats]',
+    CONFIG.stats?.items,
+    (item) =>
+      `<li class="hero__stat"><span class="hero__stat-value">${item.value}</span><span class="hero__stat-label">${item.label}</span></li>`,
+  );
 }
 
-function renderStudio() {
-  const statement = document.querySelector('[data-studio-statement]');
-  const studio = CONFIG.studio;
-  if (statement && studio?.statement) {
-    const accent = studio.accent;
-    if (accent && studio.statement.includes(accent)) {
-      statement.innerHTML = studio.statement.replace(
-        accent,
-        `<span class="studio__accent">${accent}</span>`,
-      );
-    } else {
-      statement.textContent = studio.statement;
+function renderTags() {
+  renderList(
+    '[data-tags]',
+    CONFIG.tags,
+    (label) => `<li><span class="tag">${label}</span></li>`,
+  );
+}
+
+function renderModules() {
+  renderList(
+    '[data-modules]',
+    CONFIG.modules?.items,
+    (item) =>
+      `<li class="modules__item reveal">
+        <a class="modules__link" href="${item.href}">
+          <span class="modules__num">${item.num}</span>
+          <span class="modules__text">
+            <span class="modules__title">${item.title}</span>
+            <span class="modules__body">${item.body}</span>
+          </span>
+          <span class="modules__go" aria-hidden="true">→</span>
+        </a>
+      </li>`,
+  );
+}
+
+function renderFeelPills() {
+  renderList(
+    '[data-feel-pills]',
+    CONFIG.feel?.pills,
+    (label) => `<li><span class="tag tag--on-paper">${label}</span></li>`,
+  );
+}
+
+function renderBuilds() {
+  renderList('[data-builds]', CONFIG.builds?.items, (item) => {
+    if (item.tone === 'photo') {
+      return `<article class="build-card build-card--photo reveal">
+        <img src="${item.image}" alt="" width="800" height="1000" loading="lazy" />
+        <div class="build-card__overlay">
+          <span class="build-card__num">${item.num}</span>
+          <h3>${item.title}</h3>
+          <p>${item.body}</p>
+          <span class="build-card__cta">${item.cta || 'Discover'} →</span>
+        </div>
+      </article>`;
     }
-  }
-
-  renderList('[data-studio-pills]', studio?.pills, (pill) =>
-    `<span class="word-pill word-pill--${pill.tone}">${
-      pill.tone === 'ink'
-        ? `<span class="word-pill__arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>`
-        : pill.label
-    }</span>`);
-}
-
-function renderSelected() {
-  renderList('[data-selected]', CONFIG.selected?.items, (item) =>
-    `<article class="selected__card reveal">
-      <figure class="selected__media">
-        <img src="${item.image}" alt="${item.alt || ''}" width="800" height="1000" loading="lazy" />
-      </figure>
-      <div class="selected__meta">
+    if (item.tone === 'ink') {
+      return `<article class="build-card build-card--ink reveal">
+        <span class="build-card__num">${item.num}</span>
         <h3>${item.title}</h3>
-        <p>${item.note}</p>
-      </div>
-    </article>`);
+        <p>${item.body}</p>
+        <span class="build-card__cta">${item.cta || 'Discover'} →</span>
+      </article>`;
+    }
+    const links = (item.links || [])
+      .map((label) => `<li><span>${label}</span><span aria-hidden="true">↗</span></li>`)
+      .join('');
+    return `<article class="build-card build-card--paper reveal">
+      <span class="build-card__num">${item.num}</span>
+      <h3>${item.title}</h3>
+      <p>${item.body}</p>
+      <ul class="build-card__links">${links}</ul>
+    </article>`;
+  });
 }
 
-function renderCta() {
-  renderList('[data-cta-meta]', CONFIG.cta?.aside?.lines, (row) =>
-    `<li><span>${row.k}</span><span>${row.v}</span></li>`);
-  renderList('[data-cta-steps]', CONFIG.cta?.steps, (step) =>
-    `<li class="cta__step">
-      <span class="cta__num">${step.num}</span>
-      <div>
-        <h3>${step.title}</h3>
-        <p>${step.body}</p>
-      </div>
-    </li>`);
+function renderFooter() {
+  renderList(
+    '[data-footer-links]',
+    CONFIG.footer?.links,
+    (item) => `<li><a href="${item.href}">${item.label}</a></li>`,
+  );
+  const socialHtml = (item) => `<li><a href="${item.href}">${item.label}</a></li>`;
+  renderList('[data-footer-social]', CONFIG.footer?.social, socialHtml);
+  renderList('[data-menu-social]', CONFIG.footer?.social, socialHtml);
 }
 
 loadFonts();
 applyBrand();
 bindText();
 renderNav();
-renderBoard();
 renderTrusted();
-renderServices();
 renderStats();
-renderStudio();
-renderSelected();
-renderCta();
+renderTags();
+renderModules();
+renderFeelPills();
+renderBuilds();
+renderFooter();

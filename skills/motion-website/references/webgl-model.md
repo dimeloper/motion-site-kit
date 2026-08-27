@@ -9,11 +9,11 @@ Frame scrub remains the default kit path. Live WebGL is the optional branch when
 | Engine | Demo | Motion language | Asset |
 |---|---|---|---|
 | Frame scrub | `template/`, classic reskins | Camera move baked into a 120-frame ladder | AVIF/WebP sequence under budget |
-| Live WebGL | Harbor (`local`) → pattern for **Vortex** / **Halo** | Orbit / explode-assemble / peel — one language per vertical | `models/*.glb` + Three.js |
+| Live WebGL | Harbor (`local`) → pattern for **Vortex** / **Halo** | Orbit / peel-and-seat / peel — one language per vertical | Harbor: `models/*.glb`. Vortex: procedural fitness torus + poster still. |
 | Particles | Optional fork | Scroll densifies a field | Canvas only — poster still for LCP |
 | Float layers | Optional fork | Layered stills drift in z-depth | A few stills, no sequence decode |
 
-Do **not** ship three demos that all rotate-and-zoom the same way. Harbor proved orbit; Vortex should explode→assemble; Halo should peel material — three verticals **and** three motion languages.
+Do **not** ship three demos that all rotate-and-zoom the same way. Harbor proved orbit; Vortex peels particles off a fitness torus and reseats them (no product GLB); Halo should peel material — three verticals **and** three motion languages.
 
 ## Harbor craft checklist (reuse for Vortex)
 
@@ -28,9 +28,9 @@ Learnings locked in after the Harbor pass — apply these before calling a WebGL
 - **Menu** — paper body matching brand paper/ink; **top chrome matches the hero topbar** (dark frosted bar, white brand, glass close). Animate open/close; static nav HTML as fallback; `role="dialog"` + `aria-modal` + focus trap + Escape + restore focus.
 
 ### Scene / GLB
-1. **Still** — product on a clean, preferably dark or cutout background. Avoid racks, trays, props that Meshy will bake into the mesh (Harbor's first pass included a cooling rack as a black ring).
-2. **`generate_3d`** (Meshy image→3D / PBR) via project MCP `motion-kit-higgsfield`. Prefer the tool over inventing geometry in Three.js.
-3. Download the GLB into the site tree (`models/product.glb`). Keep source stills for the poster `<img>`.
+1. **Still** — product alone on a clean background (or a cutout). Avoid racks, trays, consoles, props that Meshy will bake into the mesh (Harbor's first pass included a cooling rack as a black ring). **Skip DualSense-class controllers** — sticks, mixed plastics, and translucent buttons turn into clay + grit. Prefer a sculptural object with two or three materials (loaf, over-ear cups, speaker).
+2. Prefer the **Unsplash → cutout → Meshy** path below over inventing geometry in Three.js.
+3. Download the GLB into the site tree (`models/product.glb`). Composite the cutout onto a dark field for the poster `<img>` (LCP).
 4. Wire `config.js`:
 
 ```js
@@ -43,9 +43,22 @@ motion: {
 }
 ```
 
-5. Runtime lives in Harbor's `src/scene.js` + `src/motion.js` (Three r170 + `GLTFLoader` via import map). **Copy that pair** when you need the WebGL path; do not fold it into the frame-scrub `template/src/motion.js`.
-6. Soft **flour / dust motes** (or product-appropriate particles) orbit the model — additive, warm or brand-tinted, continuous RAF so they drift when idle. Do not port a full postprocessing particle “sea” unless the vertical asks for it.
-7. No decorative plinths / void caps that intersect the mesh — they read as rings on dark backgrounds. Soft bounce light under the object helps baked AO; it does not fix a rack baked into the GLB.
+5. Runtime lives in Harbor's / Vortex's `src/scene.js` + `src/motion.js` (Three r170 + `GLTFLoader` via import map). **Copy that pair** when you need the WebGL path; do not fold it into the frame-scrub `template/src/motion.js`.
+6. Soft **flour / dust / assemble particles** — additive, brand-tinted, continuous RAF. Harbor: motes orbit the loaf. Vortex: particles **peel off and reseat** a procedural fitness torus (same mesh as the poster; the ring never pops in). Do not send DualSense / hollow cups through image-to-3D.
+7. No decorative plinths / void caps that intersect the mesh — they read as rings on dark backgrounds. Soft bounce light under the object helps baked AO; it does not fix a prop baked into the GLB.
+
+### Unsplash → Higgsfield 3D (Vortex recipe)
+
+Use this when you need a **realistic PBR product mesh** and do not already have a clean studio GLB.
+
+1. **Find a still** on Unsplash (or equivalent) of the **product alone** — full object in frame, no sibling hardware, no trays. Three-quarter product shots work best. DualSense / gamepads fail this path; over-ear headphones and bakery loaves do not.
+2. **`media_import_url`** the HTTPS image into Higgsfield. Never pass raw Unsplash URLs into `generate_3d` medias.
+3. **`remove_background`** on that media_id when the subject sits on wood/cloth/desk — Meshy will otherwise extrude the surface into the mesh.
+4. **`generate_3d`** with `meshy_v7_image_to_3d` (or `image_to_3d`): `should_texture: true`, `enable_pbr: true`, `symmetry_mode: 'on'` for bilateral products, `target_polycount` ~40–80k. Preflight with `get_cost: true` (often ~38 credits on Plus).
+5. Download the `.glb` into `docs/examples/<demo>/models/`. Keep the cutout + a dark-composited JPEG/AVIF as `images/` poster.
+6. Wire `modelUrl` and a motion language that fits a **single mesh** (coalesce / orbit / peel) — do not fake multi-part explode with box primitives.
+
+Check `balance` before regenerating. CloudFront GLB URLs expire; re-fetch via `job_status` if a download 403s.
 
 ### Credits and size
 
@@ -77,17 +90,18 @@ Poster is a real `<img>`; the canvas fades in over it (`aria-hidden` on canvas).
 
 ## Starting Vortex
 
-1. Scaffold from Harbor structure (`config.js` + `bind.js` + page chrome) or promote `docs/examples/saas/` stub.  
-2. New motion language only: **parts explode, then seat on scroll** — do not copy Harbor's orbit camera.  
-3. Generate a clean DualSense-class GLB (or kitbash) via Higgsfield; same fallback chain.  
-4. Reuse Harbor menu / Lenis / proximity / mobile scrim patterns; reskin brand tokens in `config.js`.  
-5. Gate: scroll reverse, Slow 4G, real phone, axe on default + menu-open states.
+1. Live craft reference: `docs/examples/saas/` (Vortex). Do **not** reskin Harbor's bakery sections — chrome should read as a dark hardware / GetLayers-style landing (floating glass pill nav, numbered module list, finish cards, Baseline-style full-screen menu).
+2. Motion language: **land → puff → seat** on one fitness torus. Particles spiral **one way** (accumulated spin, never reversed). Intro spirals in on that path. On the close, the solid band rotates onto the particle ring. Poster is static fallback only. Do not send DualSense / hollow cups through image-to-3D.
+3. Poster is a real `<img>` of the locked ring (Higgsfield Recraft still is fine). `data-motion` starts `static`; once JS commits, the poster hides and the canvas plays the land intro. Same fallback chain as Harbor.
+4. Reuse Harbor **a11y / Lenis / menu dialog / loader** patterns only; brand tokens and section composition stay Vortex-specific in `config.js`.
+5. Gate: motion path lands from a blank field (no solid ring at rest); scroll reverse; Slow 4G; real phone; axe on default + menu-open states.
 
 ## Verification
 
 ```bash
 cd docs && python3 -m http.server 8080
 # open /examples/local/ — hero should reach data-motion="ready"
-# mobile width ~390px: headline readable, CTAs tappable, loaf not under type
+# open /examples/saas/ — particles spiral in one direction; on close the band aligns with the particle ring; reverse opens it
+# mobile width ~390px: headline readable, CTAs tappable, lock not under type
 # scroll reverse; throttle Slow 4G; confirm poster path with reduced-motion
 ```
