@@ -10,9 +10,11 @@ with `template/`). The demos each fork their own engine:
 |---|---|
 | `examples/local/` | Live WebGL (Higgsfield Meshy GLB) |
 | `examples/saas/` | Live WebGL fitness ring (peel / seat) |
-| `examples/commerce/` | Floating layered stills |
+| `examples/commerce/` | Halo studio. Rings lift / seat. Compose from `kit/` |
+| `kit/` | 30 section families; `planPage()` picks from content |
 
 `.nojekyll` is required so GitHub Pages does not run Jekyll on the frames.
 
 Frame ladders: regenerate with `scripts/hero-clip/` then `optimize_frames.py`.
 WebGL model path: `skills/motion-website/references/webgl-model.md`.
+Page kit: `kit/` and `skills/motion-website/references/page-kit.md`.

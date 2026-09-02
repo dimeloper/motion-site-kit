@@ -1,22 +1,14 @@
 /**
- * Binds config.js into Kiln Carry markup.
+ * Halo chrome binders. Sections come from the page kit.
  */
 
-import { CONFIG } from '../config.js';
+import { CONFIG } from '../config.js?v=7';
+import { compose, planPage } from '../../../kit/compose.js?v=7';
 
 const SYSTEM_FONTS = new Set([
-  'georgia',
-  'serif',
-  'sans-serif',
-  'monospace',
-  'system-ui',
-  'ui-sans-serif',
-  'ui-serif',
-  'ui-monospace',
-  '-apple-system',
-  'blinkmacsystemfont',
-  'arial',
-  'helvetica',
+  'georgia', 'serif', 'sans-serif', 'monospace', 'system-ui',
+  'ui-sans-serif', 'ui-serif', 'ui-monospace', '-apple-system',
+  'blinkmacsystemfont', 'arial', 'helvetica', 'avenir next',
 ]);
 
 const get = (path, source = CONFIG) =>
@@ -48,9 +40,9 @@ function applyBrand() {
   style.setProperty('--brand-paper', brand.paper);
   style.setProperty('--font-display', brand.displayFont);
   style.setProperty('--font-body', brand.bodyFont);
-  document.title = `${brand.name} - ${CONFIG.hero.headline}`;
+  document.title = brand.name;
   const description = document.querySelector('meta[name="description"]');
-  if (description) description.setAttribute('content', CONFIG.hero.sub);
+  if (description && CONFIG.hero.sub) description.setAttribute('content', CONFIG.hero.sub);
 }
 
 function bindText() {
@@ -64,46 +56,23 @@ function bindText() {
   }
 }
 
-function renderList(selector, rows, html) {
-  const host = document.querySelector(selector);
-  if (!host || !rows?.length) return;
-  host.innerHTML = rows.map(html).join('');
-}
-
-function renderSpec() {
-  renderList('[data-spec]', CONFIG.spec?.items, (item) =>
-    `<li class="cap__item">
-      <a class="cap__link" href="${item.href}">
-        <span class="cap__num">${item.num}</span>
-        <span class="cap__title">${item.title}</span>
-        <span class="cap__body">${item.body}</span>
-        <span class="cap__arrow" aria-hidden="true">↗</span>
-      </a>
-    </li>`);
-}
-
-function renderSections() {
-  const host = document.querySelector('[data-sections]');
-  if (!host || !CONFIG.sections?.length) return;
-  host.innerHTML = CONFIG.sections
-    .map((section) => {
-      const kicker = section.kicker
-        ? `<p class="panel__kicker">${section.kicker}</p>`
-        : '';
-      return `
-      <section class="panel" id="${section.id}">
-        <div class="panel__card">
-          ${kicker}
-          <h2 class="panel__title">${section.title}</h2>
-          <p class="panel__body">${section.body}</p>
-        </div>
-      </section>`;
-    })
-    .join('');
+function renderNav() {
+  const host = document.querySelector('[data-nav]');
+  const items = CONFIG.nav || [];
+  if (!host) return;
+  host.replaceChildren();
+  for (const item of items) {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = item.href;
+    a.textContent = item.label;
+    li.append(a);
+    host.append(li);
+  }
 }
 
 loadFonts();
 applyBrand();
 bindText();
-renderSpec();
-renderSections();
+renderNav();
+compose(document.querySelector('[data-kit]'), planPage(CONFIG.page));

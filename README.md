@@ -21,7 +21,7 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 | `motion.config.json` | Frame counts, widths, and the performance budget CI enforces |
 | `.github/workflows/budget.yml` | The gate that refuses a merge when the sequence gets heavy |
 | `scripts/vendor.sh` | Optional: vendor GSAP + Lenis locally instead of loading them from a CDN |
-| `examples/` | Three verticals with **distinct** engines: [Ledgerline particles](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Kiln Carry float](https://dimeloper.github.io/motion-site-kit/examples/commerce/), [Harbor WebGL](https://dimeloper.github.io/motion-site-kit/examples/local/) |
+| `examples/` | [Harbor orbit](https://dimeloper.github.io/motion-site-kit/examples/local/), [Vortex peel-seat](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Halo studio](https://dimeloper.github.io/motion-site-kit/examples/commerce/). New pages compose from `docs/kit/`. |
 
 ## Quick start
 

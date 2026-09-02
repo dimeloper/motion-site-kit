@@ -1,112 +1,160 @@
 /**
- * Kiln Carry float engine — layered stills drift on scroll.
- * Distinct from Harbor orbit and Ledgerline particles.
+ * Halo hero: ScrollTrigger drives ring lift. Stone stays put.
  */
 
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CONFIG } from '../config.js';
+import { CONFIG } from '../config.js?v=7';
+import { createHaloScene } from './scene.js?v=8';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
 function shouldUseStaticFallback() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'reduced-motion';
   const connection = navigator.connection;
   if (connection?.saveData) return 'save-data';
   if (['slow-2g', '2g'].includes(connection?.effectiveType)) return 'slow-connection';
+  if (!hasWebGL()) return 'no-webgl';
   return null;
 }
 
-function renderLayers(host, layers) {
-  host.innerHTML = layers
-    .map(
-      (layer, index) => `
-      <figure class="float-layer" data-layer data-depth="${layer.depth}" style="
-        --x:${layer.x};
-        --y:${layer.y};
-        --scale:${layer.scale};
-        --rotate:${layer.rotate}deg;
-        --z:${index + 1};
-      ">
-        <img src="${layer.src}" alt="" decoding="async" loading="${index < 2 ? 'eager' : 'lazy'}" />
-      </figure>`,
-    )
-    .join('');
+function hasWebGL() {
+  try {
+    const probe = document.createElement('canvas');
+    return Boolean(probe.getContext('webgl2') || probe.getContext('webgl'));
+  } catch {
+    return false;
+  }
 }
 
-async function boot() {
-  const hero = document.querySelector('[data-hero]');
-  const stage = document.querySelector('[data-float]');
-  if (!hero || !stage) return;
-
-  const layers = CONFIG.float?.layers || [];
-  renderLayers(stage, layers);
-
-  const reason = shouldUseStaticFallback();
-  if (reason) {
-    hero.dataset.motion = 'static';
-    hero.dataset.fallback = reason;
-    return;
-  }
-
-  hero.dataset.motion = 'preloading';
-
-  const images = [...stage.querySelectorAll('img')];
-  await Promise.all(
-    images.map(
-      (img) =>
-        new Promise((resolve) => {
-          if (img.complete) resolve();
-          else {
-            img.addEventListener('load', resolve, { once: true });
-            img.addEventListener('error', resolve, { once: true });
-          }
-        }),
-    ),
-  );
-
-  const nodes = [...stage.querySelectorAll('[data-layer]')];
-  stage.classList.add('is-ready');
-  hero.dataset.motion = 'ready';
-
+function initSmoothScroll() {
   const lenis = new Lenis({
-    duration: CONFIG.motion.lenisDuration ?? 1.15,
+    duration: CONFIG.motion.lenisDuration,
     smoothWheel: true,
+    syncTouch: false,
   });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
+  window.__haloLenis = lenis;
+  return lenis;
+}
 
-  const scrub = { p: 0 };
+function wireInPageAnchors(lenis) {
+  document.addEventListener(
+    'click',
+    (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const hash = link.getAttribute('href');
+      if (!hash || hash.length < 2) return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+      event.preventDefault();
+      if (lenis) lenis.scrollTo(target, { offset: -8 });
+      else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    { capture: true },
+  );
+}
+
+function setLoaderProgress(bar, progress) {
+  if (bar) bar.style.setProperty('--progress', clamp(progress, 0, 1).toFixed(3));
+}
+
+function showStaticFallback(root, reason) {
+  root.dataset.motion = 'static';
+  root.dataset.fallbackReason = reason;
+  root.querySelector('[data-loader]')?.remove();
+}
+
+function dismissLoader(loader) {
+  if (!loader) return;
+  if (!loader.hasAttribute('data-exit')) {
+    loader.remove();
+    return;
+  }
+  loader.classList.add('is-leaving');
+  const finish = () => loader.remove();
+  loader.addEventListener('animationend', finish, { once: true });
+  window.setTimeout(finish, 900);
+}
+
+function bindScrollScene({ hero, canvas, scene }) {
+  let progress = 0;
+
   ScrollTrigger.create({
     trigger: hero,
     start: 'top top',
-    end: () => `+=${window.innerHeight * (CONFIG.motion.scrollLengthVh ?? 3)}`,
+    end: () => `+=${window.innerHeight * CONFIG.motion.scrollLengthVh}`,
     pin: true,
-    scrub: CONFIG.motion.scrub ?? 0.6,
+    anticipatePin: 1,
+    scrub: CONFIG.motion.scrub,
+    invalidateOnRefresh: true,
     onUpdate: (self) => {
-      scrub.p = self.progress;
-      for (const node of nodes) {
-        const depth = Number(node.dataset.depth) || 0.5;
-        const y = (scrub.p - 0.5) * depth * -120;
-        const x = Math.sin(scrub.p * Math.PI) * depth * 36;
-        const rot = (scrub.p - 0.5) * depth * 12;
-        const scale = 1 + scrub.p * depth * 0.12;
-        node.style.setProperty('--drift-x', `${x}px`);
-        node.style.setProperty('--drift-y', `${y}px`);
-        node.style.setProperty('--drift-rot', `${rot}deg`);
-        node.style.setProperty('--drift-scale', String(scale));
-      }
+      progress = self.progress;
+      scene.render(progress);
     },
   });
+
+  const onResize = () => {
+    scene.resize();
+    scene.render(progress);
+    ScrollTrigger.refresh();
+  };
+  window.addEventListener('resize', onResize, { passive: true });
+  canvas.classList.add('is-ready');
 }
 
-boot().catch((error) => {
-  console.error('[kiln float]', error);
-  const hero = document.querySelector('[data-hero]');
-  if (hero) {
-    hero.dataset.motion = 'static';
-    hero.dataset.fallback = 'boot-failed';
+export async function initMotion() {
+  const root = document.querySelector('[data-hero]');
+  if (!root) return;
+
+  const canvas = root.querySelector('[data-canvas]');
+  const loader = root.querySelector('[data-loader]');
+  const bar = root.querySelector('[data-loader-bar]');
+
+  const fallbackReason = shouldUseStaticFallback();
+  if (fallbackReason) {
+    showStaticFallback(root, fallbackReason);
+    return;
   }
-});
+
+  root.dataset.motion = 'preloading';
+  setLoaderProgress(bar, 0.08);
+
+  let scene;
+  try {
+    setLoaderProgress(bar, 0.12);
+    scene = await createHaloScene(canvas, {
+      maxDpr: CONFIG.motion.maxDpr,
+      modelUrl: CONFIG.motion.modelUrl,
+      onProgress: (n) => setLoaderProgress(bar, 0.12 + 0.78 * n),
+    });
+    setLoaderProgress(bar, 0.92);
+    scene.resize();
+    scene.render(0);
+    setLoaderProgress(bar, 1);
+  } catch (error) {
+    console.warn('[motion] WebGL hero failed, falling back to poster', error);
+    scene?.dispose?.();
+    showStaticFallback(root, 'webgl-failed');
+    return;
+  }
+
+  const lenis = initSmoothScroll();
+  wireInPageAnchors(lenis);
+  bindScrollScene({ hero: root, canvas, scene });
+
+  root.dataset.motion = 'ready';
+  dismissLoader(loader);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMotion, { once: true });
+} else {
+  initMotion();
+}

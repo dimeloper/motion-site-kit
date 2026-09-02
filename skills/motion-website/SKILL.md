@@ -29,7 +29,7 @@ product still ──▶ Higgsfield Meshy generate_3d ──▶ GLB ──▶ Thr
 
 Read `references/webgl-model.md` **and** the **WebGL hero** section of `references/qa.md` before generating. Prefer a clean cutout still; props in the photo become mesh. **Do not send rings, DualSense, or hollow cups through Meshy** — the decision tree in `webgl-model.md` says CAD or skip. Check Sketchfab/`isDownloadable` before promising a third-party file. If Meshy is unavailable or the GLB fails the visual gate, **fall back to the frame pipeline** with the same poster — do not ship a broken canvas.
 
-Halo (`docs/examples/commerce/`) is **material peel**, not a third orbit and not Vortex's particle halo. Do not start it until Vortex is accepted; do not show a Halo hero until the WebGL gate is green.
+Halo (`docs/examples/commerce/`) is a **studio**. Compose from `docs/kit/`. Rings lift off textured stone and seat on reverse. Do not clone Vortex sections. Do not show the hero until the gate in `webgl-model.md` is green.
 
 ## Build order
 
@@ -87,7 +87,7 @@ If it fails, in order of what to try: drop frame count to 90, lower AVIF quality
 
 Copy `template/` and edit only `config.js` — copy, colors, fonts, section order. `src/motion.js` is the **frame** engine and should not need changes between frame-scrub projects.
 
-For live WebGL, particles, or float layers, start from the matching example under `docs/examples/{local,saas,commerce}/` rather than forcing those runtimes into `template/src/motion.js`. That separation keeps the second *frame* build a reskin, while optional engines stay explicit forks.
+For live WebGL, particles, or float layers, start from the matching example under `docs/examples/{local,saas,commerce}/` rather than forcing those runtimes into `template/src/motion.js`. That separation keeps the second *frame* build a reskin, while optional engines stay explicit forks. A **new** WebGL vertical composes sections from `docs/kit/` (`references/page-kit.md`). Do not copy Vortex's module list, feel panel, and three finish cards.
 
 ### 6. Verify
 
@@ -131,5 +131,6 @@ Read these as needed rather than upfront:
 - `references/frame-pipeline.md` — extraction, encoding, the responsive ladder, manifest format
 - `references/performance-budget.md` — how the numbers were chosen, what to cut first
 - `references/webgl-model.md` — asset decision tree, visual gate, Harbor / Vortex / Halo handoff, fallbacks
+- `references/page-kit.md` — section families for a new vertical; do not clone Vortex chrome
 - `references/remotion.md` — programmatic frame generation, and the licensing caveat
 - `references/qa.md` — pre-ship checklist; **WebGL hero** first when the demo is live Three.js

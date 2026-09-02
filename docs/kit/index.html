@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page kit - motion-site-kit</title>
+  <meta name="description" content="Layout families for a new vertical. Harbor and Vortex keep their chrome. The next demo composes from these." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Syne:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="sections.css?v=7" />
+</head>
+<body>
+  <a class="kit-chrome__back" href="#content" style="position:absolute;left:-999px">Skip to families</a>
+
+  <header class="kit-chrome">
+    <div class="kit-chrome__row">
+      <p class="kit-chrome__mark">motion-site-kit</p>
+      <a class="kit-chrome__back" href="../">Docs home</a>
+    </div>
+    <h1>Page kit</h1>
+    <p class="kit-chrome__lead">
+      Thirty layout families. Harbor and Vortex keep the chrome they earned.
+      A new demo describes content. The planner picks a short sequence. It does not clone Vortex.
+    </p>
+    <ul class="kit-families"></ul>
+  </header>
+
+  <main id="content" data-kit></main>
+
+  <script type="module">
+    import { compose, FAMILIES } from './compose.js?v=7';
+    import { CATALOG } from './catalog.js?v=7';
+    const list = document.querySelector('.kit-families');
+    const byType = new Map(CATALOG.sections.map((section) => [section.type, section.id]));
+    list.replaceChildren(...FAMILIES.map((type) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = `#${byType.get(type) || type}`;
+      link.textContent = type;
+      item.append(link);
+      return item;
+    }));
+    compose(document.querySelector('[data-kit]'), CATALOG.sections);
+  </script>
+</body>
+</html>

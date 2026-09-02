@@ -1,0 +1,13 @@
+---
+description: Higgsfield MCP is project-scoped only. Never use the marketplace plugin.
+alwaysApply: true
+---
+
+# Higgsfield MCP
+
+The only Higgsfield server in this repo is `motion-kit-higgsfield` in `.cursor/mcp.json` (`https://mcp.higgsfield.ai/mcp`). In the agent tool list it appears as `project-0-motion-site-kit-motion-kit-higgsfield`.
+
+- Call Higgsfield tools only on that namespace.
+- Do not use `plugin-higgsfield-higgsfield`.
+- Do not add Higgsfield to `~/.cursor/mcp.json`.
+- If the project connector is unauthorized, ask to reconnect it. Do not fall back to the marketplace plugin.

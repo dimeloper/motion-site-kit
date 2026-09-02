@@ -9,11 +9,11 @@ Frame scrub remains the default kit path. Live WebGL is the optional branch when
 | Engine | Demo | Motion language | Asset |
 |---|---|---|---|
 | Frame scrub | `template/`, classic reskins | Camera move baked into a 120-frame ladder | AVIF/WebP sequence under budget |
-| Live WebGL | Harbor (`local`) → **Vortex** → **Halo** | Orbit / particle peel-seat / **material peel** | Harbor: meshopt GLB. Vortex: CAD torus in `scene.js`. Halo: sculptural GLB (headphones) + peel shader — not a third orbit. |
+| Live WebGL | Harbor (`local`) → **Vortex** → **Halo** | Orbit / particle peel-seat / **rings lift and seat** | Harbor: meshopt GLB. Vortex: CAD torus. Halo: textured stone + emissive rings. Compose from `docs/kit/`. |
 | Particles | Optional fork | Scroll densifies a field | Canvas only — poster still for LCP |
 | Float layers | Optional fork | Layered stills drift in z-depth | A few stills, no sequence decode |
 
-Do **not** ship three demos that all rotate-and-zoom the same way. Harbor proved orbit; Vortex peels particles off a CAD titanium band and reseats them; Halo should peel material — three verticals **and** three motion languages.
+Do **not** ship three demos that all rotate-and-zoom the same way. Harbor proved orbit; Vortex peels particles off a CAD titanium band and reseats them. Halo lifts two rings of light off textured stone and seats them on reverse, on a page composed from `docs/kit/`, not Vortex's section list.
 
 ## Do not show the user until this gate is green
 
@@ -23,7 +23,7 @@ Vortex burned rounds on a cracked Meshy ring, a model under the headline, and a 
 2. **License checked** before promising a third-party file. Sketchfab `isDownloadable: false` or empty `license` means **do not rip the viewer**. Ask for a downloadable CC file or build CAD.
 3. **Framing contract (desktop)** — reading lane left, product in the right third. Longest on-screen axis of the product is **about 35–50% of hero height**. The model does not sit under the headline or crop the top of the object.
 4. **Supporting field fills the hero after intro** — particles / peel shards appear on the object first, then expand across the hero (~0.5s delay). At rest they must not be a tight shell that reads as noise on the mesh.
-5. **Motion language is the vertical's** — Harbor orbit, Vortex particle peel→seat, Halo **material peel**. Do not clone the last demo's camera.
+5. **Motion language is the vertical's** — Harbor orbit, Vortex particle peel→seat. Halo is not a third orbit and not another particle halo. Do not clone the last demo's camera.
 6. **One body mesh** — extra liner/inlay tori z-fight and look cracked. Lights and env maps do not fix intersecting geometry.
 7. **Poster is a real `<img>`**; canvas fades in; `data-motion` starts `static`. Phones get the animation.
 
@@ -65,7 +65,7 @@ motion: {
 ```
 
 5. Runtime lives in Harbor's / Vortex's `src/scene.js` + `src/motion.js` (Three r170 + `GLTFLoader` via import map). **Copy that pair** when you need the WebGL path; do not fold it into the frame-scrub `template/src/motion.js`.
-6. Soft **flour / dust / assemble particles** — additive, brand-tinted, continuous RAF. Harbor: motes orbit the loaf. Vortex: particles **peel off and reseat** the CAD band (sampled from the torus surface), then **fill the hero** after intro. Halo: peel is **material**, not another particle halo. Do not send DualSense / hollow cups / rings through image-to-3D.
+6. Soft **flour / dust / assemble particles** — additive, brand-tinted, continuous RAF. Harbor: motes orbit the loaf. Vortex: particles **peel off and reseat** the CAD band (sampled from the torus surface), then **fill the hero** after intro. Halo must not be a third particle halo. Do not send DualSense / hollow cups / rings through image-to-3D. Untextured CAD primitives failed on the ring and on the deleted cups. Next object: Meshy PBR or a licensed textured GLB.
 7. No decorative plinths / void caps that intersect the mesh — they read as rings on dark backgrounds. Soft bounce light under the object helps baked AO; it does not fix a prop baked into the GLB.
 
 ### Unsplash → Higgsfield 3D (Harbor recipe; skip for rings)
@@ -124,16 +124,15 @@ Poster is a real `<img>`; the canvas fades in over it (`aria-hidden` on canvas).
 4. Reuse Harbor **a11y / Lenis / menu dialog / loader** patterns only; brand tokens and section composition stay Vortex-specific in `config.js`.
 5. Gate: ring readable on the dark field (not a glowing primitive); halo fills the hero after intro; scroll reverse peels then reseats; Slow 4G; real phone; axe on default + menu-open states.
 
-## Starting Halo
+## Halo (shipped)
 
-Halo is the **third** WebGL vertical (`docs/examples/commerce/`). It is still a Kiln Carry **float-layer stub**. Do not reskin that bag collage and call it done. Do not start Halo until Vortex is accepted on `main`.
+Halo is a **studio**, not a SKU (`docs/examples/commerce/`). The page is a content brief (`kind: 'studio'`) and `planPage()` maps it to `featured-work` / `ascent-steps` / `work-rail` / `faq-rule` / `statement-cta`. Motion: two rings of light lift off a textured stone and seat on reverse.
 
-1. **Product** — over-ear headphones (sculptural cups, 2–3 materials). Meshy is allowed **if** the still is a clean three-quarter of one pair, no stand, no hollow-cup interior as the hero. If the first GLB is clay or a fused headband, stop and switch to a licensed CAD / cleaner still — do not light the clay.
-2. **Motion language: material peel.** An outer finish (leather / fabric / coating) splits or slides off the cups and reveals metal or driver housing. That is **not** Harbor orbit and **not** Vortex's particle peel. One new language.
-3. **Copy the Vortex/Harbor pair** (`scene.js` + `motion.js` + import map), then replace the scene. Keep loader / Lenis / menu / fallback invariants. Brand and sections become Halo in `config.js` — do not keep Kiln Carry float layers.
-4. **Canonical GLB** under `docs/examples/commerce/models/`; `examples/commerce/models/` is a symlink. Compress with `scripts/compress_glb.sh` and set `MeshoptDecoder` before the page is shown.
-5. **Visual gate above, then `qa.md` WebGL section**, in a **visible** browser tab. Reverse scroll must re-skin the cups. Headline stays readable; product in the right lane at 35–50% hero height.
-6. If Meshy is unavailable or the GLB fails the gate, **frame-scrub with the same poster** — do not leave a broken canvas.
+1. Do **not** copy Vortex HTML or bind `modules` / `feel` / `builds` / `about` / `cta`.
+2. Reuse Harbor / Vortex loader, Lenis, menu, poster/canvas, fallbacks only.
+3. Stone is a Meshy PBR GLB (`models/pillar.glb`, meshopt + WebP, ~1.1 MB). Rings are CAD emissive (genus-1). Untextured product primitives stay banned.
+4. Camera stays put. The rings move. That is not Harbor orbit and not a particle halo.
+5. Gate in a visible tab. Reverse must seat the rings. Poster is a real `<img>`; canvas fades in and the poster drops out once `data-motion="ready"`.
 
 ## Verification
 
@@ -141,7 +140,8 @@ Halo is the **third** WebGL vertical (`docs/examples/commerce/`). It is still a 
 cd docs && python3 -m http.server 8080
 # open /examples/local/ — hero should reach data-motion="ready"; loaf.glb ~1 MB
 # open /examples/saas/ — CAD band visible at rest, off the headline; halo fills the hero after intro; scroll peels then reseats; reverse opens the halo
-# open /examples/commerce/ — only after Starting Halo: material peel on cups, not orbit, not Vortex particles
+# open /kit/ — page families must not read as Vortex (no 3-up cards, no modules/feel/builds)
+# open /examples/commerce/ — Halo studio: rings lift off the stone; reverse seats; kit families below the hero
 # mobile width ~390px: headline readable, CTAs tappable, product not under type
 # scroll reverse; throttle Slow 4G; confirm poster path with reduced-motion
 # visible tab only — rAF/GSAP stall in background and fake a broken loader

@@ -50,8 +50,8 @@ export const CONFIG = {
     {
       id: 'examples',
       kicker: 'Same engine, different sequence',
-      title: 'Three reskins, live',
-      body: '<a href="examples/saas/">Ledgerline</a> lifts stacked glass. <a href="examples/commerce/">Kiln Carry</a> is a brass D-ring. <a href="examples/local/">Harbor Oven</a> raises a cloche. Each changes config.js and swaps the clip — src/motion.js stays identical.',
+      title: 'Harbor, Vortex, and Halo',
+      body: '<a href="examples/local/">Harbor</a> orbits a loaf. <a href="examples/saas/">Vortex</a> peels a CAD band. <a href="examples/commerce/">Halo</a> is a studio: rings lift off stone. New pages compose from the <a href="kit/">page kit</a>.',
     },
   ],
 

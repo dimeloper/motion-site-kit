@@ -12,7 +12,8 @@ Run in a **visible** browser tab (`data-motion="ready"`, canvas opacity 1). Back
 - [ ] **Mesh is solid.** No cracked clay, no jagged reconstruction, no z-fighting from extra liner/inlay meshes. If the first GLB fails this, discard it — do not ship and "see what they think."
 - [ ] **Two-lane framing.** Desktop: type left, product in the right third, **not under the headline**. Longest on-screen product axis is about **35–50% of hero height** (close enough to read materials; not a postage stamp; not cropped at the top).
 - [ ] **Supporting field fills the hero after intro.** Particles or peel shards land on the object first, then expand across the hero after a short beat. At rest they are not a noisy shell that makes a good mesh look cracked.
-- [ ] **Motion language is this vertical's.** Harbor = orbit. Vortex = particle peel → seat. Halo = **material peel** on cups. Reverse scroll restores the previous state (orbit back / halo reopen / material reseat).
+- [ ] **Motion language is this vertical's.** Harbor = orbit. Vortex = particle peel → seat. Halo = rings lift off stone and seat on reverse. Not a third orbit and not a particle halo.
+- [ ] **Page is composed**, not cloned. If the demo is new, sections come from `docs/kit/` and do not match Vortex's modules / feel / builds / about / cta.
 - [ ] **Loader invariant.** `data-motion` starts `static`; `preloading` only after JS commits. No `requestAnimationFrame` wait in the loader path.
 - [ ] **Poster is a real `<img>`**; canvas fades in over it. Reduced-motion / Save-Data / 2G / no WebGL still show the poster.
 - [ ] **Weight.** GLB went through `scripts/compress_glb.sh`; loader has `MeshoptDecoder`. Canonical file under `docs/examples/*/models/`; `examples/` is a symlink.

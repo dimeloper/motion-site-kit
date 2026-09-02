@@ -1,87 +1,144 @@
 /**
- * Kiln Carry — commerce demo.
- * Motion: layered floating stills on scroll (not orbit / frame scrub).
+ * Halo studio. Page composes from docs/kit/.
+ * Content, not types: planPage() picks families from this brief.
+ * Motion: rings lift off a textured stone and seat on reverse.
  */
 
 export const CONFIG = {
   brand: {
-    name: 'Kiln Carry',
-    primary: '#C45C26',
-    ink: '#050403',
-    paper: '#EDE6DC',
-    displayFont: '"Cormorant Garamond", Georgia, serif',
-    bodyFont: 'Figtree, system-ui, -apple-system, sans-serif',
+    name: 'Halo',
+    primary: '#e4c56a',
+    ink: '#eceae6',
+    paper: '#0c0d10',
+    displayFont: 'Syne, Avenir Next, sans-serif',
+    bodyFont: 'Figtree, system-ui, sans-serif',
   },
 
-  hero: {
-    eyebrow: 'The Weekender',
-    headline: 'One bag for a two-night trip.',
-    sub: 'A 32-litre carry-on that holds a jacket, two outfits, and a laptop without a second bag.',
-    cta: { label: 'See the spec', href: '#spec' },
-    animationDescription:
-      'As you scroll, product stills drift and layer in space — a floating collage, not a spin or zoom through frames.',
-  },
-
-  float: {
-    layers: [
-      { src: 'frames/960/webp/0012.webp', depth: 0.18, x: '-18%', y: '8%', scale: 0.55, rotate: -8 },
-      { src: 'frames/960/webp/0048.webp', depth: 0.42, x: '22%', y: '-6%', scale: 0.48, rotate: 6 },
-      { src: 'frames/960/webp/0075.webp', depth: 0.7, x: '4%', y: '18%', scale: 0.72, rotate: -2 },
-      { src: 'frames/960/webp/0105.webp', depth: 0.95, x: '-8%', y: '-14%', scale: 0.4, rotate: 10 },
-    ],
-  },
-
-  spec: {
-    title: 'What you get',
-    items: [
-      {
-        num: '01',
-        title: 'Under-seat shell',
-        body: 'Fits under the seat with the jacket still inside.',
-        href: '#proof',
-      },
-      {
-        num: '02',
-        title: '1050D nylon',
-        body: 'A replaceable skid plate on the base, not a fashion sole.',
-        href: '#proof',
-      },
-      {
-        num: '03',
-        title: 'External laptop sleeve',
-        body: 'Sixteen-inch sleeve loads from the outside at security.',
-        href: '#proof',
-      },
-      {
-        num: '04',
-        title: '10-year repair ticket',
-        body: 'Zipper or plate fails — send it back. We fix the part.',
-        href: '#cta',
-      },
-    ],
-  },
-
-  sections: [
-    {
-      id: 'proof',
-      kicker: 'Built to be used',
-      title: 'Sold with a 10-year repair ticket',
-      body: 'If a zipper or skid plate fails, send it back. We repair or replace the part. The bag is made to be used, not archived.',
-    },
+  nav: [
+    { label: 'Work', href: '#rail' },
+    { label: 'Studio', href: '#ascent' },
+    { label: 'Ask', href: '#faq' },
   ],
 
-  cta: {
-    title: 'The Weekender, in two colours',
-    body: 'Charcoal and rust. Same spec. Ships in three days from the workshop.',
-    label: 'Order the Weekender',
-    href: 'https://example.com/shop',
+  hero: {
+    headline: 'Crafted to spark wonder',
+    sub: 'Brand, motion, and immersive web. The tools change. The craft does not.',
+    cta: { label: 'Pitch your idea', href: '#invite' },
+    secondary: { label: 'See the work', href: '#rail' },
+    animationDescription:
+      'As you scroll, two rings of light lift off a stone pillar and hang in the dark. Scroll back and they seat again.',
+    statusLeft: 'Stone at rest',
+    statusCenter: 'Scroll to lift',
+    statusRight: 'Rings seat',
+  },
+
+  page: {
+    kind: 'studio',
+    content: {
+      featured: {
+        headline: 'Altar',
+        title: 'Stone, then light',
+        body: 'The piece we would put on a table. Rings written as light.',
+        image: {
+          src: 'images/pillar.jpg',
+          alt: 'Weathered limestone monolith, Halo studio object',
+          width: 1200,
+          height: 1600,
+        },
+      },
+      stepsHeadline: 'How a brief starts',
+      steps: [
+        {
+          num: '01',
+          title: 'Send the object',
+          body: 'The still, who it is for, and one sentence for what scroll should do.',
+        },
+        {
+          num: '02',
+          title: 'We pick a motion',
+          body: 'Lift and seat, orbit, or peel. If scroll does not change the object, we cut it.',
+        },
+        {
+          num: '03',
+          title: 'You get a lane',
+          body: 'A motion language and a page sequence. Not a reskin of the last site.',
+        },
+      ],
+      stillsHeadline: 'Stills from the room',
+      stills: [
+        {
+          title: 'Grain',
+          body: 'The texture is the brief.',
+          image: {
+            src: 'images/grain.jpg',
+            alt: 'Limestone grain, Halo studio still',
+            width: 1200,
+            height: 1600,
+          },
+        },
+        {
+          title: 'Table',
+          body: 'Prints and samples before a pitch.',
+          image: {
+            src: 'images/table.jpg',
+            alt: 'Studio table with a stone sample and a rolled print',
+            width: 1600,
+            height: 1200,
+          },
+        },
+        {
+          title: 'Cut',
+          body: 'The same stone, flattened for the poster.',
+          image: {
+            src: 'images/pillar-hero.jpg',
+            alt: 'Stone pillar on a dark field, Halo poster still',
+            width: 1200,
+            height: 1600,
+          },
+        },
+        {
+          title: 'Altar',
+          body: 'The piece on the table.',
+          image: {
+            src: 'images/pillar.jpg',
+            alt: 'Weathered limestone monolith, Halo studio object',
+            width: 1200,
+            height: 1600,
+          },
+        },
+      ],
+      questionsHeadline: 'Before you write',
+      questions: [
+        {
+          q: 'What do you take on?',
+          a: 'Brand systems, motion sites, and WebGL heroes where the object has to hold. One surface at a time.',
+        },
+        {
+          q: 'Do you start from a template?',
+          a: 'The scroll engine is shared. The page is composed from the brief. We do not reskin the last site and change the nouns.',
+        },
+        {
+          q: 'How do we begin?',
+          a: 'Send the object, the audience, and one sentence for what scroll should do. We reply with a lane and a motion language.',
+        },
+      ],
+      invite: {
+        line: 'Pitch the object. We will tell you if it can hold.',
+        cta: { label: 'Pitch your idea', href: 'mailto:hello@halo.studio' },
+      },
+    },
+  },
+
+  footer: {
+    credit: 'Halo studio. Motion, identity, immersive web.',
   },
 
   motion: {
-    engine: 'float',
-    scrollLengthVh: 3.0,
+    engine: 'webgl',
+    modelUrl: 'models/pillar.glb',
+    scrollLengthVh: 3.2,
     scrub: 0.6,
-    lenisDuration: 1.15,
     maxDpr: 2,
+    lenisDuration: 1.1,
   },
 };
