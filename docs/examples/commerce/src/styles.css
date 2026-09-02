@@ -461,6 +461,19 @@ button {
   }
 }
 
+[data-theme="halo"] [data-kit] ol,
+[data-theme="halo"] [data-kit] ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[data-theme="halo"] [data-kit] img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 [data-theme="halo"] .sec-featured {
   min-height: unset;
   grid-template-columns: minmax(16rem, 26rem) minmax(0, 1fr);
@@ -495,6 +508,94 @@ button {
   border-top: 1px solid var(--kit-line);
 }
 
+[data-theme="halo"] .sec-ascent {
+  display: grid;
+  grid-template-columns: minmax(14rem, 26rem) minmax(0, 1fr);
+  gap: clamp(1.8rem, 5vw, 4.5rem);
+  align-items: start;
+  padding: 5.5rem var(--kit-pad, 1.5rem) 5rem;
+  border-top: 1px solid var(--kit-line);
+}
+
+[data-theme="halo"] .ascent__headline {
+  max-width: 8ch;
+  margin: 0;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  line-height: 0.95;
+}
+
+[data-theme="halo"] .ascent__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  border-left: 1px solid rgb(228 197 106 / 0.35);
+}
+
+[data-theme="halo"] .ascent__step {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.2rem 1.2rem;
+  padding: 0 0 2.4rem 1.5rem;
+}
+
+[data-theme="halo"] .ascent__step::marker { content: none; }
+
+[data-theme="halo"] .ascent__num {
+  margin: 0.45rem 0 0;
+  color: var(--brand-primary);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+}
+
+[data-theme="halo"] .ascent__copy h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+[data-theme="halo"] .sec-rail {
+  padding: 5rem 0 5.5rem;
+  border-top: 1px solid var(--kit-line);
+  overflow: hidden;
+}
+
+[data-theme="halo"] .rail {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 var(--kit-pad, 1.5rem) 1.2rem;
+  scrollbar-width: thin;
+}
+
+[data-theme="halo"] .rail__cell {
+  flex: 0 0 min(62vw, 24rem);
+  width: min(62vw, 24rem);
+  max-width: min(62vw, 24rem);
+  scroll-snap-align: start;
+}
+
+[data-theme="halo"] .rail__media img {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+[data-theme="halo"] .rail__meta h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+[data-theme="halo"] .sec-faq,
+[data-theme="halo"] .sec-statement {
+  border-top: 1px solid var(--kit-line);
+}
+
 @media (max-width: 767px) {
   .hero__copy {
     padding-top: 6rem;
@@ -508,5 +609,11 @@ button {
   [data-theme="halo"] .featured-card {
     margin-left: 0;
     max-width: none;
+  }
+  [data-theme="halo"] .sec-ascent {
+    grid-template-columns: 1fr;
+  }
+  [data-theme="halo"] .ascent__step {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
   }
 }

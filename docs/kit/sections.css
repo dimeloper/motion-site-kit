@@ -623,13 +623,18 @@ a { color: inherit; }
 
 .rail__cell {
   flex: 0 0 min(72vw, 22rem);
+  width: min(72vw, 22rem);
+  max-width: min(72vw, 22rem);
   scroll-snap-align: start;
 }
 
 .rail__media { margin: 0; }
 
 .rail__media img {
+  display: block;
   width: 100%;
+  max-width: 100%;
+  height: auto;
   aspect-ratio: 4 / 5;
   object-fit: cover;
 }
@@ -708,10 +713,17 @@ a { color: inherit; }
   border-left: 1px solid var(--kit-line);
 }
 
+.ascent__list li,
 .ascent__step {
+  list-style: none;
   position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  gap: 0.85rem 1.1rem;
   padding: 0 0 2.2rem 1.6rem;
 }
+
+.ascent__step::marker { content: none; }
 
 .ascent__step:last-child { padding-bottom: 0; }
 
@@ -1249,6 +1261,7 @@ a { color: inherit; }
   .flank__void { min-height: 8rem; order: -1; }
 
   .featured__headline { max-width: none; }
+  .ascent__step { grid-template-columns: 2.2rem minmax(0, 1fr); }
 
   .contact__lane--end,
   .signoff__meta,

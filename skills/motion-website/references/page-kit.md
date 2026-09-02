@@ -23,6 +23,17 @@ Not the section list. Not `modules` / `feel` / `builds` / `about` / `cta` with n
 
 `compose.js` warns in the console if a family repeats or the Vortex id list is present. `select.js` maps brief shape to families.
 
+## Do not ship naked kit HTML
+
+Halo painted `ascent-steps` and `work-rail` as unstyled markup: browser `1. 2. 3.` next to `01`, and Grain at the image's intrinsic 1200px width. Featured looked fine because Halo already overrode that family. The other two only had kit CSS, and that file is easy to miss (stale cache, relative path, no version query).
+
+Rules that keep this from coming back:
+
+1. **Designed lists are not `<ol>` / `<ul>`.** `ascent-steps` mounts `div[role=list]`. A real list element draws markers the moment kit CSS loses.
+2. **The demo owns a safety net** in its own stylesheet: `[data-kit] img { max-width: 100% }`, list-style reset, and explicit rail flex + cell width. Do not rely on `sections.css` alone for any family on the live page.
+3. **Cache-bust `sections.css` with the JS** (`?v=` on both). Bumping `bind.js` and leaving the kit stylesheet unversioned is how a stale file wins.
+4. **Look at every composed family after a hard reload**, not just the hero. Default list markers or a still wider than the viewport means the kit styles did not apply.
+
 ## How the planner chooses
 
 `planPage({ kind, content })` reads the brief, not a type list.

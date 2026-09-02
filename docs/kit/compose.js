@@ -292,8 +292,8 @@ function renderColonnade(section) {
 function renderAscentSteps(section) {
   return el('section', { class: 'sec-ascent', id: section.id || 'ascent', 'data-family': 'ascent-steps' }, [
     section.headline && el('h2', { class: 'ascent__headline', text: section.headline }),
-    el('ol', { class: 'ascent__list' }, (section.steps || []).map((step, i) =>
-      el('li', { class: 'ascent__step' }, [
+    el('div', { class: 'ascent__list', role: 'list' }, (section.steps || []).map((step, i) =>
+      el('div', { class: 'ascent__step', role: 'listitem' }, [
         el('p', { class: 'ascent__num', text: step.num || String(i + 1).padStart(2, '0') }),
         el('div', { class: 'ascent__copy' }, [
           step.title && el('h3', { text: step.title }),

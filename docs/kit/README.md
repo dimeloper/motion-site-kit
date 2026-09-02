@@ -12,6 +12,8 @@ Reuse from Harbor / Vortex: loader, Lenis, menu dialog, poster/canvas, fallbacks
 
 Pass a **content brief**. `planPage()` chooses families from the shape (one featured still, three steps, four stills, questions). Do not hardcode types unless you are writing a kit specimen.
 
+A live page must not depend on `sections.css` alone. Designed lists are `div[role=list]`, not `<ol>`. Cache-bust the kit stylesheet with the JS. If you see browser list markers or a still at its intrinsic width, kit CSS did not apply.
+
 ## Families
 
 Thirty families. A page uses a short sequence. The catalog is not a page.

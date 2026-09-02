@@ -31,6 +31,7 @@ An open-source kit for scroll-driven motion websites: a Claude skill (`skills/mo
 2. `check_budget.py` exited 2 when no manifest existed, so CI was red on every fresh clone (frames are gitignored). It now skips cleanly; `--strict` opts into failing.
 3. Hero stuck on a permanent "Loading" bar when modules failed to load. See the loader invariant above.
 4. `extract_frames.py` used `-vsync 0`, which FFmpeg 9 removed. It now prefers `-fps_mode passthrough` and falls back to `-vsync 0` on older builds.
+5. Halo below-hero sections painted as raw HTML (`1. 01` on an `<ol>`, Grain at intrinsic 1200px). Kit families must not use `<ol>`/`<ul>` for designed lists, and the demo CSS must constrain `[data-kit] img` plus any rail. Cache-bust `sections.css` with the JS. See `references/page-kit.md`.
 
 ## What's stubbed
 

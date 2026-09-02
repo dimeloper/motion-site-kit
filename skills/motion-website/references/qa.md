@@ -14,6 +14,7 @@ Run in a **visible** browser tab (`data-motion="ready"`, canvas opacity 1). Back
 - [ ] **Supporting field fills the hero after intro.** Particles or peel shards land on the object first, then expand across the hero after a short beat. At rest they are not a noisy shell that makes a good mesh look cracked.
 - [ ] **Motion language is this vertical's.** Harbor = orbit. Vortex = particle peel → seat. Halo = rings lift off stone and seat on reverse. Not a third orbit and not a particle halo.
 - [ ] **Page is composed**, not cloned. If the demo is new, sections come from `docs/kit/` and do not match Vortex's modules / feel / builds / about / cta.
+- [ ] **Composed sections are styled, not raw HTML.** After a hard reload: no browser `1. 2. 3.` on ascent, no still at intrinsic width (1200px Grain). `sections.css` is cache-busted with the JS. The demo CSS resets `[data-kit] img` and any rail.
 - [ ] **Loader invariant.** `data-motion` starts `static`; `preloading` only after JS commits. No `requestAnimationFrame` wait in the loader path.
 - [ ] **Poster is a real `<img>`**; canvas fades in over it. Reduced-motion / Save-Data / 2G / no WebGL still show the poster.
 - [ ] **Weight.** GLB went through `scripts/compress_glb.sh`; loader has `MeshoptDecoder`. Canonical file under `docs/examples/*/models/`; `examples/` is a symlink.

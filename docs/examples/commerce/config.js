@@ -67,16 +67,6 @@ export const CONFIG = {
       stillsHeadline: 'Stills from the room',
       stills: [
         {
-          title: 'Grain',
-          body: 'The texture is the brief.',
-          image: {
-            src: 'images/grain.jpg',
-            alt: 'Limestone grain, Halo studio still',
-            width: 1200,
-            height: 1600,
-          },
-        },
-        {
           title: 'Table',
           body: 'Prints and samples before a pitch.',
           image: {
@@ -87,10 +77,20 @@ export const CONFIG = {
           },
         },
         {
+          title: 'Grain',
+          body: 'The texture is the brief.',
+          image: {
+            src: 'images/grain.jpg',
+            alt: 'Limestone grain, Halo studio still',
+            width: 1200,
+            height: 1600,
+          },
+        },
+        {
           title: 'Cut',
           body: 'The same stone, flattened for the poster.',
           image: {
-            src: 'images/pillar-hero.jpg',
+            src: 'images/pillar-cut.webp',
             alt: 'Stone pillar on a dark field, Halo poster still',
             width: 1200,
             height: 1600,
