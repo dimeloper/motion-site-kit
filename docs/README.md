@@ -1,7 +1,9 @@
 # docs/ — GitHub Pages publish dir
 
 This directory is a copy of `template/` (root docs site) plus the three demos under
-`examples/`. GitHub Pages serves it from `/docs` on `main`.
+`examples/`. GitHub Pages serves it from `/docs` on `main`. A clone can serve it
+with no pipeline: `python3 -m http.server 8080 --directory docs`. To reskin
+`template/` against the same ladder, run `./scripts/use-demo-frames.sh`.
 
 The **root** docs site still uses the frame-scrub engine (`src/motion.js` aligned
 with `template/`). The demos each fork their own engine:

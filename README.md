@@ -21,32 +21,45 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 | `motion.config.json` | Frame counts, widths, and the performance budget CI enforces |
 | `.github/workflows/budget.yml` | The gate that refuses a merge when the sequence gets heavy |
 | `scripts/vendor.sh` | Optional: vendor GSAP + Lenis locally instead of loading them from a CDN |
+| `scripts/use-demo-frames.sh` | Copy the committed `docs/frames` ladder into `template/frames` so a reskin needs no clip |
 | `examples/` | [Harbor orbit](https://dimeloper.github.io/motion-site-kit/examples/local/), [Vortex peel-seat](https://dimeloper.github.io/motion-site-kit/examples/saas/), [Halo studio](https://dimeloper.github.io/motion-site-kit/examples/commerce/). New pages compose from `docs/kit/`. |
 
 ## Quick start
 
+A clone already contains a committed frame ladder under `docs/` — that is what GitHub Pages serves. You do not need ffmpeg, Pillow, or a source clip to see the site move.
+
 ```bash
 git clone https://github.com/dimeloper/motion-site-kit
 cd motion-site-kit
-pip install "Pillow>=11.3"          # AVIF + WebP encoding
-# ffmpeg must be on PATH for extraction
+python3 -m http.server 8080 --directory docs
+# http://localhost:8080               landing page (frame scrub)
+# http://localhost:8080/examples/     Harbor / Vortex / Halo
+# http://localhost:8080/kit/          section-family specimen
+```
 
-# 1. frames from a clip
-python3 skills/motion-website/scripts/extract_frames.py hero.mp4 \
-  --out frames/raw --count 120 --width 1600
+To reskin the standalone template with that same ladder:
 
-# 2. responsive AVIF/WebP ladder + manifest
-python3 skills/motion-website/scripts/optimize_frames.py frames/raw \
-  --out template/frames --config motion.config.json
-
-# 3. the gate
-python3 skills/motion-website/scripts/check_budget.py --config motion.config.json
-
-# 4. serve
+```bash
+./scripts/use-demo-frames.sh
 cd template && python3 -m http.server 8080
 ```
 
 Then edit `template/config.js` — copy, colors, fonts, section order. Nothing else needs to change.
+
+### Bring your own clip
+
+```bash
+pip install "Pillow>=11.3"          # AVIF + WebP encoding
+# ffmpeg must be on PATH for extraction
+
+python3 skills/motion-website/scripts/extract_frames.py hero.mp4 \
+  --out frames/raw --count 120 --width 1600
+
+python3 skills/motion-website/scripts/optimize_frames.py frames/raw \
+  --out template/frames --config motion.config.json
+
+python3 skills/motion-website/scripts/check_budget.py --config motion.config.json
+```
 
 ### No CDN
 
