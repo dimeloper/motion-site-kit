@@ -96,7 +96,7 @@ function renderHeroEditorial(section) {
 
   if (!section.framed) return inner;
 
-  return el('figure', { class: 'kit-frame', 'data-family': 'hero-editorial' }, [
+  return el('figure', { class: 'kit-frame' }, [
     el('figcaption', { class: 'kit-frame__cap', text: section.frameCaption || 'Light family. Own page only, not a mid-scroll invert.' }),
     inner,
   ]);
@@ -212,9 +212,9 @@ function renderFaqRule(section) {
   const root = el('section', { class: 'sec-faq', id: section.id || 'faq', 'data-family': 'faq-rule' }, [
     section.headline && el('h2', { class: 'faq__headline', text: section.headline }),
     el('div', { class: 'faq__rule', 'aria-hidden': 'true' }),
-    el('ul', { class: 'faq__list' }, (section.items || []).map((item, i) => {
+    el('div', { class: 'faq__list', role: 'list' }, (section.items || []).map((item, i) => {
       const panelId = `${section.id || 'faq'}-a-${i}`;
-      return el('li', { class: 'faq__item', 'data-faq-item': '', 'data-open': i === 0 ? 'true' : 'false' }, [
+      return el('div', { class: 'faq__item', role: 'listitem', 'data-faq-item': '', 'data-open': i === 0 ? 'true' : 'false' }, [
         el('button', {
           class: 'faq__q',
           type: 'button',
@@ -404,8 +404,8 @@ function renderInvertBand(section) {
 function renderRuleList(section) {
   return el('section', { class: 'sec-rules', id: section.id || 'rules', 'data-family': 'rule-list' }, [
     section.headline && el('h2', { class: 'rules__headline', text: section.headline }),
-    el('ol', { class: 'rules__list' }, (section.items || []).map((item) =>
-      el('li', { class: 'rules__item' }, [
+    el('div', { class: 'rules__list', role: 'list' }, (section.items || []).map((item) =>
+      el('div', { class: 'rules__item', role: 'listitem' }, [
         item.title && el('h3', { text: item.title }),
         item.body && el('p', { text: item.body }),
       ])
@@ -423,8 +423,8 @@ function renderMeasureBand(section) {
 function renderChapterIndex(section) {
   return el('section', { class: 'sec-chapters', id: section.id || 'index', 'data-family': 'chapter-index' }, [
     section.headline && el('h2', { class: 'chapters__headline', text: section.headline }),
-    el('ol', { class: 'chapters__list' }, (section.chapters || []).map((chapter) =>
-      el('li', {}, [
+    el('div', { class: 'chapters__list', role: 'list' }, (section.chapters || []).map((chapter) =>
+      el('div', { class: 'chapters__item', role: 'listitem' }, [
         el('a', { href: chapter.href || '#', class: 'chapters__link' }, [
           el('span', { class: 'chapters__num', text: chapter.num }),
           el('span', { class: 'chapters__title', text: chapter.title }),
@@ -464,8 +464,8 @@ function renderClientMarks(section) {
   const marks = section.marks || (section.items || []).map((item) => item.label).filter(Boolean);
   return el('section', { class: 'sec-marks', id: section.id || 'marks', 'data-family': 'client-marks' }, [
     section.headline && el('p', { class: 'marks__headline', text: section.headline }),
-    el('ul', { class: 'marks__list' }, marks.map((mark) =>
-      el('li', { text: typeof mark === 'string' ? mark : mark.label })
+    el('div', { class: 'marks__list', role: 'list' }, marks.map((mark) =>
+      el('div', { class: 'marks__item', role: 'listitem', text: typeof mark === 'string' ? mark : mark.label })
     )),
   ]);
 }
@@ -507,8 +507,8 @@ function renderSpotlightStage(section) {
 function renderClaimStack(section) {
   return el('section', { class: 'sec-claims', id: section.id || 'claims', 'data-family': 'claim-stack' }, [
     section.headline && el('h2', { class: 'claims__headline', text: section.headline }),
-    el('ul', { class: 'claims__list' }, (section.claims || []).map((claim) =>
-      el('li', { text: typeof claim === 'string' ? claim : claim.text })
+    el('div', { class: 'claims__list', role: 'list' }, (section.claims || []).map((claim) =>
+      el('div', { class: 'claims__item', role: 'listitem', text: typeof claim === 'string' ? claim : claim.text })
     )),
   ]);
 }

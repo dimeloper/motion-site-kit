@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Syne:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="sections.css?v=7" />
+  <link rel="stylesheet" href="sections.css?v=10" />
 </head>
 <body>
   <a class="kit-chrome__back" href="#content" style="position:absolute;left:-999px">Skip to families</a>
@@ -29,8 +29,8 @@
   <main id="content" data-kit></main>
 
   <script type="module">
-    import { compose, FAMILIES } from './compose.js?v=7';
-    import { CATALOG } from './catalog.js?v=7';
+    import { compose, FAMILIES } from './compose.js?v=10';
+    import { CATALOG } from './catalog.js?v=10';
     const list = document.querySelector('.kit-families');
     const byType = new Map(CATALOG.sections.map((section) => [section.type, section.id]));
     list.replaceChildren(...FAMILIES.map((type) => {

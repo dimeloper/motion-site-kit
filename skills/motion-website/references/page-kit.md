@@ -29,7 +29,7 @@ Halo painted `ascent-steps` and `work-rail` as unstyled markup: browser `1. 2. 3
 
 Rules that keep this from coming back:
 
-1. **Designed lists are not `<ol>` / `<ul>`.** `ascent-steps` mounts `div[role=list]`. A real list element draws markers the moment kit CSS loses.
+1. **Designed lists are not `<ol>` / `<ul>`.** `ascent-steps`, `faq-rule`, `rule-list`, `chapter-index`, `client-marks`, and `claim-stack` mount `div[role=list]`. A real list element draws markers the moment kit CSS loses.
 2. **The demo owns a safety net** in its own stylesheet: `[data-kit] img { max-width: 100% }`, list-style reset, and explicit rail flex + cell width. Do not rely on `sections.css` alone for any family on the live page.
 3. **Cache-bust `sections.css` with the JS** (`?v=` on both). Bumping `bind.js` and leaving the kit stylesheet unversioned is how a stale file wins.
 4. **Look at every composed family after a hard reload**, not just the hero. Default list markers or a still wider than the viewport means the kit styles did not apply.
