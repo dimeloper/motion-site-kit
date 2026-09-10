@@ -1,14 +1,18 @@
 # Fold: one source, two delivery paths
 
-The live vgpu study and baked frames use `source/material.wgsl`. The exporter
+The exporter can bake the live study or an archived shader. The exporter
 records the shader hash, resolution, frame count and sampling rule. The page
 layouts and cropping differ, so this comparison establishes source provenance
 and asset costs; it is not a controlled frame-time or visual-quality benchmark.
 
-## Current sculpture (v2)
+The current v3 shader changes the lighting and fold frequency. Its posters were
+regenerated; the sequence sizes below describe archived shaders, not v3.
+
+## Archived sculpture (v2)
 
 ```bash
-node docs/examples/vgpu/export-frames.mjs frames/raw-fold-v2
+FOLD_SHADER=./archive/material-v2.wgsl \
+  node docs/examples/vgpu/export-frames.mjs frames/raw-fold-v2
 python3 skills/motion-website/scripts/optimize_frames.py frames/raw-fold-v2 \
   --out out/fold-v2-frames --config motion.config.json
 python3 skills/motion-website/scripts/check_budget.py \
@@ -25,9 +29,9 @@ settings produce these exact sequence bytes:
 | 960 | 874,967 | 982,798 |
 | 1600 | 1,550,795 | 1,906,592 |
 
-All six pass the original budgets. Current shader SHA-256:
+All six pass the original budgets. Archived v2 shader SHA-256:
 `e3c5818c8b962e50560147b36e03ad3011b1242cd88405fe61076758754f8d96`.
-The live build has 44,256 bytes of gzip-level-9 JS and a 191,805-byte silver
+The v2 live build had 44,256 bytes of gzip-level-9 JS and a 191,805-byte silver
 poster. Export provenance is written alongside the generated frames. The
 original dark frame reskin below belongs to v1; these light v2 assets were
 verified as sequences, not reviewed as a new frame-template site.

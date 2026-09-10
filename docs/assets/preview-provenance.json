@@ -12,21 +12,25 @@
   {
     "name": "vortex",
     "source": "Screenshot of this repository\u2019s live example at 1440x1000",
-    "sourceSha256": "82ae1041857155f08593bf779cad2618a6c6d481fbb6e1a8029521f9f61128d7",
+    "sourceSha256": "ee086f98a78e21d5cde91d664d2a04aaa0906ebe8f7ab2851230f980f7354dc9",
     "output": "docs/assets/vortex-preview.webp",
-    "bytes": 33040,
+    "bytes": 33586,
     "width": 1200,
     "height": 833,
-    "quality": 82
+    "quality": 82,
+    "date": "2026-09-10",
+    "renderer": "Chromium, live WebGL, 1440x1000 at DPR 1"
   },
   {
     "name": "halo",
     "source": "Screenshot of this repository\u2019s live example at 1440x1000",
-    "sourceSha256": "50c738b3d0f6cc924d0b10224b01144f7c11c1bc3168eb2d488090270e4c7275",
+    "sourceSha256": "03d0895c58aade06f56fba6971ef613bcd1b32cbf6c8ce3b27d317d8d3e716e2",
     "output": "docs/assets/halo-preview.webp",
-    "bytes": 31756,
+    "bytes": 33088,
     "width": 1200,
     "height": 833,
-    "quality": 82
+    "quality": 82,
+    "date": "2026-09-10",
+    "renderer": "Chromium, live WebGL, 1440x1000 at DPR 1"
   }
 ]

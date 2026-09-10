@@ -72,3 +72,13 @@ macOS Safari passes the docs, three WebGL examples, Fold live WebGPU and catalog
 checks both locally and on the published HTTPS site. Release QA found and repaired
 a batched IntersectionObserver visibility bug; device prerequisites and the
 follow-up CI result are tracked in [release QA](RELEASE-QA.md).
+
+## Active follow-on: composition quality and onboarding
+
+Authorized after the release checkpoint on 10 September. Track current progress
+in [WORK-IN-PROGRESS.md](WORK-IN-PROGRESS.md), open beside the task. The hourly
+continuation is active again for this scope: four new story sections, four full
+page recipes with desktop/mobile preview and export, Halo portfolio rebuild,
+Fold material refinement, public-copy review and beginner onboarding. Earlier
+completion notes refer to the previous scoped pass. Commit/push authorization
+continues; physical iPhone QA still needs the unlocked device.

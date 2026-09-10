@@ -490,7 +490,7 @@ test('docs copy controls and catalog search, selection and config work', async p
   assert.equal(await page.evaluate(() => JSON.parse(window.copiedText).type), 'material-board');
   await page.$eval('#family-search', el => { el.value = ''; el.dispatchEvent(new Event('input')); });
   const families = await page.$$eval('.catalog-families button', els => els.map(el => el.dataset.family));
-  assert.equal(families.length, 30);
+  assert.equal(families.length, 34);
   for (const family of families) {
     await page.click(`.catalog-families button[data-family="${family}"]`);
     assert.equal(await page.$eval('[data-source]', el => JSON.parse(el.textContent).type), family);
@@ -500,6 +500,70 @@ test('docs copy controls and catalog search, selection and config work', async p
   await page.click('.catalog-families button[data-family="featured-work"]');
   await page.addScriptTag({ path: resolve(modules, 'axe-core/axe.min.js') });
   assert.deepEqual(await audit(), []);
+});
+
+test('recipe browser selects compositions, changes viewport and exports the selected brief', async page => {
+  await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
+  await page.evaluateOnNewDocument(() => Object.defineProperty(navigator, 'clipboard', {
+    value: { writeText: async text => { window.copiedRecipe = text; } },
+  }));
+  await page.goto(`${url}/kit/index.html`);
+  await page.waitForSelector('#recipe-select option');
+  for (const recipe of ['product', 'hospitality', 'exhibition', 'studio']) {
+    await page.select('#recipe-select', recipe);
+    await page.waitForFunction(key => document.querySelector('#recipe-frame').contentDocument?.body.dataset.recipe === key, {}, recipe);
+    await page.click('[data-copy-recipe]');
+    await page.waitForFunction(() => window.copiedRecipe === document.querySelector('[data-recipe-source]').textContent);
+    const exported = await page.evaluate(() => JSON.parse(window.copiedRecipe));
+    assert.ok(exported.page.order.length > 0);
+    assert.ok(exported.image.src);
+    assert.equal(await page.$eval('#recipe-frame', el => el.contentDocument.querySelector('h1').textContent), exported.headline);
+    assert.equal(await page.$eval('[data-open-recipe]', el => el.href), `${url}/kit/preview.html?recipe=${recipe}`);
+  }
+  await page.click('[data-preview-width="mobile"]');
+  assert.equal(await page.$eval('#recipe-frame', el => el.clientWidth), 390);
+  assert.equal(await page.$eval('[data-preview-width="mobile"]', el => el.getAttribute('aria-pressed')), 'true');
+  await page.click('[data-preview-width="desktop"]');
+  assert.ok(await page.$eval('#recipe-frame', el => el.clientWidth > 1000));
+});
+
+test('story sections support keyboard comparison and project selection', async page => {
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await page.goto(`${url}/kit/index.html#family=image-comparison`);
+  await page.waitForSelector('.comparison-control input');
+  await page.focus('.comparison-control input');
+  await page.keyboard.press('End');
+  assert.equal(await page.$eval('.comparison-frame', el => el.style.getPropertyValue('--comparison')), '100%');
+  await page.keyboard.press('Home');
+  assert.equal(await page.$eval('.comparison-control input', el => el.getAttribute('aria-valuetext')), '0% Champagne');
+  await page.click('.catalog-families button[data-family="project-index"]');
+  await page.focus('.project-row:nth-child(2)');
+  assert.equal(await page.$eval('.project-row:nth-child(2)', el => el.getAttribute('aria-pressed')), 'true');
+  assert.ok(await page.$eval('.project-visit', el => el.href.endsWith('/examples/saas/')));
+  await page.addScriptTag({ path: resolve(modules, 'axe-core/axe.min.js') });
+  const violations = await page.evaluate(async () => (await axe.run(document.querySelector('.catalog-preview'))).violations.map(v => v.id));
+  assert.deepEqual(violations, []);
+});
+
+test('complete recipes preserve content order and fit desktop and phone layouts', async page => {
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  for (const width of [1440, 390]) {
+    await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
+    for (const recipe of ['studio', 'product', 'hospitality', 'exhibition']) {
+      await page.goto(`${url}/kit/preview.html?recipe=${recipe}`);
+      await page.waitForSelector('[data-family]');
+      assert.equal(await page.$$eval('h1', els => els.length), 1);
+      const sections = await page.$$eval('[data-kit]>section', els => els.map(el => el.id));
+      const expected = { studio: 'projects', product: 'chapters', hospitality: 'featured', exhibition: 'comparison' };
+      assert.equal(sections[0], expected[recipe]);
+      for (const id of sections) {
+        await page.$eval(`[id="${id}"]`, el => el.scrollIntoView());
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${recipe}/${width}/${id}`);
+      }
+      await page.addScriptTag({ path: resolve(modules, 'axe-core/axe.min.js') });
+      assert.deepEqual(await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } })).violations.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) }))), [], `${recipe}/${width}`);
+    }
+  }
 });
 
 try {

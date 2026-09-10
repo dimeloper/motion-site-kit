@@ -107,3 +107,13 @@ for this design revision; the earlier rows remain historical observations.
 The three new gallery preview WebPs total 102,340 bytes and load lazily. Their
 source screenshots, dimensions and encoder settings are recorded in
 [preview provenance](assets/preview-provenance.json). The docs font is now local.
+
+## Composition revision, 10 September 2026
+
+The page-resource totals above describe the earlier design revisions. Halo's
+new portfolio, the four recipe previews and Fold v3 change the requested
+content; those historical totals must not be quoted as current transfer sizes.
+Fold v3's reproducible build check measures 44,377 bytes of gzip-level-9 JS.
+Its three posters are 211,111, 212,279 and 203,531 bytes (silver, champagne,
+graphite), within the unchanged limits. These are file/build measurements,
+not measured cellular downloads. See [poster provenance](examples/vgpu/poster-provenance.json).

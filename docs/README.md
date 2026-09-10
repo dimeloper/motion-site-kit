@@ -15,7 +15,7 @@ with `template/`). The demos each fork their own engine:
 | `examples/saas/` | Live WebGL fitness ring (peel / seat) |
 | `examples/commerce/` | Halo studio. Rings lift / seat. Compose from `kit/` |
 | `examples/vgpu/demo/` | Fold: optional vgpu procedural material; source and build instructions alongside it |
-| `kit/` | Search, preview and copy config for 30 families; `planPage()` picks from content |
+| `kit/` | Search, preview and copy config for 34 families and four complete page recipes; `planPage()` picks from content |
 
 `.nojekyll` is required so GitHub Pages does not run Jekyll on the frames.
 
@@ -35,3 +35,5 @@ committed root ladder strictly and models separately.
 The docs font is self-hosted in `assets/` with its OFL license. Example
 preview WebPs are screenshots of this repository’s pages, not external artwork.
 The docs remain readable without JavaScript; catalog composition requires it.
+
+Start with [onboarding](ONBOARDING.md). Current authorized work is tracked in [the checklist](WORK-IN-PROGRESS.md).

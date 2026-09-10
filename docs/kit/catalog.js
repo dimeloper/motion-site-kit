@@ -26,11 +26,24 @@ const lock = {
 
 export const CATALOG = {
   sections: [
+    { type: 'visual-chapters', id: 'chapters', headline: 'From dough to table', chapters: [
+      { title: 'The loaf', body: 'A close view of the flour-dusted crust.', image: loaf },
+      { title: 'The table', body: 'The same bread, sliced and ready to share.', image: board },
+    ] },
+    { type: 'expanding-image', id: 'expansion', headline: 'Room for the image', image: board, caption: 'Harbor Oven / bread and jam' },
+    { type: 'project-index', id: 'projects', headline: 'Selected studies', projects: [
+      { title: 'Harbor Oven', discipline: 'Hospitality / WebGL', body: 'A bakery built around a flour-dusted loaf.', image: loaf, href: '../examples/local/' },
+      { title: 'Vortex', discipline: 'Product / WebGL', body: 'A titanium band that opens as you scroll.', image: lock, href: '../examples/saas/' },
+    ] },
+    { type: 'image-comparison', id: 'comparison', headline: 'One form, two finishes',
+      before: { label: 'Silver', image: { src: '../examples/vgpu/demo/poster.png', alt: 'Silver Fold sculpture', width: 1200, height: 900 } },
+      after: { label: 'Champagne', image: { src: '../examples/vgpu/demo/poster-champagne.png', alt: 'Champagne Fold sculpture', width: 1200, height: 900 } },
+    },
     {
       type: 'hero-cinematic',
       id: 'hero-cinematic',
       headline: 'Crafted to hold a void',
-      body: 'Type stays in the reading lane. The object owns the right. Harbor and Vortex already use a split hero. This one leaves the object lane empty on purpose.',
+      body: 'A headline and introduction sit beside space reserved for your model, video or still.',
       cta: { label: 'See the families', href: '#editorial' },
       foot: 'Cinematic hero. One object. No four-up stats.',
       voidLabel: 'Object lane',
@@ -42,11 +55,11 @@ export const CATALOG = {
       columns: [
         {
           num: '[ 01 ]',
-          body: 'This family is a headline plus two short columns and a tall still. It is not a numbered module list.',
+          body: 'A headline, two short passages and a tall still introduce the subject.',
         },
         {
           num: '[ 02 ]',
-          body: 'Use it when the next vertical needs to explain a mechanism without three identical cards.',
+          body: 'Use the second passage for context, a source note or a practical detail.',
         },
       ],
       image: board,
@@ -54,11 +67,11 @@ export const CATALOG = {
     {
       type: 'stat-stack',
       id: 'metrics',
-      aside: 'One glass column. The first metric is larger. The others are not clones of it.',
+      aside: 'A lead metric followed by supporting figures and a next step.',
       items: [
-        { variant: 'lead', value: '30', label: 'layout families', note: 'the planner picks a short sequence', href: '#featured', goLabel: 'Next family' },
-        { variant: 'plain', value: '1×', label: 'each family, once per page' },
-        { variant: 'action', value: '0', label: 'Vortex section clones', href: '#board', goLabel: 'Material board' },
+        { variant: 'lead', value: '34', label: 'layout families', note: 'the planner picks a short sequence', href: '#featured', goLabel: 'Next family' },
+        { variant: 'plain', value: '1×', label: 'complete page preview' },
+        { variant: 'action', value: '0', label: 'required extra packages', href: '#board', goLabel: 'Material board' },
       ],
     },
     {
@@ -68,7 +81,7 @@ export const CATALOG = {
       item: {
         kicker: 'Featured work',
         title: 'Harbor, loaf orbit',
-        body: 'Art direction, WebGL. A single card, not a finish grid.',
+        body: 'An interactive bakery study built around a textured loaf.',
         image: loaf,
       },
     },
@@ -82,7 +95,7 @@ export const CATALOG = {
     {
       type: 'material-board',
       id: 'board',
-      headline: 'Materials, not finishes',
+      headline: 'A material collection',
       items: [
         { span: 'tall', title: 'Crust', body: 'Tall cell. Owns the left column.', image: loaf },
         { span: 'unit', title: 'Board', body: 'Shorter cell, different ratio.', image: board },
@@ -97,19 +110,19 @@ export const CATALOG = {
         {
           num: '01',
           title: 'Pick families',
-          body: 'Four or more, all different. If the page reads as modules, feel, then three finish cards, start over.',
+          body: 'Choose the content your visitor needs and set its reading order.',
         },
         {
           num: '02',
           title: 'Then the object',
-          body: 'Meshy PBR or a licensed textured GLB. Untextured CAD primitives failed twice. Do not light clay and ship it.',
+          body: 'Use an authored or licensed asset. Inspect its silhouette, texture and lighting before adding motion.',
         },
       ],
     },
     {
       type: 'work-rail',
       id: 'rail',
-      headline: 'A strip, not a grid',
+      headline: 'Browse the collection',
       items: [
         { title: 'Loaf', body: 'Scroll sideways. Snap each still.', image: loaf },
         { title: 'Board', body: 'Different ratio on purpose.', image: board },
@@ -129,11 +142,11 @@ export const CATALOG = {
     {
       type: 'ascent-steps',
       id: 'ascent',
-      headline: 'A spine, not two columns',
+      headline: 'From brief to page',
       steps: [
-        { num: '01', title: 'Name the object', body: 'If you cannot point at it, you do not have a brief.' },
+        { num: '01', title: 'Name the object', body: 'Choose the object or image that carries the story.' },
         { num: '02', title: 'Pick a motion', body: 'Orbit, peel, or lift. One language per page.' },
-        { num: '03', title: 'Compose the page', body: 'Four different families. Stop before you use all thirty.' },
+        { num: '03', title: 'Compose the page', body: 'Arrange the sections, then review the full page at desktop and phone widths.' },
       ],
     },
     {
@@ -150,7 +163,7 @@ export const CATALOG = {
     {
       type: 'quote-pull',
       id: 'quote',
-      quote: 'If you cannot point at the object, you do not have a brief.',
+      quote: 'Bread in the morning. Soup by noon.',
       by: 'Page kit, on picking a family',
     },
     {
@@ -164,7 +177,7 @@ export const CATALOG = {
     {
       type: 'pair-stills',
       id: 'pair',
-      headline: 'Two frames, not a row of three',
+      headline: 'Two views of the table',
       items: [
         { title: 'Loaf', body: 'The wider cell.', image: loaf },
         { title: 'Board', body: 'The shorter cell.', image: board },
@@ -174,8 +187,8 @@ export const CATALOG = {
       type: 'note-margin',
       id: 'note',
       headline: 'A note in the margin',
-      body: 'Body copy keeps the reading lane. The aside is a short correction, not a second column of the same weight.',
-      note: 'Do not turn this into two equal process columns.',
+      body: 'A main passage explains the subject. A shorter margin note adds context.',
+      note: 'Keep the note short enough to scan beside the main passage.',
     },
     {
       type: 'hours-list',
@@ -201,23 +214,23 @@ export const CATALOG = {
     {
       type: 'invert-band',
       id: 'band',
-      band: 'Same paper. A band is not a light page.',
+      band: 'A short pause between chapters.',
     },
     {
       type: 'rule-list',
       id: 'rules',
-      headline: 'Rules, not a spine',
+      headline: 'Before you publish',
       items: [
-        { title: 'Name the object', body: 'If you cannot point at it, pick a still, not a family.' },
-        { title: 'One motion', body: 'Orbit, peel, or lift. Mixing languages is a reskin.' },
-        { title: 'Short sequence', body: 'Four families. The catalog is not a page.' },
+        { title: 'Name the object', body: 'Choose an image that explains the subject.' },
+        { title: 'One motion', body: 'Choose a movement that reveals a useful detail.' },
+        { title: 'Short sequence', body: 'Include the sections needed to complete the story.' },
       ],
     },
     {
       type: 'measure-band',
       id: 'measure',
       value: '1×',
-      label: 'each family, once. Repeating a layout is the clone.',
+      label: 'complete page, reviewed at two widths.',
     },
     {
       type: 'chapter-index',
@@ -251,7 +264,7 @@ export const CATALOG = {
     {
       type: 'client-marks',
       id: 'marks',
-      headline: 'Names, not a logo wall',
+      headline: 'From the kit',
       marks: ['Harbor', 'Vortex', 'Halo'],
     },
     {
@@ -270,9 +283,9 @@ export const CATALOG = {
       id: 'claims',
       headline: 'What the page claims',
       claims: [
-        'The object holds.',
-        'Scroll changes it.',
-        'The page is not Vortex.',
+        'Start with the object.',
+        'Show what changes.',
+        'Give the reader a next step.',
       ],
     },
     {
@@ -281,16 +294,16 @@ export const CATALOG = {
       headline: 'Frequently',
       items: [
         {
-          q: 'Can the next demo reuse Vortex HTML?',
-          a: 'No. Reuse loader, Lenis, menu, and fallback invariants. Section markup comes from this kit, or it is written new.',
+          q: 'Where should I start?',
+          a: 'Choose a complete page recipe above. Replace its content, then review the full sequence.',
         },
         {
           q: 'Do I have to use every family?',
-          a: 'No. planPage() picks a short sequence from the brief. Using all thirty on one site is the same mistake as three identical cards.',
+          a: 'Use the families that serve your content. There is no required section count.',
         },
         {
           q: 'Where does Halo live?',
-          a: 'docs/examples/commerce/. Studio brief: featured still, three steps, four stills, questions, invite. The planner maps that to featured-work, ascent-steps, work-rail, faq-rule, statement-cta. Rings lift off the stone.',
+          a: 'Open the Halo example to see the shared project index, visual chapters and expanding image in a complete portfolio.',
         },
       ],
     },
@@ -298,18 +311,18 @@ export const CATALOG = {
       type: 'hero-editorial',
       id: 'hero-editorial',
       framed: true,
-      frameCaption: 'Light family. Use on its own light page. Do not drop it between dark sections.',
+      frameCaption: 'Editorial hero with a tall image and supporting notes.',
       headline: 'A living interface',
       columns: [
-        { num: '[ 01 ]', body: 'Sparse type, tall still, two notes. For a light vertical only.' },
-        { num: '[ 02 ]', body: 'If the page is dark, keep this family in a drawer.' },
+        { num: '[ 01 ]', body: 'Introduce the subject with a short passage beside the image.' },
+        { num: '[ 02 ]', body: 'Set the section colors to fit the surrounding page and verify contrast.' },
       ],
       image: board,
     },
     {
       type: 'statement-cta',
       id: 'cta',
-      line: 'Pick a concept. Then we compose a page that is not Vortex.',
+      line: 'See these sections in a working portfolio.',
       cta: { label: 'Open Halo', href: '../examples/commerce/' },
     },
   ],

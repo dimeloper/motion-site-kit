@@ -64,3 +64,31 @@ objective claim of parity with every GetLayers template. Real-device power and
 cellular delivery remain separate performance checks. This design checkpoint
 preceded publication; see [release QA](RELEASE-QA.md) for current browser and
 release status.
+
+## Composition follow-on, 10 September 2026
+
+Halo now presents named website studies through a project index, image-led
+chapters and an expanding context image. Its hero keeps the stone and rings,
+with thinner luminous cores and reduced bloom. Fold uses broader pleats, softer
+reflections and a working finish comparison. Both retain their existing runtime
+and poster fallback contracts.
+
+The kit now has 34 section families and four complete recipes. Studio uses an
+asymmetric portfolio, product moves through construction and context, hospitality
+uses bread photography and service copy, and exhibition compares finishes before
+showing the full material. Explicit section ordering supports these sequences.
+Desktop and 390px previews share the same brief; export includes its hero and page
+content. The product hero's crop was corrected after screenshot review found the
+band too small and then off-center.
+
+Reviewed recipe first screens and lower-section captures at 1440px and 390px,
+including Fold's narrow finish comparison. Screenshots remain in ignored
+`out/final-visual/`. The full 29-scenario Chromium suite passes, including all
+four recipes at both widths, content order, native comparison keyboard controls,
+project selection, preview switching and export. Axe covers the complete recipes
+and the tested catalog states; this is not an accessibility certification.
+
+Public copy now identifies Vortex as a concept study instead of presenting
+unsubstantiated ratings, battery figures or a shipping date. Harbor captions
+match the bread imagery. The new onboarding guide covers each working route,
+image-path handling and the distinction between editing source and serving a build.

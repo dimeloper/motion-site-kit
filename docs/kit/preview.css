@@ -1,0 +1,36 @@
+@font-face { font-family: Manrope; src: url('../assets/manrope-latin.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+body { --kit-display: Manrope, sans-serif; --kit-body: Manrope, sans-serif; --kit-bg: #edede5; --kit-ink: #20221e; --kit-mute: #5c6058; --kit-line: #bfc2b7; color-scheme: light; }
+.preview-skip { position: absolute; top: -100px; }
+.preview-skip:focus { top: 0; z-index: 10; background: var(--kit-bg); padding: 1rem; }
+.recipe-nav { padding: 1.5rem var(--kit-pad); display: flex; gap: 2rem; border-bottom: 1px solid var(--kit-line); }
+.recipe-nav a { text-decoration: none; font-size: .8rem; }
+.recipe-nav a:first-child { margin-right: auto; font-size: 1.25rem; font-weight: 700; }
+.recipe-hero { padding: 5rem var(--kit-pad); display: grid; grid-template-columns: 1.1fr 1fr; gap: 5%; align-items: center; }
+.recipe-hero h1 { font: 400 clamp(3rem, 7.5vw, 8rem)/.98 var(--kit-display); letter-spacing: -.055em; margin: 2rem 0; }
+.recipe-hero p { max-width: 34ch; }
+.recipe-hero [data-label] { font-size: .8rem; }
+.recipe-hero img { width: 100%; max-height: 700px; object-fit: cover; }
+.recipe-hero [data-action] { display: inline-block; margin-top: 1rem; text-underline-offset: .4em; }
+.recipe-footer { padding: 3rem var(--kit-pad); border-top: 1px solid var(--kit-line); font-size: .8rem; }
+body[data-recipe="product"] { --kit-bg: #0b101a; --kit-ink: #f0f3fb; --kit-mute: #a9b3c7; --kit-line: #3b4659; color-scheme: dark; }
+body[data-recipe="product"] .recipe-hero img { object-position: 100% 50%; }
+body[data-recipe="studio"] .recipe-hero { grid-template-columns: 1.8fr .65fr; }
+body[data-recipe="studio"] .recipe-hero img { margin-top: 9rem; }
+body[data-recipe="hospitality"] { --kit-display: Georgia, serif; --kit-bg: #eee7da; --kit-ink: #302a23; --kit-mute: #655e52; }
+body[data-recipe="hospitality"] .recipe-hero { grid-template-columns: 1fr 1fr; }
+body[data-recipe="hospitality"] .recipe-hero img { border-radius: 50% 50% 0 0; max-height: 750px; }
+body[data-recipe="exhibition"] .recipe-hero { position: relative; min-height: 800px; display: block; }
+body[data-recipe="exhibition"] .recipe-hero h1 { max-width: 9ch; font-size: clamp(4rem, 10vw, 10rem); }
+body[data-recipe="exhibition"] .recipe-hero img { position: absolute; right: 0; bottom: 0; width: 58%; pointer-events: none; }
+body[data-recipe="exhibition"] .recipe-hero>div { position: relative; z-index: 1; }
+@media (max-width: 700px) {
+  .recipe-nav { gap: 1rem; }
+  .recipe-hero, body[data-recipe] .recipe-hero { display: flex; flex-direction: column; padding-top: 2rem; min-height: 0; }
+  body[data-recipe] .recipe-hero img { position: static; width: 100%; margin-top: 2rem; max-height: 450px; }
+  .recipe-hero h1, body[data-recipe="exhibition"] .recipe-hero h1 { font-size: clamp(3rem, 13vw, 5rem); }
+}
+
+body[data-recipe="hospitality"] .featured-card { background: #e3dacb; }
+
+.recipe-product-media { width: 100%; aspect-ratio: 1; overflow: hidden; }
+body[data-recipe="product"] .recipe-product-media img { height: 100%; max-height: none; margin: 0; transform: scale(2.5); transform-origin: 56% 50%; }

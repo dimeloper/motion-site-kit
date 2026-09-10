@@ -13,7 +13,7 @@ establishing a visual identity. Similar text sections gave the lower page little
 change of pace. This made it read as a technical sample, even though the shader
 and fallback behavior worked.
 
-## What changed
+## What changed in v2
 
 - The opening screen is one composition: a large FOLD wordmark behind a finite
   sculptural sheet, with navigation, introduction and finish controls around it.
@@ -43,9 +43,23 @@ change scroll progress themselves.
 
 This is a substantial improvement in hierarchy and art direction. It is still
 an original procedural study, not a claim of photoreal material accuracy or
-parity with every GetLayers template. Safari, real phone GPU load, battery use
-and cellular behavior need direct verification before production claims. The
+parity with every GetLayers template. Native macOS Safari 26.6.2 passes live
+rendering and finish selection. Real-phone GPU load, battery use and cellular
+behavior still need direct verification before production claims. The
 large material close-up deliberately shows a crop; the hero shows the silhouette.
 
 See [README](README.md) for current build sizes and fallback contracts, and
 [the comparison](FRAME-COMPARISON.md) for current and archived shader exports.
+
+## V3, 10 September 2026
+
+The sheet now has fewer, broader pleats. Broad studio reflections replace the
+strong horizontal dark stripe; champagne uses a warmer, less orange tint. A
+working silver/champagne comparison replaces three repetitive text columns,
+so the lower page lets visitors inspect a material difference. Copy describes
+the object and interaction before linking to technical details.
+
+The three fallback posters were rendered from the current shader. Their hashes,
+dimensions and source hash are in [poster provenance](poster-provenance.json).
+The archived v2 sequence remains available for reproducible byte comparisons;
+its measurements do not describe the current shader.

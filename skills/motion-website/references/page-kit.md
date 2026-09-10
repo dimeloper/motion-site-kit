@@ -14,8 +14,8 @@ Not the section list. Not `modules` / `feel` / `builds` / `about` / `cta` with n
 
 ## Composition rules
 
-1. Describe **content**, then let `planPage()` pick families. Hardcode `type` only for a kit specimen.
-2. A page uses **at least four different** families. A family appears **once**.
+1. Start from a complete recipe in `docs/kit/recipes.js`. Describe content and use `page.order` to set its reading order; explicit family configurations remain available for authored compositions.
+2. Choose the section count from the content. Repetition is a review cue, not a hard failure; inspect the rhythm of the complete page.
 3. Do not ship the Vortex ids `modules`, `feel`, `builds`, `about`, `cta` together.
 4. Three equal cards and four equal stat cells are banned.
 5. Eyebrows (small uppercase tracking labels) at most once every three sections. Prefer none.
@@ -36,10 +36,14 @@ Rules that keep this from coming back:
 
 ## How the planner chooses
 
-`planPage({ kind, content })` reads the brief, not a type list.
+`planPage({ kind, content, order })` reads the brief, not a type list.
 
 | Content | Family |
 |---|---|
+| Named projects | `project-index` |
+| Chapters with images | `visual-chapters` |
+| Expansion image | `expanding-image` |
+| Before/after comparison | `image-comparison` |
 | One featured still | `featured-work` |
 | Three or more steps | `ascent-steps` |
 | Two steps | `process-columns` |
@@ -52,16 +56,20 @@ Rules that keep this from coming back:
 | Quote | `quote-pull` |
 | Metrics, and `kind` is not `studio` | `stat-stack` |
 
-Studio (`kind: 'studio'`, or inferred from a featured still + stills) skips `stat-stack` and never inserts `hero-editorial` mid-page. Halo ships a studio brief; the planner should land on featured → ascent → rail → faq → invite.
+Studio (`kind: 'studio'`, or inferred from a featured still + stills) skips `stat-stack` and never inserts `hero-editorial` mid-page. Halo ships a studio brief with explicit order: projects → chapters → expansion → invite. Omitted IDs follow the listed ones.
 
 A section with no `type` still mounts if `inferFamily()` can read its fields (`items[].q`, `steps`, `item.image`, and so on).
 
 ## Families
 
-Thirty families. A page uses a short sequence. The catalog is not a page.
+Thirty-four families. A page uses a short sequence. The catalog is not a page.
 
 | Type | Use when | Not a substitute for |
 |---|---|---|
+| `visual-chapters` | Images tied to successive reading sections | A carousel requiring clicks |
+| `expanding-image` | One image opening into the page | A pinned canvas |
+| `project-index` | Named projects with a selectable preview | Unlabeled thumbnail navigation |
+| `image-comparison` | Two aligned views of the same subject | Unrelated before/after claims |
 | `hero-cinematic` | Dark page, type in a reading lane, object in a void | Cloning Harbor/Vortex split chrome and calling it new |
 | `hero-editorial` | Light page, tall still, two short notes | Inverting a dark page mid-scroll |
 | `stat-stack` | A few metrics that are not the same size | Four-up hero stats |
@@ -103,7 +111,7 @@ import { compose, planPage } from '../../kit/compose.js';
 compose(document.querySelector('[data-kit]'), planPage(CONFIG.page));
 ```
 
-`CONFIG.page` is `{ kind, content }`. Halo is the studio example. Specimens may still pass `{ sections: […] }` with explicit types.
+`CONFIG.page` is `{ kind, content, order }`. Halo is the studio example. Specimens may still pass `{ sections: […] }` with explicit types.
 
 Styles: `docs/kit/sections.css`. Brand tokens (colors, fonts) override on `[data-theme]` in the demo's own CSS. Do not fork `sections.css` to restyle one card into Vortex.
 

@@ -2,7 +2,7 @@
  * Halo page chrome: loader numerals, menu, in-page anchors.
  */
 
-import { CONFIG } from '../config.js?v=8';
+import { CONFIG } from '../config.js?v=11';
 
 function syncLoaderCount() {
   const bar = document.querySelector('[data-loader-bar]');

@@ -20,6 +20,10 @@ export function inferKind(content = {}) {
 
 export function inferFamily(section = {}) {
   if (section.type) return section.type;
+  if (section.projects?.length) return 'project-index';
+  if (section.before?.image && section.after?.image) return 'image-comparison';
+  if (section.chapters?.some(chapter => chapter.image)) return 'visual-chapters';
+  if (section.expand && section.image) return 'expanding-image';
 
   const items = section.items || [];
   const imaged = items.filter((item) => item?.image);
@@ -84,6 +88,11 @@ export function planPage(page = {}) {
   const kind = page.kind || inferKind(content);
   const out = [];
   const used = new Set();
+
+  if (content.projects?.length) take(out, used, 'project-index', { id: 'projects', headline: content.projectsHeadline || 'Selected studies', projects: content.projects });
+  if (content.chapters?.length) take(out, used, 'visual-chapters', { id: 'chapters', headline: content.chaptersHeadline, chapters: content.chapters });
+  if (content.comparison) take(out, used, 'image-comparison', { id: 'comparison', ...content.comparison });
+  if (content.expansion) take(out, used, 'expanding-image', { id: 'expansion', ...content.expansion });
 
   const featured = content.featured;
   if (featured && (featured.image || featured.item?.image)) {
@@ -175,5 +184,11 @@ export function planPage(page = {}) {
     });
   }
 
+  // Art direction can set a reading order without naming renderer families.
+  // Unlisted content remains present, following the explicit sequence.
+  if (page.order?.length) {
+    const rank = id => { const index = page.order.indexOf(id); return index < 0 ? page.order.length : index; };
+    out.sort((a, b) => rank(a.id) - rank(b.id));
+  }
   return out;
 }

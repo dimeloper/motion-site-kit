@@ -70,3 +70,10 @@ async function start() {
 }
 window.addEventListener('pagehide', () => fallback('page-hidden'), { once: true });
 void start();
+
+// The comparison remains available even when the live renderer falls back.
+const comparison = document.querySelector('.finish-range input');
+comparison.addEventListener('input', () => {
+  document.querySelector('.finish-compare').style.setProperty('--finish-split', `${comparison.value}%`);
+  comparison.setAttribute('aria-valuetext', `${comparison.value}% champagne`);
+});

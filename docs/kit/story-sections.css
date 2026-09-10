@@ -1,0 +1,46 @@
+.story-section { padding: clamp(3rem, 8vw, 8rem) var(--kit-pad); min-width: 0; }
+.story-title { max-width: 15ch; font-family: var(--kit-display); font-size: clamp(2.2rem, 5.5vw, 5.5rem); font-weight: 400; line-height: 1; letter-spacing: -.045em; margin: 0 0 2rem; }
+.story-lead { max-width: 45ch; color: var(--kit-mute); margin-bottom: 3rem; }
+.story-number { font-size: .75rem; font-variant-numeric: tabular-nums; }
+.chapters-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 8%; align-items: start; }
+.chapters-visual { position: sticky; top: 6rem; height: min(70vh, 650px); }
+.chapters-visual img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.chapters-visual img.is-current { opacity: 1; }
+.chapter { min-height: 65vh; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--kit-line); }
+.chapter h3 { font: 400 clamp(2rem, 3vw, 3.5rem)/1.1 var(--kit-display); margin: 1.5rem 0; letter-spacing: -.035em; }
+.chapter p { max-width: 32ch; color: var(--kit-mute); }
+.chapter-mobile { display: none; }
+.expand-frame { margin: 0; position: relative; overflow: hidden; }
+.expand-frame img { width: 100%; max-height: 80vh; object-fit: cover; }
+.expand-frame figcaption { padding: 1rem 0; font-size: .8rem; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .expand-frame img { animation: story-expand linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
+  }
+}
+@keyframes story-expand { from { clip-path: inset(8% 16%); } to { clip-path: inset(0); } }
+.project-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 6%; align-items: start; }
+.project-row { appearance: none; background: none; color: inherit; border: 0; border-top: 1px solid var(--kit-line); padding: 1.8rem 0; width: 100%; display: grid; grid-template-columns: 2rem 1fr; gap: .4rem 1rem; text-align: left; cursor: pointer; }
+.project-name { font: 400 clamp(1.8rem, 3.6vw, 4rem)/1.1 var(--kit-display); letter-spacing: -.04em; }
+.project-discipline { grid-column: 2; font-size: .8rem; color: var(--kit-mute); }
+.project-row[aria-pressed="true"] .project-name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .15em; }
+.project-preview { margin: 0; position: sticky; top: 6rem; }
+.project-preview img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.project-preview figcaption { margin: 1rem 0; max-width: 40ch; }
+.project-visit { font-size: .85rem; text-underline-offset: .3em; }
+.comparison-frame { position: relative; aspect-ratio: 4/3; background: var(--kit-glass); overflow: hidden; }
+.comparison-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.comparison-after { clip-path: inset(0 calc(100% - var(--comparison, 50%)) 0 0); }
+.comparison-frame::after { content: ''; position: absolute; top: 0; bottom: 0; left: var(--comparison, 50%); width: 1px; background: var(--kit-ink); pointer-events: none; }
+.comparison-labels { display: flex; justify-content: space-between; padding: 1rem 0; font-size: .8rem; }
+.comparison-control { display: grid; gap: .5rem; font-size: .85rem; }
+.comparison-control input { width: 100%; min-height: 44px; accent-color: var(--kit-ink); }
+.story-section :focus-visible { outline: 2px solid var(--kit-ink); outline-offset: 6px; }
+@media (max-width: 700px) {
+  .chapters-layout, .project-layout { grid-template-columns: 1fr; }
+  .chapters-visual { display: none; }
+  .chapter { min-height: 0; padding: 2rem 0; }
+  .chapter-mobile { display: block; width: 100%; margin: 1.5rem 0; }
+  .project-preview { position: static; margin-top: 2rem; }
+  .project-row { padding: 1.2rem 0; }
+}

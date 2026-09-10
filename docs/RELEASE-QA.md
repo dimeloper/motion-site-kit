@@ -8,7 +8,7 @@ physical-iPhone QA and documentation updates. No performance budget was relaxed.
 | Environment | Evidence | Result |
 | --- | --- | --- |
 | macOS Safari 26.6.2, Apple SafariDriver | Docs frame forward/reverse canvas comparison; Harbor, Vortex and Halo initialization, menus and context-loss fallback; Fold live WebGPU and champagne finish; catalog search/selection | Pass |
-| Chromium, local suite | 26 scenarios covering runtime failure/recovery, bitmap bounds, WebGL suspension, menus, Fold and docs/catalog | Pass on 9 September; affected docs checks repeated after the 320px correction |
+| Chromium, local suite | 29 scenarios covering runtime failure/recovery, bitmap bounds, WebGL suspension, menus, Fold, docs/catalog and complete recipes | Pass on 10 September |
 | Firefox 151.0.3 | Frame forward/reverse, forced no-WebGPU Fold fallback, reduced motion | Three smoke checks pass |
 | Python / Node | 12 budget regressions and 17 cache/config tests | Pass on 10 September |
 | Asset/build gates | Strict committed frame ladder, model/JS limits, example mirrors, reproducible Fold build and all three posters | Pass on 10 September |
@@ -74,3 +74,17 @@ No actual-cellular, Android-device, production LCP, frame-time distribution,
 thermal or battery-efficiency result is claimed. A USB automation connection does
 not establish the phone's network route. WebDriver DOM scrolling and scripted
 menu actions cover behavior, not a complete manual touch/gesture audit.
+
+## Composition release candidate
+
+The 10 September composition revision adds four section families, complete
+recipes, Halo's portfolio and Fold v3. All 29 Chromium scenarios pass locally.
+The six native Safari checks also pass against the local revision, including
+Fold live WebGPU; these observations are under `out/composition-safari/`.
+Recipe toolbar/export behavior and complete desktop/phone recipe layouts are
+covered in Chromium. Physical iPhone QA remains blocked as described above.
+
+Fresh-directory onboarding copied all 120 demo frames byte-for-byte without
+installing Node or media tools. Python/Node tests, strict frame budgets, model
+and source gates, mirror alignment and Fold source/build equivalence pass.
+Remote CI and publication of this revision still require the release step.

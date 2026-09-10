@@ -4,7 +4,7 @@ An agent skill for Codex and Claude Code, plus a reskinnable template for buildi
 
 Live demo: [dimeloper.github.io/motion-site-kit](https://dimeloper.github.io/motion-site-kit/)
 
-The technique is not the hard part. Shipping it without a 200 MB hero, a stuttering canvas, or a page that abandons phone visitors is the hard part. That's what's in here.
+The kit enforces frame download limits, bounds decoded bitmap storage and keeps animation available on phones. It includes four examples and reusable page compositions.
 
 ```
 source clip ──▶ extract N frames ──▶ responsive ladder ──▶ budget gate ──▶ site
@@ -27,6 +27,13 @@ source clip ──▶ extract N frames ──▶ responsive ladder ──▶ bud
 The optional [Fold vgpu study](docs/examples/vgpu/README.md) adds a deterministic
 scroll-driven shader with a real poster and device-loss fallback. Its generated
 static build is at `docs/examples/vgpu/demo/`; only editing it needs Vite.
+
+## Choose a starting point
+
+- **Try it without installing anything:** open the [live examples](https://dimeloper.github.io/motion-site-kit/) or [page recipes](https://dimeloper.github.io/motion-site-kit/kit/).
+- **Build a frame-scrub site:** use the quick start below, then edit `template/config.js`.
+- **Compose a portfolio or landing page:** start with one of four recipes in `docs/kit/recipes.js` and preview it at `/kit/preview.html?recipe=studio`.
+- **Edit a WebGL or WebGPU example:** follow the example-specific path in [onboarding](docs/ONBOARDING.md).
 
 ## Quick start
 
@@ -74,7 +81,7 @@ The template resolves GSAP and Lenis through an import map pointed at a CDN, so 
 ./scripts/vendor.sh
 ```
 
-This installs both packages, copies their ESM builds into `template/vendor/`, and rewrites the import map to local paths. Worth doing for client work, where a CDN outage taking the hero with it is your problem, not theirs.
+This installs both packages, copies their ESM builds into `template/vendor/`, and rewrites the import map to local paths. Use this when your deployment must serve its runtime dependencies locally.
 
 ## Using it as an agent skill
 
@@ -91,6 +98,7 @@ or describe a matching task. See the [official skill documentation](https://lear
 For Claude Code:
 
 ```bash
+mkdir -p ~/.claude/skills
 cp -r skills/motion-website ~/.claude/skills/
 ```
 
@@ -98,11 +106,11 @@ It triggers on scroll animations, pinned heroes, image sequences, GSAP ScrollTri
 
 ## Design decisions worth knowing about
 
-**120 frames, not 300.** At scroll speed the visitor's scroll velocity sets the perceived cadence, not the frame count. Going 120 → 240 doubles page weight for a difference nobody identifies blind.
+**Frame count.** Start with 120 frames, then inspect the sequence at its intended scroll range. More frames increase transfer and decoding work; keep them only when they improve the result.
 
-**Phones get the animation.** The common advice is to disable the sequence under 768px. The 640 rung is a few hundred kilobytes, and phones are most of the traffic — so the kit ships them a narrow ladder instead of a JPEG. The static fallback is reserved for `prefers-reduced-motion`, Save-Data, and 2G, where it's an actual user signal rather than a guess based on screen size.
+**Phones get the animation.** The runtime selects a responsive frame ladder for small screens. The static fallback is reserved for `prefers-reduced-motion`, Save-Data, and 2G, where it's an actual user signal rather than a guess based on screen size.
 
-**The budget is a CI job, not a README line.** These sequences don't get heavy by decision; they grow half a megabyte per iteration while everyone's looking at the visuals. `check_budget.py` exits 1 and prints what to cut, in order.
+**Asset budgets.** CI checks every advertised frame against the configured byte limits. `check_budget.py` exits 1 and prints what to cut, in order.
 
 **GSAP for the hero, native CSS for the trim.** Scroll-driven CSS animations (`animation-timeline: scroll()`) ship in Chrome 115+ and Safari 26+ but not Firefox, which keeps them out of Baseline. The kit uses them behind `@supports` for the progress bar, where a Firefox visitor losing the effect costs nothing, and keeps ScrollTrigger for the hero, where it doesn't.
 

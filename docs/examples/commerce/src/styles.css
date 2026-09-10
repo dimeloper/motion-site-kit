@@ -785,3 +785,12 @@ button {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+/* Portfolio edition: shared story families carry the lower page. */
+.hero__copy h1 { max-width: 7ch; }
+[data-kit] .project-index { background: #e9e6dc; --kit-ink: #262821; --kit-mute: #616457; --kit-line: #bec0b4; color: var(--kit-ink); }
+[data-kit] .story-title { font-family: Georgia, serif; }
+[data-kit] .project-preview img { background: #dad9cd; }
+[data-kit] .visual-chapters { background: #171a18; --kit-mute: #b3b8aa; }
+[data-kit] .expanding-image { background: #e9e6dc; --kit-ink: #262821; color: var(--kit-ink); }
+[data-kit] .chapter h3 { font-family: Georgia, serif; }

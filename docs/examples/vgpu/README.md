@@ -44,13 +44,12 @@ Native poster rendering is not required to serve the committed fallback.
 - DPR is capped at 1.5 to bound render-target pixels on dense phone screens.
   Width alone never disables motion.
 
-## Evidence, 9 September 2026
+## Evidence, 10 September 2026
 
-Pinned vgpu 0.4.1 and Vite 8.2.2. The current production build contains 44,256
+Pinned vgpu 0.4.1 and Vite 8.2.2. The current production build contains 44,377
 bytes of JavaScript after gzip level 9 across both chunks. Silver, champagne
-and graphite posters are 191,805, 201,784 and 201,992 bytes respectively.
-Vite reports the lazy engine chunk as 42.98 kB gzip at its
-default compression level. These are build sizes, not measured HTTP transfer
+and graphite posters are 211,111, 212,279 and 203,531 bytes respectively.
+These are build sizes, not measured HTTP transfer
 or an assurance that every host enables gzip. The separate limits are 56 KiB
 gzip JS and 400 KiB per poster, unchanged from the original prototype.
 Manrope is self-hosted with its OFL license. Finish selection works in the
@@ -63,8 +62,8 @@ and only the fallback could run. Software rendering allowances in the test
 runner make these behavior checks unsuitable as GPU-speed benchmarks.
 
 Firefox 151.0.3 passed the no-WebGPU poster smoke check; this does not
-verify live WebGPU in Firefox. Real-phone power use, actual cellular transfer,
-Live rendering and finish selection pass in macOS Safari 26.6.2; see
+verify live WebGPU in Firefox. Real-phone power use and actual cellular transfer
+remain unverified. Live rendering and finish selection pass in macOS Safari 26.6.2; see
 [release QA](../../RELEASE-QA.md). Frame-time percentiles remain unmeasured. Compare an equivalent rendered sequence before
 claiming this is faster or lighter than the frame engine. A procedural shader
 does not replace the default engine's ability to display arbitrary footage.
@@ -78,4 +77,5 @@ export command, config-only frame reskin, provenance and all six sequence sizes.
 
 See [design review](DESIGN.md) for the GetLayers reference assessment and the
 changes from the first prototype. The frame comparison distinguishes the
-current sculpture from the archived first material.
+archived v1 and v2 materials. The current v3 lighting has matching rendered
+posters; its full baked-frame sequence has not been measured.

@@ -15,16 +15,16 @@ export const CONFIG = {
   },
 
   nav: [
-    { label: 'Work', href: '#rail' },
-    { label: 'Studio', href: '#ascent' },
-    { label: 'Ask', href: '#faq' },
+    { label: 'Work', href: '#projects' },
+    { label: 'Studio', href: '#chapters' },
+    { label: 'The kit', href: '#invite' },
   ],
 
   hero: {
-    headline: 'Ideas made tangible.',
-    sub: 'Brand, motion, and immersive web. The tools change. The craft does not.',
-    cta: { label: 'Pitch your idea', href: '#invite' },
-    secondary: { label: 'See the work', href: '#rail' },
+    headline: 'Objects in motion.',
+    sub: 'Independent website studies in food, wearable objects and sculptural materials.',
+    cta: { label: 'Explore the studies', href: '#projects' },
+    secondary: { label: 'Inside Altar', href: '#chapters' },
     animationDescription:
       'As you scroll, two rings of light lift off a stone pillar and hang in the dark. Scroll back and they seat again.',
     statusLeft: 'Stone at rest',
@@ -34,103 +34,27 @@ export const CONFIG = {
 
   page: {
     kind: 'studio',
+    order: ['projects', 'chapters', 'expansion', 'invite'],
     content: {
-      featured: {
-        headline: 'Altar',
-        title: 'Stone, then light',
-        body: 'The piece we would put on a table. Rings written as light.',
-        image: {
-          src: 'images/pillar.jpg',
-          alt: 'Weathered limestone monolith, Halo studio object',
-          width: 1200,
-          height: 1600,
-        },
-      },
-      stepsHeadline: 'How a brief starts',
-      steps: [
-        {
-          num: '01',
-          title: 'Send the object',
-          body: 'The still, who it is for, and one sentence for what scroll should do.',
-        },
-        {
-          num: '02',
-          title: 'We pick a motion',
-          body: 'Lift and seat, orbit, or peel. If scroll does not change the object, we cut it.',
-        },
-        {
-          num: '03',
-          title: 'You get a lane',
-          body: 'A motion language and a page sequence. Not a reskin of the last site.',
-        },
+      projectsHeadline: 'Selected studies',
+      projects: [
+        { title: 'Harbor Oven', discipline: 'Hospitality / WebGL', body: 'A bakery website with a flour-dusted loaf at its centre.', image: { src: '../../assets/harbor-preview.webp', alt: 'Harbor Oven website', width: 1440, height: 1000 }, href: '../local/' },
+        { title: 'Vortex', discipline: 'Product / WebGL', body: 'A titanium band opens to reveal its construction.', image: { src: '../../assets/vortex-preview.webp', alt: 'Vortex website', width: 1440, height: 1000 }, href: '../saas/' },
+        { title: 'Fold', discipline: 'Material / WebGPU', body: 'A thin sheet, shaped by scroll and reflected light.', image: { src: '../vgpu/demo/poster.png', alt: 'Silver Fold sculpture', width: 1200, height: 900 }, href: '../vgpu/demo/' },
       ],
-      stillsHeadline: 'Stills from the room',
-      stills: [
-        {
-          title: 'Table',
-          body: 'Prints and samples before a pitch.',
-          image: {
-            src: 'images/table.jpg',
-            alt: 'Studio table with a stone sample and a rolled print',
-            width: 1600,
-            height: 1200,
-          },
-        },
-        {
-          title: 'Grain',
-          body: 'The texture is the brief.',
-          image: {
-            src: 'images/grain.jpg',
-            alt: 'Limestone grain, Halo studio still',
-            width: 1200,
-            height: 1600,
-          },
-        },
-        {
-          title: 'Cut',
-          body: 'The same stone, flattened for the poster.',
-          image: {
-            src: 'images/pillar-cut.webp',
-            alt: 'Stone pillar on a dark field, Halo poster still',
-            width: 1200,
-            height: 1600,
-          },
-        },
-        {
-          title: 'Altar',
-          body: 'The piece on the table.',
-          image: {
-            src: 'images/pillar.jpg',
-            alt: 'Weathered limestone monolith, Halo studio object',
-            width: 1200,
-            height: 1600,
-          },
-        },
+      chaptersHeadline: 'Inside Altar',
+      chapters: [
+        { title: 'Weight', body: 'The limestone stays grounded. Its rough surface gives the scene a fixed point while the light moves above it.', image: { src: 'images/pillar.jpg', alt: 'Weathered limestone pillar', width: 1200, height: 1600 } },
+        { title: 'Surface', body: 'Close up, the stone breaks into pores and uneven edges. Side lighting keeps that texture visible.', image: { src: 'images/grain.jpg', alt: 'Close view of limestone texture', width: 1200, height: 1600 } },
+        { title: 'Context', body: 'The table study brings the object back to a familiar scale, alongside a rolled print and material samples.', image: { src: 'images/table.jpg', alt: 'Stone sample and rolled print on a studio table', width: 1600, height: 1200 } },
       ],
-      questionsHeadline: 'Before you write',
-      questions: [
-        {
-          q: 'What do you take on?',
-          a: 'Brand systems, motion sites, and WebGL heroes where the object has to hold. One surface at a time.',
-        },
-        {
-          q: 'Do you start from a template?',
-          a: 'The scroll engine is shared. The page is composed from the brief. We do not reskin the last site and change the nouns.',
-        },
-        {
-          q: 'How do we begin?',
-          a: 'Send the object, the audience, and one sentence for what scroll should do. We reply with a lane and a motion language.',
-        },
-      ],
-      invite: {
-        line: 'Pitch the object. We will tell you if it can hold.',
-        cta: { label: 'Pitch your idea', href: 'mailto:hello@halo.studio' },
-      },
+      expansion: { headline: 'From the studio table', image: { src: 'images/table.jpg', alt: 'Material study on a studio table', width: 1600, height: 1200 }, caption: 'Altar / original material study, 2026' },
+      invite: { line: 'Build a study of your own.', cta: { label: 'Start with the kit', href: '../../index.html#start' } },
     },
   },
 
   footer: {
-    credit: 'Halo studio. Motion, identity, immersive web.',
+    credit: 'Halo / Independent studies from Motion site kit.',
   },
 
   motion: {

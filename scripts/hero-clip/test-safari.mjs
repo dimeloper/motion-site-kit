@@ -83,7 +83,7 @@ try {
     console.log(`PASS Safari ${name}: ${JSON.stringify(observations.at(-1))}`);
   }
   await command(`/session/${session}/url`, { url: url + '/kit/index.html' });
-  await until(`return document.querySelectorAll('.catalog-families button').length===30;`);
+  await until(`return document.querySelectorAll('.catalog-families button').length===34;`);
   await run(`const s=document.querySelector('#family-search');s.value='material';s.dispatchEvent(new Event('input'));document.querySelector('.catalog-families button:not([hidden])').click();`);
   assert.equal(await run(`return document.querySelector('.catalog-preview [data-family]').dataset.family;`), 'material-board');
   await screenshot('catalog');

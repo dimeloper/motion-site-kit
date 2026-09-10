@@ -1,0 +1,30 @@
+{
+  "revision": "v3",
+  "date": "2026-09-10",
+  "source": "source/material.wgsl",
+  "sourceSha256": "2757f94151e7f2fb1f5d69a567fdcbc8ad4c015a5872ef792623a725a93382f8",
+  "renderer": "Native WebGPU on macOS Metal; npm run poster",
+  "posters": [
+    {
+      "file": "source/public/poster.png",
+      "sha256": "a3db7758f6df5d4630375768b46eb1417c095fdcf8c87a269d58cca26fec7bc5",
+      "bytes": 211111,
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "source/public/poster-champagne.png",
+      "sha256": "57c2dd06d0330078087d88deb9d7e0c5bd5c04c51ce00fcff1861b6f0c883205",
+      "bytes": 212279,
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "source/public/poster-graphite.png",
+      "sha256": "c25b9efe03980a857df216153016e1b5d8a0851f9f5d007177580d2a0e8a7ae8",
+      "bytes": 203531,
+      "width": 1200,
+      "height": 900
+    }
+  ]
+}

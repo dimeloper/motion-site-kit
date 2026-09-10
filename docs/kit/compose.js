@@ -1,9 +1,10 @@
 /**
  * Page kit. Mount distinct layout families from config.
- * A family may appear once per page. Cloning Vortex's
- * modules → feel → builds → about → cta sequence is the failure mode.
+ * Review the full reading order and repeated layouts against the content.
  * Prefer planPage() when the brief is content, not types.
  */
+
+import { renderChapters, renderExpand, renderProjectIndex, renderComparison, disposeStory } from './story-sections.js';
 
 import { inferFamily, inferKind, planPage } from './select.js';
 
@@ -40,6 +41,10 @@ export const FAMILIES = [
   'client-marks',
   'spotlight-stage',
   'claim-stack',
+  'visual-chapters',
+  'expanding-image',
+  'project-index',
+  'image-comparison',
 ];
 
 const BANNED_VORTEX_SEQUENCE = ['modules', 'feel', 'builds', 'about', 'cta'];
@@ -544,6 +549,10 @@ const RENDERERS = {
   'client-marks': renderClientMarks,
   'spotlight-stage': renderSpotlightStage,
   'claim-stack': renderClaimStack,
+  'visual-chapters': renderChapters,
+  'expanding-image': renderExpand,
+  'project-index': renderProjectIndex,
+  'image-comparison': renderComparison,
 };
 
 function looksLikeVortexClone(sections) {
@@ -553,6 +562,7 @@ function looksLikeVortexClone(sections) {
 
 export function compose(root, sections, { warn = true } = {}) {
   if (!root) throw new Error('page-kit: missing mount root');
+  disposeStory(root);
   root.replaceChildren();
 
   const used = new Set();
@@ -568,7 +578,7 @@ export function compose(root, sections, { warn = true } = {}) {
       continue;
     }
     if (used.has(type) && warn) {
-      console.warn(`page-kit: family "${type}" already used on this page. One family, one section.`);
+      console.warn(`page-kit: family "${type}" already used on this page. Check that repetition serves the content.`);
     }
     used.add(type);
     root.append(render(section));

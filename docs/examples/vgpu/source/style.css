@@ -70,3 +70,15 @@ footer p,footer>a:last-child { font-size:11px; }
 @media(max-width:900px) { .hero-word { top:12%; }.stage { min-height:700px; }.artwork { top:0;height:90%; }.hero-copy { bottom:135px; }.finish-picker { left:4vw;right:auto;bottom:36px; }.notes { grid-template-columns:1fr 3fr; }.round-link { display:none; }.material { min-height:600px; }.material-image { min-height:580px; }.material-copy { padding:70px 6vw 70px 1vw; }.details { gap:7vw; } }
 @media(max-width:600px) { .masthead { height:72px;margin:0 6vw; }.wordmark { font-size:28px; }.masthead nav { display:none; }.header-link { padding:10px 14px; font-size:10px; }.stage { height:calc(100svh - 72px); min-height:700px; }.hero-word { font-size:32vw;top:12%; }.artwork { top:-3%;height:79%;width:120%;left:-10%; }.hero-copy { left:6vw;bottom:139px; }.hero-copy>span { font-size:23px; }.hero-copy p { font-size:12px; margin:10px 0 17px; }.finish-picker { left:6vw;bottom:38px; }.section { margin:0 6vw;padding:64px 0; }.notes { grid-template-columns:1fr;gap:30px; }.statement p { font-size:14px; }.material { grid-template-columns:1fr; }.material-image { min-height:430px; }.material-image img { width:125%;height:140%;left:-12%;top:-20%; }.material-copy { padding:35px 6vw 64px; }.material-copy h2 { margin-top:25px; }.details { grid-template-columns:1fr;gap:40px; }.principles article:last-child { margin-bottom:0; }.closing { padding:70px 6vw; }.closing p { font-size:40px; }footer { flex-wrap:wrap;padding:32px 6vw; }footer p { order:3;width:100%;margin:0; } }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition:none !important; } }
+
+.finish-study { display: grid; grid-template-columns: .8fr 1.2fr; gap: 7%; align-items: center; background: #deded4; }
+.finish-study h2 { font-size: clamp(2.8rem, 5.5vw, 6rem); font-weight: 500; line-height: 1; letter-spacing: -.05em; margin: 1.5rem 0; }
+.finish-study p { max-width: 30ch; color: #52554e; }
+.finish-compare { position: relative; aspect-ratio: 4/3; }
+.finish-compare img { position: absolute; width: 100%; height: 100%; object-fit: contain; }
+.finish-after { clip-path: inset(0 calc(100% - var(--finish-split, 50%)) 0 0); }
+.finish-compare::after { content: ''; position: absolute; top: 0; bottom: 0; left: var(--finish-split, 50%); width: 1px; background: #55594f; }
+.finish-labels { display: flex; justify-content: space-between; font-size: .8rem; }
+.finish-range { display: grid; gap: .7rem; margin-top: 1.5rem; font-size: .8rem; }
+.finish-range input { width: 100%; min-height: 44px; accent-color: #383d32; }
+@media(max-width:700px) { .finish-study { grid-template-columns: 1fr; gap: 2rem; } }

@@ -20,14 +20,14 @@ export const CONFIG = {
   ],
 
   hero: {
-    eyebrow: 'Fitness ring',
+    eyebrow: 'Wearable concept',
     line1: 'Wear the ring.',
     line2: 'Every day.',
     headline: 'Wear the ring. Every day.',
     lead: 'Move, strain, and sleep. On one band.',
-    sub: 'Vortex is a fitness ring you wear through the day. Heart, load, and recovery sit on your finger — not on another screen.',
-    proof: '18-hour wear · Daily close',
-    opened: 'Ship window Q3',
+    sub: 'Vortex is a fitness ring you wear through the day. This concept explores movement, sleep and recovery in a small wearable.',
+    proof: 'Titanium / concept study',
+    opened: 'Independent design study',
     cta: { label: 'Explore', href: '#cta' },
     secondary: { label: 'On the band', href: '#modules' },
     watermark: 'VORTEX',
@@ -70,7 +70,7 @@ export const CONFIG = {
       {
         num: '03',
         title: 'Recover',
-        body: 'Sleep and HRV tell you when to push and when to stop.',
+        body: 'A place for overnight trends and recovery information in the wearable concept.',
         href: '#builds',
       },
       {
@@ -84,9 +84,9 @@ export const CONFIG = {
 
   stats: {
     items: [
-      { value: '18 h', label: 'Wear time' },
-      { value: '7-day', label: 'Close streak' },
-      { value: '4.9', label: 'Worn rating' },
+      { value: 'Ti', label: 'Titanium study' },
+      { value: '01', label: 'Band design' },
+      { value: '3D', label: 'Working model' },
     ],
   },
 
@@ -129,8 +129,8 @@ export const CONFIG = {
 
   about: {
     kicker: 'Why a ring',
-    title: 'A watch wants your wrist. This does not.',
-    body: 'Vortex stays on your finger so heart rate, strain, and sleep keep running while you train, type, and sleep. No extra strap. No second screen.',
+    title: 'A wearable for your finger.',
+    body: 'Vortex explores how a compact ring could fit around training, desk work and sleep. The website is a design study; the ring is not a product for sale.',
   },
 
   cta: {

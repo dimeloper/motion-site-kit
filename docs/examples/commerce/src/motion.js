@@ -6,8 +6,8 @@ import { createLifecycle } from '../../shared/lifecycle.js';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CONFIG } from '../config.js?v=8';
-import { createHaloScene } from './scene.js?v=8';
+import { CONFIG } from '../config.js?v=11';
+import { createHaloScene } from './scene.js?v=11';
 
 gsap.registerPlugin(ScrollTrigger);
 

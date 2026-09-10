@@ -14,7 +14,7 @@ fn sheet(point: vec3f) -> f32 {
   let xz = rotate(p.xz, -0.36 + params.progress * 0.8);
   p = vec3f(xz.x, p.y, xz.y);
   let bend = 0.46 * sin(p.y * 2.6 + params.progress * 1.5);
-  let pleat = (0.09 - params.progress * 0.03) * cos(p.x * 7.0 + p.y * 0.45);
+  let pleat = (0.075 - params.progress * 0.025) * cos(p.x * 10.0 + p.y * 0.6);
   let q = abs(p.xy) - vec2f(0.82, 1.14) + 0.075;
   let edge = length(max(q, vec2f(0.0))) + min(max(q.x, q.y), 0.0) - 0.075;
   return max(edge, (abs(p.z - bend - pleat) - 0.012) / 2.2);
@@ -28,15 +28,12 @@ fn normalAt(p: vec3f) -> vec3f {
 }
 
 fn studio(direction: vec3f) -> vec3f {
-  let sky = smoothstep(-0.65, 0.95, direction.y);
-  var light = mix(vec3f(0.18,0.19,0.20), vec3f(0.70,0.73,0.76), sky);
-  // Broad studio sources describe curvature without a painted horizon stripe.
-  let key = exp(-pow((direction.x + 0.42) * 3.0, 2.0)) * smoothstep(-0.75, 0.4, direction.y);
-  let rim = exp(-pow((direction.x - 0.68) * 7.0, 2.0));
-  let fill = exp(-pow((direction.y + 0.55) * 3.0, 2.0));
-  light += vec3f(1.0,0.97,0.92) * key * 2.0;
-  light += vec3f(0.80,0.88,1.0) * rim * 1.25;
-  light += vec3f(0.42,0.39,0.35) * fill * 0.22;
+  let sky = smoothstep(-0.3, 0.85, direction.y);
+  var light = mix(vec3f(0.11,0.12,0.13), vec3f(0.77,0.81,0.85), sky);
+  let softbox = exp(-pow(abs(direction.x + 0.48) * 5.5, 4.0)) * smoothstep(-0.5, 0.15, direction.y);
+  let strip = exp(-pow(abs(direction.x - 0.57) * 16.0, 4.0));
+  light += vec3f(1.0,0.98,0.94) * softbox * 1.7 + vec3f(0.86,0.91,1.0) * strip * 0.9;
+  light *= 1.0 - 0.7 * exp(-pow(abs(direction.y - 0.12) * 12.0, 4.0));
   return light;
 }
 
@@ -64,8 +61,8 @@ fn studio(direction: vec3f) -> vec3f {
   let reflection = studio(reflect(rd, n));
   let fresnel = pow(1.0 - max(dot(-rd, n), 0.0), 3.0);
   var tint = vec3f(0.88,0.91,0.94);
-  if (params.finish > 0.5 && params.finish < 1.5) { tint = vec3f(0.86,0.70,0.48); }
+  if (params.finish > 0.5 && params.finish < 1.5) { tint = vec3f(0.93,0.68,0.39); }
   if (params.finish > 1.5) { tint = vec3f(0.28,0.32,0.36); }
   let color = reflection * mix(tint, vec3f(1.0), fresnel * 0.6);
-  return vec4f(pow(color / (color + 0.55), vec3f(0.95)), 1.0);
+  return vec4f(pow(color / (color + 0.55), vec3f(0.85)), 1.0);
 }

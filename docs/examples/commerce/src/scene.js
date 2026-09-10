@@ -90,13 +90,13 @@ function makeHaloRing(radius, glowTex) {
   const group = new THREE.Group();
 
   const core = new THREE.Mesh(
-    new THREE.TorusGeometry(radius, 0.018, 20, 160),
+    new THREE.TorusGeometry(radius, 0.009, 20, 160),
     new THREE.MeshBasicMaterial({ color: RING, toneMapped: false }),
   );
   core.rotation.x = Math.PI / 2;
 
   const shell = new THREE.Mesh(
-    new THREE.TorusGeometry(radius, 0.062, 16, 96),
+    new THREE.TorusGeometry(radius, 0.024, 16, 96),
     new THREE.MeshBasicMaterial({
       color: RING,
       transparent: true,
@@ -154,7 +154,7 @@ export async function createHaloScene(canvas, opts = {}) {
     powerPreference: 'high-performance',
   });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.18;
+  renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(BG, 1);
 
@@ -269,7 +269,7 @@ export async function createHaloScene(canvas, opts = {}) {
     const x = mobile ? 0.06 : stoneHome.x;
     stone.position.set(x, stoneHome.y - (mobile ? 0.06 : 0), 0);
     shaft.position.x = x;
-    bloom.strength = mobile ? 0.2 : 0.28;
+    bloom.strength = mobile ? 0.08 : 0.12;
   }
 
   function resize() {
@@ -293,17 +293,17 @@ export async function createHaloScene(canvas, opts = {}) {
 
     ringLow.position.set(xShift, midY + e * 0.78, 0.06);
     ringLow.scale.setScalar(1 + e * 1.15);
-    ringLow.userData.shell.material.opacity = 0.26 + e * 0.22;
-    ringLow.userData.sprite.material.opacity = 0.62 + e * 0.28;
+    ringLow.userData.shell.material.opacity = 0.12 + e * 0.1;
+    ringLow.userData.sprite.material.opacity = 0.16 + e * 0.10;
 
     ringHigh.position.set(xShift, topY + e * 1.02, 0.02);
     ringHigh.scale.setScalar(1 + e * 1.45);
     ringHigh.rotation.z = e * 0.42;
     ringHigh.rotation.x = e * 0.12;
-    ringHigh.userData.shell.material.opacity = 0.28 + e * 0.24;
-    ringHigh.userData.sprite.material.opacity = 0.68 + e * 0.26;
+    ringHigh.userData.shell.material.opacity = 0.14 + e * 0.1;
+    ringHigh.userData.sprite.material.opacity = 0.18 + e * 0.10;
 
-    shaft.material.opacity = 0.3 + e * 0.16;
+    shaft.material.opacity = 0.10 + e * 0.08;
   }
 
   function drawFrame() {

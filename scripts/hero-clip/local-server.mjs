@@ -13,7 +13,7 @@ export async function startLocalServer(docs) {
       const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
       const vendor = pathname.startsWith('/vendor/');
       const base = vendor ? modules : docs;
-      const path = resolve(base, '.' + (vendor ? pathname.slice(7) : pathname === '/' ? '/index.html' : pathname));
+      const path = resolve(base, '.' + (vendor ? pathname.slice(7) : pathname.endsWith('/') ? pathname + 'index.html' : pathname));
       if (!path.startsWith(base + sep)) { res.writeHead(403).end(); return; }
       let content = await readFile(path);
       if (extname(path) === '.html') {
