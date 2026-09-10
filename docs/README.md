@@ -36,4 +36,4 @@ The docs font is self-hosted in `assets/` with its OFL license. Example
 preview WebPs are screenshots of this repository’s pages, not external artwork.
 The docs remain readable without JavaScript; catalog composition requires it.
 
-Start with [onboarding](ONBOARDING.md). Current authorized work is tracked in [the checklist](WORK-IN-PROGRESS.md).
+Start with [onboarding](ONBOARDING.md), then follow the [product-reveal use case](USE-CASE-PRODUCT-REVEAL.md) for a complete frame-project example. Current authorized work is tracked in [the checklist](WORK-IN-PROGRESS.md).

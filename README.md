@@ -2,6 +2,8 @@
 
 An agent skill for Codex and Claude Code, plus a reskinnable template for building scroll-driven motion websites — a pinned `<canvas>` playing a decoded image sequence, scrubbed by scroll position.
 
+[![Harbor, Vortex, Halo and Fold examples behind the words Cinematic scroll sites. Measured budgets.](docs/assets/social-preview.jpg)](https://dimeloper.github.io/motion-site-kit/)
+
 Live demo: [dimeloper.github.io/motion-site-kit](https://dimeloper.github.io/motion-site-kit/)
 
 The kit enforces frame download limits, bounds decoded bitmap storage and keeps animation available on phones. It includes four examples and reusable page compositions.
@@ -34,6 +36,8 @@ static build is at `docs/examples/vgpu/demo/`; only editing it needs Vite.
 - **Build a frame-scrub site:** use the quick start below, then edit `template/config.js`.
 - **Compose a portfolio or landing page:** start with one of four recipes in `docs/kit/recipes.js` and preview it at `/kit/preview.html?recipe=studio`.
 - **Edit a WebGL or WebGPU example:** follow the example-specific path in [onboarding](docs/ONBOARDING.md).
+
+If you already have a product turntable clip, follow the [product-reveal use case](docs/USE-CASE-PRODUCT-REVEAL.md). It takes the clip through extraction, responsive encoding, a config-only reskin and the final budget check.
 
 ## Quick start
 
@@ -179,6 +183,7 @@ The Remotion caveat matters for client work: a solo freelancer can use it free i
 
 ## Docs
 
+- [Product-reveal use case](docs/USE-CASE-PRODUCT-REVEAL.md) — take one turntable clip from extraction to a checked landing page
 - [Local measurements](docs/MEASUREMENTS.md) — transfer, bitmap storage, texture estimates and their limits
 - [Engine selection](skills/motion-website/references/engine-selection.md) — frames, Three.js, vgpu and conditional library choices
 - [Scroll engine](skills/motion-website/references/scroll-engine.md) — ScrollTrigger + Lenis wiring, pin/scrub math
