@@ -36,7 +36,14 @@ export function createLifecycle(root, canvas, fallback, timeoutMs = 30000) {
       if (!active) return false;
       let visible = true;
       const update = () => scene.setActive(visible && !document.hidden);
-      const observer = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; update(); });
+      const observer = new IntersectionObserver(entries => {
+        // A busy main thread can batch several crossings for the same target.
+        // The last entry describes its current visibility, not the first one.
+        for (const entry of entries) {
+          if (entry.target === root) visible = entry.isIntersecting;
+        }
+        update();
+      });
       observer.observe(root);
       own(() => observer.disconnect());
       document.addEventListener('visibilitychange', update, { signal: controller.signal });

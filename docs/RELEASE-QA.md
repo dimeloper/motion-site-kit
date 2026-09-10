@@ -25,8 +25,18 @@ The connected iPhone 17 Pro is paired, running iOS 26.6.1. SafariDriver currentl
 reports that it is locked, so physical-device behavior is pending; the simulator
 was not substituted for the requested hardware QA.
 
-Commit/push and remote CI verification are in progress. This report does not yet
-claim a remote build or deployment passed.
+Implementation commit `1871b94` was pushed to `main`. Its
+[Pages deployment](https://github.com/dimeloper/motion-site-kit/actions/runs/34439116308)
+succeeded. All six native Safari checks also passed against the public HTTPS site,
+including real CDN imports and Fold's live WebGPU path. Published-site screenshots
+and observations are under `out/safari-production-qa/`.
+
+The first [motion CI run](https://github.com/dimeloper/motion-site-kit/actions/runs/34439116615)
+failed on Halo's offscreen GPU-draw assertion. Review found that the shared
+IntersectionObserver callback used the first entry in a potentially batched
+delivery. It now applies entries in order so the newest visibility wins. A
+regression explicitly batches an earlier visible crossing with the final offscreen
+crossing; all three corrected examples pass locally. Follow-up CI is pending.
 
 ## Reproduce
 

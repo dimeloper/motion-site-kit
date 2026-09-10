@@ -6,17 +6,17 @@
 export const CONFIG = {
   brand: {
     name: 'motion-site-kit',
-    primary: '#C9C2B2',
-    ink: '#000000',
-    paper: '#EDE8DF',
-    displayFont: 'Syne, system-ui, sans-serif',
-    bodyFont: '"IBM Plex Sans", system-ui, -apple-system, sans-serif',
+    primary: '#D8F780',
+    ink: '#11160F',
+    paper: '#F0EFE7',
+    displayFont: 'Manrope, system-ui, sans-serif',
+    bodyFont: 'Manrope, system-ui, -apple-system, sans-serif',
   },
 
   hero: {
     eyebrow: 'Open source kit',
-    headline: 'Ship the sequence. Stay inside 8 MB.',
-    sub: 'A Claude skill and a reskinnable template. Extract frames, encode a ladder, fail the build when it gets heavy.',
+    headline: 'Make the web move.',
+    sub: 'A Codex / Claude skill and a reskinnable template. Extract frames, encode a ladder, fail the build when it gets heavy.',
     cta: { label: 'Read the pipeline', href: '#pipeline' },
     animationDescription:
       'A titanium smartphone with a square camera island comes apart as you scroll: back glass, cameras, board and battery lift, then seat themselves again.',
@@ -27,19 +27,19 @@ export const CONFIG = {
       id: 'pipeline',
       kicker: 'The cut that matters',
       title: '120 frames, not 300',
-      body: 'At scroll speed the visitor sets the cadence, not the frame count. Doubling to 240 doubles the weight for a difference nobody identifies blind. The pipeline samples evenly across the clip, encodes a 640 / 960 / 1600 ladder in AVIF and WebP, and writes a manifest the runtime actually reads.',
+      body: 'At scroll speed the visitor sets the cadence, not the frame count. More frames increase transfer and decoding work; choose the count by reviewing the source at the intended scroll range. The pipeline samples evenly across the clip, encodes a 640 / 960 / 1600 ladder in AVIF and WebP, and writes a manifest the runtime actually reads.',
     },
     {
       id: 'phones',
       kicker: '',
       title: 'Phones get the animation',
-      body: 'The static fallback is for prefers-reduced-motion, Save-Data, and 2G. It is not for small screens. The 640 rung is a few hundred kilobytes, and phones are most of the traffic. Serving them a JPEG to save bytes you already saved is the wrong trade.',
+      body: 'The static fallback is for prefers-reduced-motion, Save-Data, and 2G. It is not for small screens. The committed docs sequence has a 640px rung below 500 KB in each advertised format. Serving them a JPEG to save bytes you already saved is the wrong trade.',
     },
     {
       id: 'budget',
       kicker: 'Why CI, not a README line',
       title: 'The budget is a job that can fail',
-      body: 'Sequences do not get heavy by decision. They grow half a megabyte per iteration while everyone looks at the visuals. check_budget.py exits 1 and prints what to cut, in order. 8 MB for the largest rung is about four seconds on Slow 4G. Past that, the loader outlasts patience.',
+      body: 'Sequences do not get heavy by decision. They grow half a megabyte per iteration while everyone looks at the visuals. check_budget.py exits 1 and prints what to cut, in order. The 8 MiB ceiling is a maximum asset allowance, not a loading-time promise. Measure delivery on the target network.',
     },
     {
       id: 'config',
@@ -49,7 +49,7 @@ export const CONFIG = {
     },
     {
       id: 'examples',
-      kicker: 'Same engine, different sequence',
+      kicker: 'Independent WebGL examples',
       title: 'Harbor, Vortex, and Halo',
       body: '<a href="examples/local/">Harbor</a> orbits a loaf. <a href="examples/saas/">Vortex</a> peels a CAD band. <a href="examples/commerce/">Halo</a> is a studio: rings lift off stone. New pages compose from the <a href="kit/">page kit</a>.',
     },
@@ -57,7 +57,7 @@ export const CONFIG = {
 
   cta: {
     title: 'Use the skill, or just the scripts',
-    body: 'Copy skills/motion-website into ~/.claude/skills/, or run extract, optimize, and the budget gate by hand. Either path ships the same site.',
+    body: 'Install skills/motion-website into your Codex or Claude skills directory, or run extract, optimize, and the budget gate by hand. Either path ships the same site.',
     label: 'Open the repository',
     href: 'https://github.com/dimeloper/motion-site-kit',
   },

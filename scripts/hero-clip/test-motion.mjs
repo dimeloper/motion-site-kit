@@ -211,7 +211,12 @@ for (const name of ['local', 'saas', 'commerce']) {
             for (const entry of entries) {
               if (entry.target.hasAttribute('data-hero')) window.heroIntersection = entry.isIntersecting;
             }
-            callback(entries, observer);
+            // Model a browser delivery that batches an earlier visible crossing
+            // with the newest offscreen crossing. Consumers must use the latest.
+            const last = entries.at(-1);
+            if (last?.target.hasAttribute('data-hero') && !last.isIntersecting) {
+              callback([{ target: last.target, isIntersecting: true }, ...entries], observer);
+            } else callback(entries, observer);
           }, options);
         }
       };

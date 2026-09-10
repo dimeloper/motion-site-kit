@@ -64,3 +64,11 @@ User authorized a GetLayers-quality review and redesign of the docs site and rem
 - [x] Record evidence and limitations and pause continuation when this scoped redesign is complete.
 
 Follow-on evidence: see [design review](DESIGN-REVIEW.md). The full 26-scenario Chromium run passes; three Firefox smoke checks pass. Follow-up docs checks cover the corrected 320px graphic and catalog behavior. Updated screenshots were reviewed for first screens and selected lower sections. Subsequent Safari, real-hardware and remote CI status is tracked in [release QA](RELEASE-QA.md).
+
+## Release follow-on — 10 September 2026
+
+All implementation and design work was committed and pushed as `1871b94`. Native
+macOS Safari passes the docs, three WebGL examples, Fold live WebGPU and catalog
+checks both locally and on the published HTTPS site. Release QA found and repaired
+a batched IntersectionObserver visibility bug; device prerequisites and the
+follow-up CI result are tracked in [release QA](RELEASE-QA.md).
