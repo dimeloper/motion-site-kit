@@ -36,7 +36,16 @@ failed on Halo's offscreen GPU-draw assertion. Review found that the shared
 IntersectionObserver callback used the first entry in a potentially batched
 delivery. It now applies entries in order so the newest visibility wins. A
 regression explicitly batches an earlier visible crossing with the final offscreen
-crossing; all three corrected examples pass locally. Follow-up CI is pending.
+crossing; it fails against the previous implementation and passes for all three
+corrected examples. Commit `198fc27` passed the full
+[motion CI run](https://github.com/dimeloper/motion-site-kit/actions/runs/34439662420)
+and [Pages deployment](https://github.com/dimeloper/motion-site-kit/actions/runs/34439661296).
+
+The Linux CI WebGPU device fell back during the first canvas transition. The
+harness now checks that transition's fallback state and records adapter errors,
+preserving the first error before disposal. CI therefore verifies Fold's poster
+recovery, while local Chromium and native macOS Safari establish live rendering;
+Linux GPU rendering parity is not claimed.
 
 ## Reproduce
 

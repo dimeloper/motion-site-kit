@@ -402,9 +402,9 @@ test('vgpu renders, reverses and falls back after device loss when available', a
     GPUAdapter.prototype.requestDevice = async function (...args) {
       const device = await original.apply(this, args);
       window.testDevice = device;
-      device.lost.then(info => { window.testDeviceFailure = { reason: info.reason, message: info.message }; });
+      device.lost.then(info => { window.testDeviceFailure ??= { reason: info.reason, message: info.message }; });
       device.addEventListener('uncapturederror', event => {
-        window.testDeviceFailure = { error: event.error.message };
+        window.testDeviceFailure ??= { error: event.error.message };
       });
       return device;
     };
