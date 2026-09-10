@@ -75,7 +75,7 @@ thermal or battery-efficiency result is claimed. A USB automation connection doe
 not establish the phone's network route. WebDriver DOM scrolling and scripted
 menu actions cover behavior, not a complete manual touch/gesture audit.
 
-## Composition release candidate
+## Published composition release
 
 The 10 September composition revision adds four section families, complete
 recipes, Halo's portfolio and Fold v3. All 29 Chromium scenarios pass locally.
@@ -87,4 +87,10 @@ covered in Chromium. Physical iPhone QA remains blocked as described above.
 Fresh-directory onboarding copied all 120 demo frames byte-for-byte without
 installing Node or media tools. Python/Node tests, strict frame budgets, model
 and source gates, mirror alignment and Fold source/build equivalence pass.
-Remote CI and publication of this revision still require the release step.
+Implementation commit `1845a45` passed [motion CI](https://github.com/dimeloper/motion-site-kit/actions/runs/34505969794)
+and [Pages deployment](https://github.com/dimeloper/motion-site-kit/actions/runs/34505969302).
+All six native Safari checks pass on the published HTTPS site, including live
+Fold WebGPU and finish selection. Evidence is in ignored
+`out/composition-production-safari/results.json`. Published recipe, renderer,
+preview CSS, Halo config, Fold entry point and onboarding bytes match the local
+release files. The remaining physical-device prerequisite is unchanged.

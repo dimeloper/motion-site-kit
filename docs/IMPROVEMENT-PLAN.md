@@ -73,12 +73,16 @@ checks both locally and on the published HTTPS site. Release QA found and repair
 a batched IntersectionObserver visibility bug; device prerequisites and the
 follow-up CI result are tracked in [release QA](RELEASE-QA.md).
 
-## Active follow-on: composition quality and onboarding
+## Completed follow-on: composition quality and onboarding
 
-Authorized after the release checkpoint on 10 September. Track current progress
-in [WORK-IN-PROGRESS.md](WORK-IN-PROGRESS.md), open beside the task. The hourly
-continuation is active again for this scope: four new story sections, four full
-page recipes with desktop/mobile preview and export, Halo portfolio rebuild,
-Fold material refinement, public-copy review and beginner onboarding. Earlier
-completion notes refer to the previous scoped pass. Commit/push authorization
-continues; physical iPhone QA still needs the unlocked device.
+Authorized after the release checkpoint on 10 September and published as
+`1845a45`. Four new story sections, four complete page recipes with desktop/mobile
+preview and export, the Halo portfolio rebuild, Fold v3, public-copy review and
+beginner onboarding are complete. The [checklist](WORK-IN-PROGRESS.md) records
+verified work and the remaining physical-phone prerequisite.
+
+All 29 Chromium scenarios and existing local asset/build checks pass. Remote
+motion CI and Pages deployment succeeded. Native Safari passes all six checks
+on the published site, including Fold live WebGPU. See [release QA](RELEASE-QA.md)
+for links and limits. Continuation is paused until the phone is available or new
+work is authorized; the device-dependent item is not marked complete.
