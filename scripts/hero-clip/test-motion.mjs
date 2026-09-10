@@ -402,6 +402,10 @@ test('vgpu renders, reverses and falls back after device loss when available', a
     GPUAdapter.prototype.requestDevice = async function (...args) {
       const device = await original.apply(this, args);
       window.testDevice = device;
+      device.lost.then(info => { window.testDeviceFailure = { reason: info.reason, message: info.message }; });
+      device.addEventListener('uncapturederror', event => {
+        window.testDeviceFailure = { error: event.error.message };
+      });
       return device;
     };
   });
@@ -410,12 +414,19 @@ test('vgpu renders, reverses and falls back after device loss when available', a
     const state = document.querySelector('.stage').dataset;
     return state.state === 'ready' || !!state.reason;
   });
+  // A software adapter may fail asynchronously after the first submission,
+  // while the canvas is still fading in. Ready is not a permanent state.
+  await page.waitForFunction(() => !!document.querySelector('.stage').dataset.reason ||
+    Number(getComputedStyle(document.querySelector('canvas')).opacity) === 1);
   const status = await page.$eval('.stage', el => ({ ...el.dataset }));
   if (status.state !== 'ready') {
+    assert.equal(status.state, 'static');
+    assert.ok(await page.$eval('.stage img', img => img.complete && img.naturalWidth > 0));
+    assert.equal(await page.$eval('.track', el => el.classList.contains('is-live')), false);
+    console.log('  Adapter diagnostic:', await page.evaluate(() => window.testDeviceFailure ?? null));
     console.log(`  Browser WebGPU unavailable: ${status.reason}; native shader pixel tests are separate.`);
     return;
   }
-  await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('canvas')).opacity) === 1);
   const move = async progress => {
     await page.evaluate(progress => {
       const track = document.querySelector('.track'), stage = document.querySelector('.stage');
