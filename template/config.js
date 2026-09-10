@@ -73,6 +73,13 @@ export const CONFIG = {
     // delays the frames the visitor sees first.
     concurrency: 8,
 
+    // Bound loader ownership when a server never finishes a request.
+    loadTimeoutMs: 30000,
+
+    // RGBA bitmap ceiling, including the frame being decoded.
+    // 128 MiB holds about 23 frames at 1600×900; compressed frames stay cached.
+    maxDecodedBytes: 128 * 1024 * 1024,
+
     // A 3x phone display asking for the 1600 rung triples the download to
     // resolve detail invisible at arm's length.
     maxDpr: 2,

@@ -1,3 +1,4 @@
+import { createLifecycle } from '../../shared/lifecycle.js';
 /**
  * Vortex — fitness-ring WebGL hero driven by ScrollTrigger + Lenis.
  * Scene is a CAD titanium band: halo peels off the mesh and reseats.
@@ -38,14 +39,23 @@ function initSmoothScroll() {
     syncTouch: false,
   });
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  const tick = (time) => lenis.raf(time * 1000);
+  gsap.ticker.add(tick);
+  const destroy = lenis.destroy.bind(lenis);
+  lenis.destroy = () => {
+    gsap.ticker.remove(tick);
+    for (const key of ['__harborLenis', '__vortexLenis', '__haloLenis']) {
+      if (window[key] === lenis) window[key] = null;
+    }
+    destroy();
+  };
   gsap.ticker.lagSmoothing(0);
   window.__vortexLenis = lenis;
   window.__harborLenis = lenis; // page.js in-page anchors
   return lenis;
 }
 
-function wireInPageAnchors(lenis) {
+function wireInPageAnchors(lenis, signal) {
   document.addEventListener(
     'click',
     (event) => {
@@ -59,7 +69,7 @@ function wireInPageAnchors(lenis) {
       if (lenis) lenis.scrollTo(target, { offset: -8 });
       else target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
-    { capture: true },
+    { capture: true, signal },
   );
 }
 
@@ -84,6 +94,7 @@ function updateProximity(hero, progress) {
 }
 
 function showStaticFallback(root, reason) {
+  root.querySelector('[data-canvas]')?.classList.remove('is-ready');
   root.dataset.motion = 'static';
   root.dataset.fallbackReason = reason;
   const poster = root.querySelector('.hero__poster');
@@ -104,21 +115,26 @@ function dismissLoader(loader) {
   window.setTimeout(finish, 900);
 }
 
-function bindScrollScene({ hero, canvas, scene }) {
+function bindScrollScene({ hero, canvas, scene, signal }) {
   let progress = 0;
 
-  ScrollTrigger.create({
-    trigger: hero,
-    start: 'top top',
-    end: () => `+=${window.innerHeight * CONFIG.motion.scrollLengthVh}`,
-    pin: true,
-    anticipatePin: 1,
-    scrub: CONFIG.motion.scrub,
-    invalidateOnRefresh: true,
-    onUpdate: (self) => {
-      progress = self.progress;
+  const playhead = { progress: 0 };
+  const tween = gsap.to(playhead, {
+    progress: 1,
+    ease: 'none',
+    onUpdate: () => {
+      progress = playhead.progress;
       scene.render(progress);
       updateProximity(hero, progress);
+    },
+    scrollTrigger: {
+      trigger: hero,
+      start: 'top top',
+      end: () => `+=${window.innerHeight * CONFIG.motion.scrollLengthVh}`,
+      pin: true,
+      anticipatePin: 1,
+      scrub: CONFIG.motion.scrub,
+      invalidateOnRefresh: true,
     },
   });
 
@@ -131,11 +147,15 @@ function bindScrollScene({ hero, canvas, scene }) {
     updateProximity(hero, progress);
     ScrollTrigger.refresh();
   };
-  window.addEventListener('resize', onResize, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true, signal });
   canvas.classList.add('is-ready');
+  return () => { tween.scrollTrigger?.kill(); tween.kill(); };
 }
 
+let currentRun;
+
 export async function initMotion() {
+  currentRun?.stop('reinitialized');
   const root = document.querySelector('[data-hero]');
   if (!root) return;
 
@@ -149,9 +169,10 @@ export async function initMotion() {
     return;
   }
 
+  delete root.dataset.fallbackReason;
+  const run = createLifecycle(root, canvas, showStaticFallback, CONFIG.motion.loadTimeoutMs ?? 30000);
+  currentRun = run;
   root.dataset.motion = 'preloading';
-  const poster = root.querySelector('.hero__poster');
-  if (poster) poster.style.opacity = '0';
   setLoaderProgress(bar, 0.08);
 
   let scene;
@@ -159,22 +180,25 @@ export async function initMotion() {
     setLoaderProgress(bar, 0.12);
     scene = await createVortexScene(canvas, {
       maxDpr: CONFIG.motion.maxDpr,
+      signal: run.signal,
       onProgress: (n) => setLoaderProgress(bar, 0.12 + 0.78 * n),
     });
+    if (!run.attach(scene)) return;
     setLoaderProgress(bar, 0.92);
     scene.resize();
     scene.render(0);
     setLoaderProgress(bar, 1);
   } catch (error) {
     console.warn('[vortex] WebGL hero failed, falling back to poster', error);
-    scene?.dispose?.();
-    showStaticFallback(root, 'webgl-failed');
+    run.stop('webgl-failed');
     return;
   }
 
   const lenis = initSmoothScroll();
-  wireInPageAnchors(lenis);
-  bindScrollScene({ hero: root, canvas, scene });
+  run.own(() => lenis.destroy());
+  wireInPageAnchors(lenis, run.signal);
+  run.own(bindScrollScene({ hero: root, canvas, scene, signal: run.signal }));
+  run.ready();
 
   root.dataset.motion = 'ready';
   dismissLoader(loader);
@@ -186,3 +210,5 @@ if (document.readyState === 'loading') {
 } else {
   initMotion();
 }
+
+window.addEventListener('pageshow', event => { if (event.persisted) initMotion(); });

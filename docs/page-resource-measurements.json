@@ -1,0 +1,133 @@
+{
+  "observedAt": "2026-09-09T08:43:26.675Z",
+  "browser": "Chrome/152.0.7977.84",
+  "method": "Cold-cache local HTTP harness at 390x844 DPR2; no network throttling. Pinned npm modules replace CDN imports and are served uncompressed. CDP encodedDataLength includes HTTP overhead; external font requests are included when successful. No scroll/lazy below-fold load. Behavioral software-GPU flags enabled; these are resource observations, not production timing or phone benchmarks.",
+  "beforeHarborImageOptimization": [
+    {
+      "route": "/",
+      "hero": {
+        "hero": "",
+        "motion": "ready"
+      },
+      "networkSettled": true,
+      "failures": [],
+      "encodedNetworkBytes": 1206899
+    },
+    {
+      "route": "/examples/local/index.html",
+      "hero": {
+        "hero": "",
+        "motion": "ready"
+      },
+      "networkSettled": true,
+      "failures": [],
+      "encodedNetworkBytes": 6577522
+    },
+    {
+      "route": "/examples/saas/index.html",
+      "hero": {
+        "hero": "",
+        "motion": "ready"
+      },
+      "networkSettled": true,
+      "failures": [],
+      "encodedNetworkBytes": 2227701
+    },
+    {
+      "route": "/examples/commerce/index.html",
+      "hero": {
+        "hero": "",
+        "motion": "ready"
+      },
+      "networkSettled": true,
+      "failures": [],
+      "encodedNetworkBytes": 4350822
+    },
+    {
+      "route": "/examples/vgpu/demo/index.html",
+      "hero": {
+        "state": "ready"
+      },
+      "networkSettled": true,
+      "failures": [],
+      "encodedNetworkBytes": 448534
+    }
+  ],
+  "afterHarborImageOptimization": {
+    "route": "/examples/local/index.html",
+    "hero": {
+      "hero": "",
+      "motion": "ready"
+    },
+    "networkSettled": true,
+    "failures": [],
+    "encodedNetworkBytes": 4185866
+  },
+  "bakedFoldTemplate": {
+    "route": "/",
+    "hero": {
+      "hero": "",
+      "motion": "ready"
+    },
+    "networkSettled": true,
+    "failures": [],
+    "encodedNetworkBytes": 1231477
+  },
+  "foldVersionNote": "The original Fold route and bakedFoldTemplate observations describe v1. Current sculptural page is foldV2.",
+  "foldV2": {
+    "route": "/examples/vgpu/demo/index.html",
+    "hero": {
+      "state": "ready"
+    },
+    "networkSettled": true,
+    "failures": [],
+    "encodedNetworkBytes": 570204,
+    "observedAt": "2026-09-09T17:29:00.928Z"
+  },
+  "docsAndExampleRedesign": {
+    "observedAt": "2026-09-09T19:43:20.688Z",
+    "method": "Cold-cache local HTTP harness at 390x844 DPR2; no network throttling. Pinned npm modules replace CDN imports and are served uncompressed. CDP encodedDataLength includes HTTP overhead; external font requests are included when successful. No scroll/lazy below-fold load. Behavioral software-GPU flags enabled; these are resource observations, not production timing or phone benchmarks.",
+    "observations": [
+      {
+        "route": "/",
+        "hero": {
+          "hero": "",
+          "motion": "ready"
+        },
+        "networkSettled": true,
+        "failures": [],
+        "encodedNetworkBytes": 1234333
+      },
+      {
+        "route": "/examples/local/index.html",
+        "hero": {
+          "hero": "",
+          "motion": "ready"
+        },
+        "networkSettled": true,
+        "failures": [],
+        "encodedNetworkBytes": 4189061
+      },
+      {
+        "route": "/examples/saas/index.html",
+        "hero": {
+          "hero": "",
+          "motion": "ready"
+        },
+        "networkSettled": true,
+        "failures": [],
+        "encodedNetworkBytes": 2232254
+      },
+      {
+        "route": "/examples/commerce/index.html",
+        "hero": {
+          "hero": "",
+          "motion": "ready"
+        },
+        "networkSettled": true,
+        "failures": [],
+        "encodedNetworkBytes": 4354568
+      }
+    ]
+  }
+}

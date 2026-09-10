@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <link rel="preload" as="image" href="images/loaf.jpg" fetchpriority="high" />
+  <link rel="preload" as="image" href="images/loaf.webp" fetchpriority="high" />
   <link rel="stylesheet" href="src/styles.css" />
 
   <script type="importmap">
@@ -37,12 +37,6 @@
         <ul data-nav></ul>
       </nav>
       <div class="topbar__actions">
-        <div class="clock" data-clock>
-          <span class="clock__label">Local time</span>
-          <span class="clock__time" data-clock-time>8:00am</span>
-          <span class="clock__sep" aria-hidden="true">·</span>
-          <span class="clock__date" data-clock-date>Tuesday</span>
-        </div>
         <button class="menu-btn" type="button" data-menu-open aria-expanded="false" aria-controls="nav-menu">
           <span class="menu-btn__icon" aria-hidden="true"></span>
           Menu
@@ -52,7 +46,7 @@
 
     <section class="hero" data-hero data-motion="static" id="top">
       <div class="hero__media">
-        <img class="hero__poster" src="images/loaf.jpg" alt="A flour-dusted country loaf at Harbor Oven." fetchpriority="high" decoding="async" />
+        <img class="hero__poster" src="images/loaf.webp" alt="A flour-dusted country loaf at Harbor Oven." fetchpriority="high" decoding="async" />
         <canvas class="hero__canvas" data-canvas aria-hidden="true"></canvas>
         <div class="hero__glow" aria-hidden="true"></div>
         <div class="hero__scrim" aria-hidden="true"></div>
@@ -82,7 +76,7 @@
         <aside class="hero__aside">
           <article class="feature-card" data-card>
             <figure class="feature-card__thumb">
-              <img data-card-image src="images/loaf.jpg" alt="" width="480" height="480" />
+              <img data-card-image src="images/loaf.webp" alt="" width="480" height="480" />
             </figure>
             <div class="feature-card__body">
               <p class="feature-card__caption" data-card-caption></p>
@@ -238,7 +232,7 @@
 
     <section class="about" id="about">
       <figure class="about__media reveal">
-        <img src="images/board.jpg" alt="Sliced country loaf on a wooden board, with jam." width="1800" height="2400" />
+        <img src="images/board.webp" alt="Sliced country loaf on a wooden board, with jam." width="1800" height="2400" />
       </figure>
       <div class="about__copy reveal">
         <p class="kicker" data-bind="about.kicker">The oven</p>
@@ -255,7 +249,7 @@
       <div class="selected__grid" data-selected>
         <article class="selected__card reveal">
           <figure class="selected__media">
-            <img src="images/loaf.jpg" alt="Flour-dusted country loaf" width="800" height="1000" loading="lazy" />
+            <img src="images/loaf.webp" alt="Flour-dusted country loaf" width="800" height="1000" loading="lazy" />
           </figure>
           <div class="selected__meta">
             <h3>Country loaf</h3>
@@ -264,7 +258,7 @@
         </article>
         <article class="selected__card reveal">
           <figure class="selected__media">
-            <img src="images/board.jpg" alt="Sliced loaf and jam on a board" width="800" height="1000" loading="lazy" />
+            <img src="images/board.webp" alt="Sliced loaf and jam on a board" width="800" height="1000" loading="lazy" />
           </figure>
           <div class="selected__meta">
             <h3>Plum market tart</h3>
@@ -273,7 +267,7 @@
         </article>
         <article class="selected__card reveal">
           <figure class="selected__media">
-            <img src="images/loaf.jpg" alt="Bakery loaf at Harbor Oven" width="800" height="1000" loading="lazy" />
+            <img src="images/loaf.webp" alt="Bakery loaf at Harbor Oven" width="800" height="1000" loading="lazy" />
           </figure>
           <div class="selected__meta">
             <h3>Board lunch</h3>
@@ -316,7 +310,7 @@
           <h2 data-bind="cta.title">Hold a loaf for Saturday</h2>
           <p class="cta__body" data-bind="cta.body">Send a note before 9. No reservations for lunch — come when the door is open.</p>
           <div class="cta__actions">
-            <a class="pill pill--ink" data-bind-href="cta.href" href="https://example.com/harbor-oven">
+            <a class="pill pill--ink" data-bind-href="cta.href" href="#board">
               <span data-bind="cta.label">Get this week's hours</span>
               <span class="pill__arrow" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -369,6 +363,7 @@
     <p class="site-footer__brand" data-bind="brand.name">Harbor Oven</p>
     <p data-bind="footer.place">North Shore</p>
     <p class="site-footer__credit" data-bind="footer.credit">Hero loaf: Higgsfield Meshy GLB from a clean studio still. Supporting photos from Unsplash.</p>
+    <a class="kit-return" href="../../index.html#examples">Explore the kit ↗</a>
   </footer>
 
   <div
@@ -406,7 +401,7 @@
 
   <div class="progress" aria-hidden="true"></div>
 
-  <script type="module" src="src/bind.js?v=16"></script>
+  <script type="module" src="src/bind.js?v=design-18"></script>
   <script type="module" src="src/page.js?v=16"></script>
   <script type="module" src="src/motion.js?v=17"></script>
 </body>

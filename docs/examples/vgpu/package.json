@@ -1,0 +1,19 @@
+{
+  "name": "motion-kit-vgpu-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "check": "node check-build.mjs",
+    "poster": "node render-poster.mjs"
+  },
+  "dependencies": {
+    "vgpu": "0.4.1"
+  },
+  "devDependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "pngjs": "7.0.0",
+    "vite": "8.2.2"
+  }
+}

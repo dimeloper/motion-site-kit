@@ -21,7 +21,7 @@ export const CONFIG = {
   ],
 
   hero: {
-    headline: 'Crafted to spark wonder',
+    headline: 'Ideas made tangible.',
     sub: 'Brand, motion, and immersive web. The tools change. The craft does not.',
     cta: { label: 'Pitch your idea', href: '#invite' },
     secondary: { label: 'See the work', href: '#rail' },

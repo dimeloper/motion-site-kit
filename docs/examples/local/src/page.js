@@ -158,8 +158,9 @@ function initMenu() {
 
   ensureMobileNav(list);
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let closing = false;
+  let revision = 0;
   let lastFocus = null;
 
   const focusables = () =>
@@ -183,7 +184,8 @@ function initMenu() {
   };
 
   const open = () => {
-    if (closing) return;
+    if (closing || !menu.hidden) return;
+    const opening = ++revision;
     ensureMobileNav(list);
     lastFocus = document.activeElement;
     menu.hidden = false;
@@ -192,6 +194,7 @@ function initMenu() {
     document.documentElement.style.overflow = 'hidden';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        if (opening !== revision || menu.hidden || closing) return;
         menu.classList.add('is-open');
         (closeBtn || focusables()[0])?.focus();
       });
@@ -200,6 +203,7 @@ function initMenu() {
 
   const close = () => {
     if (menu.hidden || closing) return;
+    revision++;
     openBtn.setAttribute('aria-expanded', 'false');
     document.documentElement.style.overflow = '';
 
@@ -208,7 +212,7 @@ function initMenu() {
       lastFocus = null;
     };
 
-    if (reduceMotion) {
+    if (reduceMotion.matches) {
       menu.classList.remove('is-open');
       menu.hidden = true;
       restoreFocus();
@@ -219,17 +223,23 @@ function initMenu() {
     menu.classList.remove('is-open');
     menu.classList.add('is-leaving');
 
+    let finished = false;
+    let timer;
     const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      menu.removeEventListener('transitionend', onTransitionEnd);
       menu.hidden = true;
       menu.classList.remove('is-leaving');
       closing = false;
       restoreFocus();
     };
-    menu.addEventListener('transitionend', (event) => {
-      if (event.target !== menu || event.propertyName !== 'opacity') return;
-      finish();
-    }, { once: true });
-    window.setTimeout(finish, 420);
+    const onTransitionEnd = (event) => {
+      if (event.target === menu && event.propertyName === 'opacity') finish();
+    };
+    menu.addEventListener('transitionend', onTransitionEnd);
+    timer = window.setTimeout(finish, 420);
   };
 
   openBtn.addEventListener('click', open);
@@ -241,7 +251,7 @@ function initMenu() {
     const hash = link.getAttribute('href');
     event.preventDefault();
     close();
-    window.setTimeout(() => scrollToHash(hash), reduceMotion ? 0 : 280);
+    window.setTimeout(() => scrollToHash(hash), reduceMotion.matches ? 0 : 280);
   });
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !menu.hidden) close();

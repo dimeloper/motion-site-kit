@@ -1,3 +1,4 @@
+import { disposeTree } from '../../shared/lifecycle.js';
 /**
  * Vortex — CAD titanium band. Particles peel off the mesh and reseat.
  * Distinct from Harbor's loaf orbit: the band stays put, the halo moves.
@@ -224,7 +225,7 @@ function createHaloField(mesh, count) {
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         vMix = fract(aSeed * 4.17);
         float fade = smoothstep(0.02, 0.14, leave) * smoothstep(0.0, 0.14, arrive);
-        vA = (0.32 + 0.52 * aSeed) * fade * mix(0.5, 1.0, arrive);
+        vA = (0.42 + 0.52 * aSeed) * fade * mix(0.55, 1.0, arrive);
         float size = mix(1.0, 2.8, leave) * (0.75 + aSeed * 0.8) * mix(0.7, 1.0, arrive);
         gl_PointSize = size * uPixelRatio * (175.0 / max(0.7, -mv.z));
         gl_PointSize = clamp(gl_PointSize, 1.2, 16.0);
@@ -281,6 +282,13 @@ export async function createVortexScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.012);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+  };
+  opts.signal?.addEventListener('abort', release, { once: true });
   scene.environment = pmrem.fromScene(studioEnvironment(), 0.04).texture;
   scene.environmentIntensity = 1.35;
 
@@ -311,6 +319,7 @@ export async function createVortexScene(canvas, opts = {}) {
   onProgress(0.28);
   await new Promise((resolve) => setTimeout(resolve, 16));
 
+  opts.signal?.throwIfAborted();
   const ring = createCadRing();
   fitOnPlate(ring, 0.82);
   // Body is already X-tilted to edge-on. Group yaw shows inner sensors, off the type.
@@ -326,7 +335,7 @@ export async function createVortexScene(canvas, opts = {}) {
 
   onProgress(0.78);
 
-  const count = window.innerWidth < 720 ? 1800 : 3600;
+  const count = window.innerWidth < 720 ? 2600 : 5600;
   const field = createHaloField(mesh, count);
   field.points.renderOrder = 2;
   mesh.add(field.points);
@@ -389,7 +398,7 @@ export async function createVortexScene(canvas, opts = {}) {
 
   function render(progress) {
     scrollProgress = progress;
-    drawFrame();
+    if (active) drawFrame();
   }
 
   function playIntro() {
@@ -413,22 +422,33 @@ export async function createVortexScene(canvas, opts = {}) {
     fillTween = null;
   }
 
+  let active = true;
+  let disposed = false;
   function loop() {
+    if (!active || disposed) return;
     rafId = requestAnimationFrame(loop);
     drawFrame();
+  }
+  function setActive(value) {
+    if (disposed || value === active) return;
+    active = value;
+    if (active) loop();
+    else cancelAnimationFrame(rafId);
   }
   loop();
 
   function dispose() {
+    if (disposed) return;
+    disposed = true;
+    active = false;
+    opts.signal?.removeEventListener('abort', release);
+    release();
+    gsap.killTweensOf(canvas);
     introTween?.kill();
     fillTween?.kill();
     cancelAnimationFrame(rafId);
-    field.points.geometry.dispose();
-    field.material.dispose();
-    renderer.dispose();
-    pmrem.dispose();
   }
 
   onProgress(1);
-  return { resize, render, playIntro, dispose };
+  return { resize, render, playIntro, setActive, dispose };
 }

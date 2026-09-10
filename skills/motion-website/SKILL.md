@@ -49,7 +49,7 @@ Write `motion.config.json` at the project root first. It is the contract the CI 
 
 **120 frames is the default and it is almost always right.** At scroll speed the eye cannot resolve more. Doubling to 240 doubles the weight and looks identical — verify this yourself once and you will stop being tempted.
 
-8 MB for the whole sequence is the ceiling. That is roughly 4 seconds on a slow 3G connection, which is already at the edge of what someone will wait through with a loading state on screen.
+The current config caps each advertised width/format sequence at 8 MiB, with a tighter 1,500,000-byte ceiling for the 640px rung. These are byte ceilings, not load-time guarantees: eight MiB alone takes roughly 42 seconds at 1.6 Mbit/s before latency and other page resources. Copy the complete root config, including the narrow-rung and frame-count limits; do not replace it with the abbreviated example above.
 
 Live GLB weight is a **separate** concern — see `references/webgl-model.md`. Do not "fix" a 15 MB model by relaxing the sequence gate.
 
@@ -71,7 +71,7 @@ Extraction samples evenly across the clip's duration rather than taking the firs
 python3 scripts/optimize_frames.py frames/raw --out template/frames --config motion.config.json
 ```
 
-This writes `frames/{width}/{index}.avif` plus `.webp` and a `manifest.json` the runtime reads. The manifest matters: the client picks a width from `devicePixelRatio × viewport`, so it must not guess at file naming.
+This writes `frames/{width}/{format}/{index}.{format}` for AVIF and WebP and a `manifest.json` the runtime reads. The manifest matters: the client picks a width from `devicePixelRatio × viewport`, so it must not guess at file naming.
 
 ### 4. Gate on the budget
 
@@ -113,7 +113,7 @@ Note what is **not** on that list: small viewports. The common advice is to skip
 
 ## Common failure modes
 
-**Stutter during scroll.** Frames are decoding on the main thread. The engine uses `createImageBitmap` to decode off-thread and awaits every decode before starting — if you modified the preloader, check you did not reintroduce a bare `new Image()`.
+**Stutter during scroll.** Check decoding latency, draw cost and scroll scheduling separately. The engine fetches compressed blobs, then keeps a bounded `createImageBitmap` cache (128 MiB RGBA by default, including the in-flight decode). It starts after the first frame is ready and prioritizes the latest target during reversals. It does not await or retain all decoded frames. See `references/scroll-engine.md` before changing the cache.
 
 **Blank flash at the start.** The animation started before preload resolved. The loading state must gate `ScrollTrigger.create`, not just the visual.
 
@@ -127,6 +127,7 @@ Note what is **not** on that list: small viewports. The common advice is to skip
 
 Read these as needed rather than upfront:
 
+- `references/engine-selection.md` — choose between the default frames, Three.js, and the isolated vgpu study; evaluate additional libraries
 - `references/scroll-engine.md` — ScrollTrigger + Lenis config, the pin/scrub math, native CSS scroll timelines
 - `references/frame-pipeline.md` — extraction, encoding, the responsive ladder, manifest format
 - `references/performance-budget.md` — how the numbers were chosen, what to cut first

@@ -142,7 +142,7 @@ function renderBuilds() {
           <span class="build-card__num">${item.num}</span>
           <h3>${item.title}</h3>
           <p>${item.body}</p>
-          <span class="build-card__cta">${item.cta || 'Discover'} →</span>
+          <span class="build-card__cta">${item.cta || 'Material study'}</span>
         </div>
       </article>`;
     }
@@ -151,11 +151,11 @@ function renderBuilds() {
         <span class="build-card__num">${item.num}</span>
         <h3>${item.title}</h3>
         <p>${item.body}</p>
-        <span class="build-card__cta">${item.cta || 'Discover'} →</span>
+        <span class="build-card__cta">${item.cta || 'Material study'}</span>
       </article>`;
     }
     const links = (item.links || [])
-      .map((label) => `<li><span>${label}</span><span aria-hidden="true">↗</span></li>`)
+      .map((label) => `<li><span>${label}</span></li>`)
       .join('');
     return `<article class="build-card build-card--paper reveal">
       <span class="build-card__num">${item.num}</span>

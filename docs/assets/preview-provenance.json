@@ -1,0 +1,32 @@
+[
+  {
+    "name": "harbor",
+    "source": "Screenshot of this repository\u2019s live example at 1440x1000",
+    "sourceSha256": "f4e453ded0c19b6688daa2480fd698db5af7fd22480721284634fb52bb56a0b6",
+    "output": "docs/assets/harbor-preview.webp",
+    "bytes": 37544,
+    "width": 1200,
+    "height": 833,
+    "quality": 82
+  },
+  {
+    "name": "vortex",
+    "source": "Screenshot of this repository\u2019s live example at 1440x1000",
+    "sourceSha256": "82ae1041857155f08593bf779cad2618a6c6d481fbb6e1a8029521f9f61128d7",
+    "output": "docs/assets/vortex-preview.webp",
+    "bytes": 33040,
+    "width": 1200,
+    "height": 833,
+    "quality": 82
+  },
+  {
+    "name": "halo",
+    "source": "Screenshot of this repository\u2019s live example at 1440x1000",
+    "sourceSha256": "50c738b3d0f6cc924d0b10224b01144f7c11c1bc3168eb2d488090270e4c7275",
+    "output": "docs/assets/halo-preview.webp",
+    "bytes": 31756,
+    "width": 1200,
+    "height": 833,
+    "quality": 82
+  }
+]

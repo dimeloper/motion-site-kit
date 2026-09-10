@@ -1,68 +1,59 @@
-name: frame budget
+name: motion checks
 
 on:
   push:
     paths:
-      - "template/frames/**"
-      - "docs/frames/**"
-      - "docs/examples/**/frames/**"
-      - "motion.config.json"
-      - "skills/motion-website/scripts/**"
+      - 'template/**'
+      - 'docs/**'
+      - 'examples/**'
+      - 'motion.config.json'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/budget.yml'
+      - 'skills/motion-website/scripts/**'
   pull_request:
     paths:
-      - "template/frames/**"
-      - "docs/frames/**"
-      - "docs/examples/**/frames/**"
-      - "motion.config.json"
-      - "skills/motion-website/scripts/**"
+      - 'template/**'
+      - 'docs/**'
+      - 'examples/**'
+      - 'motion.config.json'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/budget.yml'
+      - 'skills/motion-website/scripts/**'
 
 jobs:
   budget:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Check frame budget
+          python-version: '3.12'
+      - name: Budget regression tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - name: Check frame budgets
         run: |
-          python3 skills/motion-website/scripts/check_budget.py \
-            --config motion.config.json \
-            --verbose
-          python3 skills/motion-website/scripts/check_budget.py \
-            --config motion.config.json \
-            --frames docs/frames \
-            --verbose
-          python3 skills/motion-website/scripts/check_budget.py \
-            --config motion.config.json \
-            --frames docs/examples/saas/frames \
-            --verbose
-          python3 skills/motion-website/scripts/check_budget.py \
-            --config motion.config.json \
-            --frames docs/examples/commerce/frames \
-            --verbose
-          python3 skills/motion-website/scripts/check_budget.py \
-            --config motion.config.json \
-            --frames docs/examples/local/frames \
-            --verbose
-
-      - name: Summarize
-        if: always()
-        run: |
-          {
-            echo "### Frame budget"
-            echo '```'
-            python3 skills/motion-website/scripts/check_budget.py \
-              --config motion.config.json --verbose 2>&1 || true
-            python3 skills/motion-website/scripts/check_budget.py \
-              --config motion.config.json --frames docs/frames --verbose 2>&1 || true
-            python3 skills/motion-website/scripts/check_budget.py \
-              --config motion.config.json --frames docs/examples/saas/frames --verbose 2>&1 || true
-            python3 skills/motion-website/scripts/check_budget.py \
-              --config motion.config.json --frames docs/examples/commerce/frames --verbose 2>&1 || true
-            python3 skills/motion-website/scripts/check_budget.py \
-              --config motion.config.json --frames docs/examples/local/frames --verbose 2>&1 || true
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          python3 skills/motion-website/scripts/check_budget.py --config motion.config.json --verbose
+          python3 skills/motion-website/scripts/check_budget.py --config motion.config.json --frames docs/frames --strict --verbose
+      # Example frame ladders are ignored legacy artifacts. Their live engines
+      # use GLBs, so checking nonexistent frame folders would prove nothing.
+      - name: Check generated copies
+        run: python3 scripts/sync_examples.py --check
+      - name: Check example models and source budgets
+        run: python3 scripts/check_example_budget.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/hero-clip/package-lock.json
+      - run: npm ci --prefix scripts/hero-clip
+      - run: npm ci --prefix docs/examples/vgpu
+      - name: Verify vgpu published build and bundle budgets
+        run: npm run check --prefix docs/examples/vgpu
+      - name: Frame cache regression tests
+        run: node --test tests/*.mjs
+      - name: Browser regression tests
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: npm run test:motion --prefix scripts/hero-clip

@@ -4,14 +4,14 @@
  */
 
 const loaf = {
-  src: '../examples/local/images/loaf.jpg',
+  src: '../examples/local/images/loaf.webp',
   alt: 'Harbor loaf, used here as a layout stand-in',
   width: 1600,
   height: 1600,
 };
 
 const board = {
-  src: '../examples/local/images/board.jpg',
+  src: '../examples/local/images/board.webp',
   alt: 'Harbor board still, used here as a layout stand-in',
   width: 1600,
   height: 2000,

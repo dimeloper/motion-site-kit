@@ -1,3 +1,4 @@
+import { disposeTree, loadGlb } from '../../shared/lifecycle.js';
 /**
  * Halo studio hero. Textured stone stays put.
  * Two rings of light lift off the body and seat on reverse.
@@ -15,7 +16,6 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 const BG = 0x0c0d10;
 const RING = 0xe4c56a;
 const DEFAULT_MODEL = new URL('../models/pillar.glb', import.meta.url).href;
-const FALLBACK_STILL = new URL('../images/pillar-hero.jpg', import.meta.url).href;
 
 function studioEnvironment() {
   const env = new THREE.Scene();
@@ -127,53 +127,19 @@ function makeHaloRing(radius, glowTex) {
   return group;
 }
 
-async function loadStone(modelUrl, onProgress) {
+async function loadStone(modelUrl, onProgress, signal) {
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  try {
-    const gltf = await loader.loadAsync(modelUrl, (event) => {
-      if (!event.total) return;
-      onProgress(0.3 + 0.45 * (event.loaded / event.total));
-    });
-    const root = gltf.scene;
-    root.traverse((obj) => {
-      if (!obj.isMesh || !obj.material) return;
-      const source = Array.isArray(obj.material) ? obj.material : [obj.material];
-      const next = source.map((mat) => {
-        const m = mat.clone();
-        m.envMapIntensity = 0.7;
-        m.needsUpdate = true;
-        return m;
-      });
-      obj.material = Array.isArray(obj.material) ? next : next[0];
-    });
-    return root;
-  } catch {
-    const texture = await new THREE.TextureLoader().loadAsync(FALLBACK_STILL);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    const img = texture.image;
-    const aspect = (img?.width || 972) / (img?.height || 1661);
-    const height = 1.72;
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(height * aspect, height),
-      new THREE.MeshBasicMaterial({
-        map: texture,
-        fog: false,
-        toneMapped: false,
-      }),
-    );
-    const group = new THREE.Group();
-    group.userData.billboard = true;
-    group.add(mesh);
-    mesh.position.y = height / 2;
-    return group;
-  }
+  const gltf = await loadGlb(loader, modelUrl, signal);
+  onProgress(0.75);
+  gltf.scene.traverse(object => {
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+      if (material) { material.envMapIntensity = 0.7; material.needsUpdate = true; }
+    }
+  });
+  return gltf.scene;
 }
 
-/**
- * @param {HTMLCanvasElement} canvas
- * @param {{ maxDpr?: number, modelUrl?: string, onProgress?: (n: number) => void }} [opts]
- */
 export async function createHaloScene(canvas, opts = {}) {
   RectAreaLightUniformsLib.init();
 
@@ -197,6 +163,13 @@ export async function createHaloScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.028);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+  };
+  opts.signal?.addEventListener('abort', release, { once: true });
   scene.environment = pmrem.fromScene(studioEnvironment(), 0.08).texture;
   scene.environmentIntensity = 0.95;
 
@@ -233,7 +206,9 @@ export async function createHaloScene(canvas, opts = {}) {
 
   onProgress(0.28);
 
-  const stone = await loadStone(modelUrl, onProgress);
+  let stone;
+  try { stone = await loadStone(modelUrl, onProgress, opts.signal); }
+  catch (error) { release(); glowTex.dispose(); shaftTex.dispose(); throw error; }
   const fitted = fitOnPlate(stone, 1.02);
   const stoneHome = {
     x: 0.62,
@@ -353,24 +328,36 @@ export async function createHaloScene(canvas, opts = {}) {
 
   function render(progress) {
     scrollProgress = progress;
-    drawFrame();
+    if (active) drawFrame();
   }
 
+  let active = true;
+  let disposed = false;
   function loop() {
+    if (!active || disposed) return;
     rafId = requestAnimationFrame(loop);
     drawFrame();
+  }
+  function setActive(value) {
+    if (disposed || value === active) return;
+    active = value;
+    if (active) loop();
+    else cancelAnimationFrame(rafId);
   }
   loop();
 
   function dispose() {
+    if (disposed) return;
+    disposed = true;
+    active = false;
     cancelAnimationFrame(rafId);
+    opts.signal?.removeEventListener('abort', release);
+    release();
     composer.dispose();
-    renderer.dispose();
-    pmrem.dispose();
     glowTex.dispose();
     shaftTex.dispose();
   }
 
   onProgress(1);
-  return { resize, render, dispose };
+  return { resize, render, setActive, dispose };
 }

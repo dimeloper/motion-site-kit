@@ -297,7 +297,6 @@ img { display: block; max-width: 100%; }
   opacity: 0;
   pointer-events: none;
 }
-.hero[data-motion="preloading"] .hero__poster,
 .hero[data-motion="ready"] .hero__poster {
   opacity: 0;
 }
@@ -576,7 +575,7 @@ img { display: block; max-width: 100%; }
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6b7285;
+  color: #596174;
 }
 .trust__list {
   display: flex;
@@ -735,7 +734,7 @@ main {
 .build-card__num {
   font-size: 0.8rem;
   color: inherit;
-  opacity: 0.55;
+  opacity: 0.8;
   margin-bottom: 0.75rem;
 }
 .build-card h3 {
@@ -880,7 +879,7 @@ main {
   margin: 0;
   grid-column: 1 / -1;
 }
-.site-footer__credit { font-size: 0.75rem; opacity: 0.7; }
+.site-footer__credit { font-size: 0.75rem; opacity: 1; }
 
 /* ── Full-screen menu — Harbor craft, dark ink ────────────────────────── */
 
@@ -1152,4 +1151,228 @@ main {
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
   }
+}
+
+/* Product direction: larger type, precise rules and contrasting material panels. */
+.hero__headline{
+  font-size:clamp(3.3rem,6.7vw,6.5rem);
+  line-height:1.01;
+  letter-spacing:-.065em
+}
+.hero__line--mute{
+  color:#b9c8dd
+}
+.hero__copy{
+  max-width:43rem
+}
+.hero__sub{
+  max-width:35ch
+}
+.hero__lead{
+  font-size:1rem
+}
+.hero__watermark{
+  font-size:clamp(7rem,17vw,16rem);
+  letter-spacing:-.07em
+}
+.hero__stats{
+  border-radius:4px;
+  background:#10151ded
+}
+.hero__tags .tag{
+  border-radius:4px
+}
+.modules__head h2,.builds__head h2,.about__copy h2{
+  font-size:clamp(2.5rem,4.5vw,4.5rem);
+  letter-spacing:-.055em
+}
+.modules__list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  column-gap:4rem;
+  border-top:1px solid #ffffff30
+}
+.modules__item{
+  border-bottom:1px solid #ffffff30
+}
+.modules__link{
+  min-height:185px;
+  padding:2rem 0;
+  border-radius:0;
+  grid-template-columns:32px 1fr 32px;
+  align-items:start
+}
+.modules__title{
+  font-size:1.7rem;
+  margin-bottom:1rem
+}
+.modules__body{
+  max-width:31ch;
+  line-height:1.6;
+  color:#afbacb
+}
+.feel__panel{
+  border-radius:4px;
+  background:#dbe5f0;
+  color:#162230;
+  padding:clamp(2rem,5vw,5rem);
+  border:0
+}
+.feel__title{
+  font-size:clamp(2.8rem,5vw,5rem);
+  letter-spacing:-.055em;
+  max-width:15ch
+}
+.feel__title em{
+  color:#315b96
+}
+.feel__body{
+  color:#455669;
+  font-size:1rem
+}
+.feel .tag{
+  color:#263e59;
+  border-color:#74869b;
+  background:transparent
+}
+.builds__grid{
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem
+}
+.build-card{
+  border-radius:4px;
+  min-height:410px;
+  padding:2rem
+}
+.build-card:first-child{
+  grid-column:1/-1;
+  min-height:450px;
+  position:relative;
+  isolation:isolate;
+  background:#dde2e8;
+  color:#142233;
+  overflow:hidden
+}
+.build-card:first-child:after{
+  content:'';
+  position:absolute;
+  right:0;
+  top:0;
+  bottom:0;
+  width:55%;
+  background:url('../images/lock.jpg') center/cover no-repeat;
+  z-index:-1;
+  mask-image:linear-gradient(90deg,transparent,#000 30%)
+}
+.build-card:first-child h3{
+  font-size:clamp(2.3rem,4vw,4rem);
+  max-width:8ch
+}
+.build-card:first-child p{
+  max-width:25ch;
+  color:#41536a
+}
+.build-card:first-child .build-card__links{
+  max-width:40%;
+  margin-top:3rem
+}
+.build-card--ink{
+  background:#122238
+}
+.build-card--ink h3{
+  font-size:2.8rem
+}
+.build-card--ink p{
+  color:#b4c6df
+}
+.build-card__links li{
+  border-color:#9caab9
+}
+.build-card--photo .build-card__overlay{
+  background:linear-gradient(0deg,#05080df2,transparent);
+  padding:2rem
+}
+.cta__panel{
+  border-radius:4px
+}
+.site-footer__brand{
+  font-size:clamp(3rem,8vw,7rem);
+  letter-spacing:-.06em
+}
+@media(max-width:767px){
+  .hero__headline{
+    font-size:clamp(2.9rem,11vw,4.6rem)
+  }
+  .hero__copy{
+    max-width:100%
+  }
+  .hero__sub{
+    font-size:.85rem;
+    max-width:34ch
+  }
+  .modules__list{
+    grid-template-columns:1fr
+  }
+  .modules__link{
+    min-height:150px
+  }
+  .builds__grid{
+    grid-template-columns:1fr
+  }
+  .build-card:first-child{
+    min-height:480px;
+    padding-bottom:220px
+  }
+  .build-card:first-child:after{
+    top:auto;
+    height:220px;
+    width:100%;
+    mask-image:linear-gradient(180deg,transparent,#000 30%)
+  }
+  .build-card:first-child h3{
+    max-width:none;
+    font-size:2.4rem
+  }
+  .build-card:first-child .build-card__links{
+    max-width:none;
+    margin-top:1.5rem
+  }
+  .build-card{
+    min-height:350px
+  }
+  .feel__body{
+    font-size:.9rem
+  }
+}
+@media(max-width:767px){
+  .hero__copy{
+    padding:0 0 14px;
+    background:linear-gradient(90deg,#07080ced,#07080c85 85%,transparent);
+    border-radius:3px
+  }
+  .hero__ctas .text-link{
+    background:#07080cbd;
+    padding:6px 10px
+  }
+}
+.feel__title {
+  color: #162230;
+}
+.feel .kicker {
+  color: #455669;
+}
+/* The source still has wide negative space; crop around the actual band. */
+.build-card:first-child::after {
+  width: 50%;
+  background-size: auto 280%;
+  background-position: 78% center;
+  mask-image: none;
+}
+.build-card--photo img {
+  transform: scale(2.2);
+  transform-origin: 76% 50%;
+  object-position: 76% center;
+}
+@media (max-width: 767px) {
+  .build-card:first-child::after { width: 100%; background-size: auto 280%; }
 }

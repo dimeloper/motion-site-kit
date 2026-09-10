@@ -1,0 +1,22 @@
+[
+  {
+    "source": "docs/examples/local/images/loaf.jpg",
+    "output": "docs/examples/local/images/loaf.webp",
+    "sourceSha256": "83dd2a7538a2c12b71b341f2f030671e2072b47b730e64ab78e7bd2fc7430f58",
+    "sourceBytes": 1833625,
+    "outputBytes": 166804,
+    "width": 1280,
+    "height": 1920,
+    "quality": 84
+  },
+  {
+    "source": "docs/examples/local/images/board.jpg",
+    "output": "docs/examples/local/images/board.webp",
+    "sourceSha256": "2e372eb5d0622d9e67e40127339bec80dc7d315c8bb37f58bff2e81cb2e7fd08",
+    "sourceBytes": 1325294,
+    "outputBytes": 599270,
+    "width": 1280,
+    "height": 1707,
+    "quality": 84
+  }
+]

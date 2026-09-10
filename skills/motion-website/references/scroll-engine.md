@@ -53,21 +53,25 @@ gsap.ticker.lagSmoothing(0);
 
 ```js
 const state = { frame: 0 };
-
-ScrollTrigger.create({
-  trigger: '#hero',
-  start: 'top top',
-  end: () => `+=${window.innerHeight * SCROLL_LENGTH_VH}`,
-  pin: true,
-  scrub: 0.5,            // seconds of catch-up; 0 = rigid, >1 = floaty
-  anticipatePin: 1,
-  invalidateOnRefresh: true,
-  onUpdate: (self) => {
-    const next = Math.round(self.progress * (frameCount - 1));
-    if (next !== state.frame) {
-      state.frame = next;
+let lastDrawn = -1;
+gsap.to(state, {
+  frame: frameCount - 1,
+  ease: 'none',
+  onUpdate: () => {
+    const next = Math.round(state.frame);
+    if (next !== lastDrawn) {
       draw(next);
+      lastDrawn = next;
     }
+  },
+  scrollTrigger: {
+    trigger: '#hero',
+    start: 'top top',
+    end: () => `+=${window.innerHeight * SCROLL_LENGTH_VH}`,
+    pin: true,
+    scrub: 0.5,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
   },
 });
 ```
@@ -76,31 +80,33 @@ Two things people get wrong here:
 
 **Scroll length.** `SCROLL_LENGTH_VH` of 3 to 4 is the usable range — the visitor scrolls three to four screen heights to play the sequence once. Below 2 the animation flies past; above 5 it feels like the page is stuck.
 
-**Redrawing every update.** `onUpdate` fires far more often than the frame count changes. The `next !== state.frame` guard is what keeps this at 120 draws instead of thousands.
+**Redrawing every update.** `onUpdate` fires far more often than the frame count changes. Guard repeated frame indices to avoid redundant draws. Reverse playback legitimately draws the same frame again.
 
-`scrub: 0.5` rather than `true` gives the canvas half a second of easing to catch up with a flung scroll. It hides the discrete frame steps and costs nothing.
+`scrub: 0.5` smooths the linked animation playhead. A standalone ScrollTrigger callback reading `self.progress` is still raw scroll progress; setting numeric scrub there does not smooth custom canvas draws. Use the tween’s `onUpdate`, as above.
 
 ## Canvas rendering
 
-Decode off the main thread, once, before anything starts:
+Fetch compressed blobs with a bounded request window, then decode the target and
+nearby frames through `template/src/frame-cache.js`. The default 128 MiB RGBA
+budget includes the in-flight bitmap; at 1600×900 it holds about 23 frames.
+Keeping all 120 decoded would require roughly 659 MiB before canvas and browser
+overhead. Compressed blobs stay available, so reversing may decode again but
+does not need a second network fetch.
 
-```js
-async function preload(urls, onProgress) {
-  let done = 0;
-  return Promise.all(urls.map(async (url) => {
-    const res = await fetch(url);
-    const bitmap = await createImageBitmap(await res.blob());
-    onProgress(++done / urls.length);
-    return bitmap;
-  }));
-}
-```
+The cache prioritizes the latest target after a fling or direction change. The
+renderer keeps its previous image until the requested bitmap is ready, then
+redraws even if the scroll playhead has stopped. Always test reverse playback:
+an animation playhead moving correctly does not prove the canvas updated.
 
-`createImageBitmap` hands back an already-decoded bitmap, so `drawImage` is a straight blit. The alternative — `new Image()` with a `load` handler — leaves decoding to happen lazily on first paint, which is the classic "stutters the first time through, smooth on the way back up" bug.
+`createImageBitmap` returns decoded images for `drawImage`; it does not itself
+guarantee a particular browser thread or total process-memory footprint. The
+budget accounts for width × height × four bytes, and real-device profiling
+remains required. Image data is checked for consistent dimensions while decoding.
 
-Size the canvas to the device pixel ratio and letterbox with `object-fit: cover` semantics computed in JS; scaling a canvas with CSS alone blurs it on retina displays.
-
-Cap concurrency if the sequence is large — 120 simultaneous fetches will saturate the connection and delay the first frames. Six to eight at a time is a reasonable window.
+Size the canvas with capped DPR and cover semantics. Concurrency defaults to
+eight compressed-frame requests. A loading deadline restores the poster; aborted
+runs release their cache, pin, resize listener and Lenis ticker. Native decoding
+may finish after cancellation, and that late bitmap is explicitly closed.
 
 ## Where native CSS scroll timelines do fit
 

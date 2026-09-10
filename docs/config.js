@@ -1,6 +1,6 @@
 /**
- * Docs site for the kit. Same engine as template/; only this file is different.
- * Content is this repo's README, rewritten as a page you can scroll.
+ * Frame runtime settings for the docs showcase. The engine is mirrored from
+ * template/; docs-specific editorial markup and chrome live in index.html.
  */
 
 export const CONFIG = {
@@ -68,6 +68,13 @@ export const CONFIG = {
     scrub: 0.5,
     lenisDuration: 1.1,
     concurrency: 8,
+
+    // Bound loader ownership when a server never finishes a request.
+    loadTimeoutMs: 30000,
+
+    // RGBA bitmap ceiling, including the frame being decoded.
+    // 128 MiB holds about 23 frames at 1600×900; compressed frames stay cached.
+    maxDecodedBytes: 128 * 1024 * 1024,
     maxDpr: 2,
   },
 };

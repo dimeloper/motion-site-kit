@@ -1,47 +1,15 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Page kit - motion-site-kit</title>
-  <meta name="description" content="Layout families for a new vertical. Harbor and Vortex keep their chrome. The next demo composes from these." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Syne:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="sections.css?v=10" />
-</head>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Page kit — Motion site kit</title><meta name="description" content="Browse thirty distinct layout families. Preview a section and copy its configuration." /><link rel="stylesheet" href="sections.css?v=10" /><link rel="stylesheet" href="catalog.css?v=2" /></head>
 <body>
-  <a class="kit-chrome__back" href="#content" style="position:absolute;left:-999px">Skip to families</a>
-
-  <header class="kit-chrome">
-    <div class="kit-chrome__row">
-      <p class="kit-chrome__mark">motion-site-kit</p>
-      <a class="kit-chrome__back" href="../">Docs home</a>
-    </div>
-    <h1>Page kit</h1>
-    <p class="kit-chrome__lead">
-      Thirty layout families. Harbor and Vortex keep the chrome they earned.
-      A new demo describes content. The planner picks a short sequence. It does not clone Vortex.
-    </p>
-    <ul class="kit-families"></ul>
-  </header>
-
-  <main id="content" data-kit></main>
-
-  <script type="module">
-    import { compose, FAMILIES } from './compose.js?v=10';
-    import { CATALOG } from './catalog.js?v=10';
-    const list = document.querySelector('.kit-families');
-    const byType = new Map(CATALOG.sections.map((section) => [section.type, section.id]));
-    list.replaceChildren(...FAMILIES.map((type) => {
-      const item = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = `#${byType.get(type) || type}`;
-      link.textContent = type;
-      item.append(link);
-      return item;
-    }));
-    compose(document.querySelector('[data-kit]'), CATALOG.sections);
-  </script>
-</body>
-</html>
+<a class="catalog-skip" href="#content">Skip to preview</a>
+<header class="catalog-header"><a href="../index.html" class="catalog-brand"><b>m.</b> motion site kit</a><nav aria-label="Primary"><a href="../index.html#examples">Examples</a><a href="https://github.com/dimeloper/motion-site-kit">Source ↗</a></nav></header>
+<section class="catalog-intro"><p class="catalog-eyebrow">The section library / 30 families</p><h1>Build the story<br>after the scroll.</h1><p>Distinct layouts for different kinds of content.<br>Find a structure. Give it your own voice.</p></section>
+<noscript><p class="catalog-intro">Enable JavaScript to preview sections, or <a href="https://github.com/dimeloper/motion-site-kit/blob/main/docs/kit/catalog.js">read the complete catalog source</a>.</p></noscript>
+<div class="catalog-workspace">
+<aside class="catalog-sidebar" aria-label="Layout families"><label for="family-search">Find a layout</label><input id="family-search" type="search" placeholder="Search families…" autocomplete="off" /><p class="catalog-count" role="status"></p><div class="catalog-families"></div></aside>
+<main id="content" tabindex="-1"><div class="catalog-preview-head"><div><p class="catalog-eyebrow">Live specimen</p><h2 data-preview-title>Featured work</h2></div><a href="#configuration">View config ↓</a></div><div class="catalog-preview" data-kit></div><section class="catalog-code" id="configuration"><div><h2>Make it yours</h2><button type="button" data-copy>Copy config</button></div><p>This object composes one section. Replace the specimen copy and image paths with your own assets.</p><pre tabindex="0"><code data-source></code></pre><p data-copy-status role="status"></p></section></main>
+</div>
+<footer class="catalog-footer"><a href="../index.html">← Back to the kit</a><span>Thirty families. One considered page at a time.</span></footer>
+<script type="module" src="catalog-ui.js?v=2"></script>
+</body></html>

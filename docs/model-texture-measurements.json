@@ -1,0 +1,104 @@
+{
+  "method": "Embedded GLB image dimensions; calculated RGBA8 bytes, not measured GPU residency. Excludes environment maps, render targets and textures created in code.",
+  "models": [
+    {
+      "path": "docs/examples/commerce/models/pillar.glb",
+      "modelBytes": 1137636,
+      "images": [
+        {
+          "name": "normal",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 260712,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "base_color",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 279794,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "metallic_roughness",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 20784,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        }
+      ],
+      "usage": "loaded by current scene",
+      "rgbaBaseBytes": 12582912,
+      "rgbaWithMipsBytes": 16777212
+    },
+    {
+      "path": "docs/examples/local/models/loaf.glb",
+      "modelBytes": 1016124,
+      "images": [
+        {
+          "name": "normal",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 260330,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "base_color",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 294836,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "metallic_roughness",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 20120,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        }
+      ],
+      "usage": "loaded by current scene",
+      "rgbaBaseBytes": 12582912,
+      "rgbaWithMipsBytes": 16777212
+    },
+    {
+      "path": "docs/examples/saas/models/ring.glb",
+      "modelBytes": 794548,
+      "images": [
+        {
+          "name": "normal",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 94092,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "base_color",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 119844,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        },
+        {
+          "name": "metallic_roughness",
+          "width": 1024,
+          "height": 1024,
+          "encodedBytes": 25650,
+          "rgbaBaseBytes": 4194304,
+          "rgbaWithMipsBytes": 5592404
+        }
+      ],
+      "usage": "unused legacy asset; Vortex uses a procedural CAD band",
+      "rgbaBaseBytes": 12582912,
+      "rgbaWithMipsBytes": 16777212
+    }
+  ]
+}

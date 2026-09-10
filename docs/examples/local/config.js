@@ -6,7 +6,7 @@
 export const CONFIG = {
   brand: {
     name: 'Harbor Oven',
-    primary: '#C45C3A',
+    primary: '#A04126',
     ink: '#121612',
     paper: '#ECEBE7',
     displayFont: '"Cormorant Garamond", Georgia, serif',
@@ -43,21 +43,21 @@ export const CONFIG = {
       caption: 'From the oven',
       title: 'Country loaf',
       note: 'On the counter from 8.',
-      image: 'images/loaf.jpg',
+      image: 'images/loaf.webp',
       alt: 'Flour-dusted country loaf',
     },
     {
       caption: 'This week',
       title: 'Plum market tart',
       note: 'Until the tray is gone.',
-      image: 'images/board.jpg',
+      image: 'images/board.webp',
       alt: 'Sliced loaf and jam on a board',
     },
     {
       caption: 'From 11',
       title: 'Soup and two sandwiches',
       note: 'The board on the door is the menu.',
-      image: 'images/loaf.jpg',
+      image: 'images/loaf.webp',
       alt: 'Bakery loaf at Harbor Oven',
     },
   ],
@@ -131,26 +131,10 @@ export const CONFIG = {
 
   selected: {
     kicker: 'From the counter',
-    title: 'Selected trays',
+    title: 'Bread, at its best.',
     items: [
-      {
-        title: 'Country loaf',
-        note: 'On the counter from 8',
-        image: 'images/loaf.jpg',
-        alt: 'Flour-dusted country loaf',
-      },
-      {
-        title: 'Plum market tart',
-        note: 'Until the tray is gone',
-        image: 'images/board.jpg',
-        alt: 'Sliced loaf and jam on a board',
-      },
-      {
-        title: 'Board lunch',
-        note: 'Soup from eleven',
-        image: 'images/loaf.jpg',
-        alt: 'Bakery loaf at Harbor Oven',
-      },
+      { title: 'Country loaf', note: 'Flour, water, salt. And time.', image: 'images/loaf.webp', alt: 'A flour-dusted country loaf' },
+      { title: 'Bread and jam', note: 'A slow start to the morning.', image: 'images/board.webp', alt: 'Sliced country loaf with jam on a wooden board' },
     ],
   },
 
@@ -177,7 +161,7 @@ export const CONFIG = {
     title: 'Hold a loaf for Saturday',
     body: 'Send a note before 9. No reservations for lunch — come when the door is open.',
     label: "Get this week's hours",
-    href: 'https://example.com/harbor-oven',
+    href: '#board',
     secondaryLabel: 'See the board',
     secondaryHref: '#board',
     stepsTitle: 'How a hold works',

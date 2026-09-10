@@ -1,3 +1,4 @@
+import { disposeTree, loadGlb } from '../../shared/lifecycle.js';
 /**
  * Harbor Oven live WebGL hero — Meshy/Higgsfield loaf GLB under a glass cloche.
  * Camera orbit and cloche lift are driven by scroll progress (0–1).
@@ -158,6 +159,13 @@ export async function createHarborScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.055);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+  };
+  opts.signal?.addEventListener('abort', release, { once: true });
   scene.environment = pmrem.fromScene(studioEnvironment(), 0.06).texture;
   scene.environmentIntensity = 1.2;
 
@@ -190,10 +198,10 @@ export async function createHarborScene(canvas, opts = {}) {
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  const gltf = await loader.loadAsync(modelUrl, (event) => {
-    if (!event.total) return;
-    onProgress(0.35 + 0.45 * (event.loaded / event.total));
-  });
+  let gltf;
+  try { gltf = await loadGlb(loader, modelUrl, opts.signal); }
+  catch (error) { release(); throw error; }
+  onProgress(0.8);
 
   const loaf = gltf.scene;
   loaf.traverse((obj) => {
@@ -270,23 +278,33 @@ export async function createHarborScene(canvas, opts = {}) {
 
   function render(progress) {
     scrollProgress = progress;
-    drawFrame();
+    if (active) drawFrame();
   }
 
+  let active = true;
+  let disposed = false;
   function loop() {
+    if (!active || disposed) return;
     rafId = requestAnimationFrame(loop);
     drawFrame();
+  }
+  function setActive(value) {
+    if (disposed || value === active) return;
+    active = value;
+    if (active) loop();
+    else cancelAnimationFrame(rafId);
   }
   loop();
 
   function dispose() {
+    if (disposed) return;
+    disposed = true;
+    active = false;
     cancelAnimationFrame(rafId);
-    flour.points.geometry.dispose();
-    flour.material.dispose();
-    renderer.dispose();
-    pmrem.dispose();
+    opts.signal?.removeEventListener('abort', release);
+    release();
   }
 
   onProgress(1);
-  return { resize, render, dispose };
+  return { resize, render, setActive, dispose };
 }

@@ -87,5 +87,5 @@ Format selection uses a one-pixel decode probe at startup rather than user-agent
 ```js
 const canAvif = await createImageBitmap(
   await (await fetch(TINY_AVIF_DATA_URL)).blob()
-).then(() => true, () => false);
+).then((bitmap) => { bitmap.close(); return true; }, () => false);
 ```
