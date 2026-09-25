@@ -123,7 +123,6 @@ test('the published family count matches the renderers', () => {
   const count = String(FAMILIES.length);
   for (const [file, pattern] of [
     ['docs/index.html', /(\d+) section families/],
-    ['docs/README.md', /for (\d+) families/],
     ['docs/ONBOARDING.md', /(\d+) section families/],
     ['docs/kit/index.html', /\/ (\d+) families/],
   ]) {

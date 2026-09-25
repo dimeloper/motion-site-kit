@@ -8,11 +8,11 @@ Serve: `python3 -m http.server 8080 --directory docs` → `/kit/`
 
 Choose sections around the content and its reading order. There is no minimum count. Repeat a layout when the content benefits from it, and vary image scale, density and spacing where the story changes. The renderer warns about repetition so it can be reviewed.
 
-Reuse from Harbor / Vortex: loader, Lenis, menu dialog, poster/canvas, fallbacks. Not the section list.
+Reuse the runtime from `../examples/shared/`: loader, Lenis, menu dialog, poster and canvas, fallbacks. Not another page's section list.
 
 Start with a complete brief in `recipes.js`. `planPage()` selects families from the content shape. `page.order` sets the reading order using IDs. Explicit `sections` configurations remain available for authored compositions.
 
-A live page must not depend on `sections.css` alone. Designed lists are `div[role=list]`, not `<ol>` or `<ul>`. Cache-bust the kit stylesheet with the JS. If you see browser list markers or a still at its intrinsic width, kit CSS did not apply.
+A live page must not depend on `sections.css` alone. Designed lists are `div[role=list]`, not `<ol>` or `<ul>`. Every kit URL, including the stylesheet and its `@import`, carries the same `?v=`; bump them together (`tests/test_kit.mjs` checks this). If you see browser list markers or a still at its intrinsic width, kit CSS did not apply.
 
 ## Complete recipes
 
@@ -64,7 +64,7 @@ Thirty-four families. A page uses a short sequence. The catalog is not a page.
 ## Use
 
 ```js
-import { compose, planPage } from '../../kit/compose.js';
+import { compose, planPage } from '../../kit/compose.js?v=12'; // the kit's current version
 
 compose(document.querySelector('[data-kit]'), planPage({
   kind: 'studio',

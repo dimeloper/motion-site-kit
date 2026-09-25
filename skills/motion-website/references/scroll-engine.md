@@ -5,6 +5,9 @@
 - [Why GSAP and not native CSS](#why-gsap-and-not-native-css)
 - [Lenis + ScrollTrigger wiring](#lenis--scrolltrigger-wiring)
 - [The pin and scrub math](#the-pin-and-scrub-math)
+- [Resizes and the mobile URL bar](#resizes-and-the-mobile-url-bar)
+- [Pinning after the visitor has scrolled](#pinning-after-the-visitor-has-scrolled)
+- [Menus and modals](#menus-and-modals)
 - [Canvas rendering](#canvas-rendering)
 - [Where native CSS scroll timelines do fit](#where-native-css-scroll-timelines-do-fit)
 
@@ -67,7 +70,7 @@ gsap.to(state, {
   scrollTrigger: {
     trigger: '#hero',
     start: 'top top',
-    end: () => `+=${window.innerHeight * SCROLL_LENGTH_VH}`,
+    end: () => `+=${hero.clientHeight * SCROLL_LENGTH_VH}`, // hero is 100svh
     pin: true,
     scrub: 0.5,
     anticipatePin: 1,
@@ -84,10 +87,36 @@ Two things people get wrong here:
 
 `scrub: 0.5` smooths the linked animation playhead. A standalone ScrollTrigger callback reading `self.progress` is still raw scroll progress; setting numeric scrub there does not smooth custom canvas draws. Use the tween’s `onUpdate`, as above.
 
+## Resizes and the mobile URL bar
+
+On a phone the address bar collapses as the visitor scrolls, and `innerHeight`
+grows with it, firing `resize`. Two things keep that from jumping the sequence:
+
+- **Measure the pin in `svh`.** The template's hero is `100svh`, which does not change with the URL bar, and the pin length reads the hero's own height. A length tied to `innerHeight` changes on every re-measure.
+- **Refresh only on a real size change.** GSAP already ignores height-only resizes on touch devices (`ignoreMobileResize` is on by default there). A resize listener that calls `ScrollTrigger.refresh()` unconditionally undoes that. The template resizes the canvas first and refreshes only when its backing size actually changed.
+
+## Pinning after the visitor has scrolled
+
+The pin cannot engage until every frame has downloaded. A visitor who scrolled
+past the hero in the meantime would see the page jump by the full pin length
+when ScrollTrigger inserts its spacer above them. Chrome and Firefox hide this
+with scroll anchoring; Safari does not anchor. The template measures the
+element after the hero before and after pinning and scrolls by the difference.
+A visitor still inside the hero is left where they are and picks up the
+sequence at that point.
+
+## Menus and modals
+
+Lenis scrolls the page with `window.scrollTo` on every wheel event, so setting
+`overflow: hidden` on the root does not stop it (Lenis only honours that with
+`autoToggle`). A menu or dialog must call `lenis.stop()` when it opens and
+`lenis.start()` when it closes. The examples do this through `lockScroll()` in
+`docs/examples/shared/smooth-scroll.js`.
+
 ## Canvas rendering
 
 Fetch compressed blobs with a bounded request window, then decode the target and
-nearby frames through `template/src/frame-cache.js`. The default 128 MiB RGBA
+nearby frames through `assets/template/src/frame-cache.js`. The default 128 MiB RGBA
 budget includes the in-flight bitmap; at 1600×900 it holds about 23 frames.
 Keeping all 120 decoded would require roughly 659 MiB before canvas and browser
 overhead. Compressed blobs stay available, so reversing may decode again but

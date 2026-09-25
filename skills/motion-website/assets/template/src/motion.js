@@ -37,8 +37,9 @@ async function supportsAvif() {
  * Reasons to serve the static poster instead of the sequence.
  *
  * Note what is deliberately absent: viewport width. The usual advice is to skip
- * the animation under 768px, but the 640 rung is a few hundred kilobytes and
- * phones are most of the traffic. Serve them the narrow ladder, not a JPEG.
+ * the animation under 768px, but phones fetch the 640 or 960 rung, both held
+ * to the 1.5 MB phone ceiling, and phones are most of the traffic. Serve them
+ * a ladder, not a JPEG.
  */
 function shouldUseStaticFallback() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 'reduced-motion';

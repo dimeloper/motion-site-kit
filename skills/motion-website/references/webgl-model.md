@@ -1,148 +1,123 @@
-# Live WebGL model hero (Higgsfield / Meshy path)
+# Live WebGL model hero
 
-Use this when the product should be a **sculptural object the camera orbits**, not a pre-rendered frame ladder. Harbor Oven is the craft reference under `docs/examples/local/` — copy its patterns, not its bakery copy.
+Use this when the product should be a sculptural object the camera moves
+around, with live light, rather than a pre-rendered frame ladder. Frame scrub
+stays the default. Live WebGL is the optional branch when you have, or can make,
+a clean GLB.
 
-Frame scrub remains the default kit path. Live WebGL is the optional branch when you have (or can generate) a clean GLB and want continuous light/camera motion instead of a fixed clip.
+The examples live in the repository, not in this skill:
+[Harbor, Vortex and Halo](https://github.com/dimeloper/motion-site-kit/tree/main/docs/examples),
+with their shared runtime in `docs/examples/shared/`. Start a new WebGL hero by
+copying one example's folder and the `shared/` folder beside it.
 
-## When to pick which engine
+**Generating a model needs a paid service.** The image-to-3D recipe below uses
+Meshy through the Higgsfield MCP server (`https://mcp.higgsfield.ai/mcp`), which
+spends account credits. Without it, use a GLB you are licensed to ship, build
+the object in code (as Vortex does), or stay on the frame path.
 
-| Engine | Demo | Motion language | Asset |
+## Choosing the engine
+
+| Engine | Example | Motion language | Asset |
 |---|---|---|---|
-| Frame scrub | `template/`, classic reskins | Camera move baked into a 120-frame ladder | AVIF/WebP sequence under budget |
-| Live WebGL | Harbor (`local`) → **Vortex** → **Halo** | Orbit / particle peel-seat / **rings lift and seat** | Harbor: meshopt GLB. Vortex: CAD torus. Halo: textured stone + emissive rings. Compose from `docs/kit/`. |
-| Particles | Optional fork | Scroll densifies a field | Canvas only — poster still for LCP |
-| Float layers | Optional fork | Layered stills drift in z-depth | A few stills, no sequence decode |
+| Frame scrub | `assets/template/` | A camera move baked into a 120-frame ladder | AVIF/WebP sequence under the budget |
+| Live WebGL, GLB | Harbor | The camera orbits a loaf | Meshy GLB, meshopt compressed, ~1 MB |
+| Live WebGL, code | Vortex | Particles peel off a titanium band and reseat | No model: the band is a lathe built in `scene.js` |
+| Live WebGL, GLB + code | Halo | Two rings of light lift off a stone and seat on reverse | Meshy GLB for the stone; the rings are code |
 
-Do **not** ship three demos that all rotate-and-zoom the same way. Harbor proved orbit; Vortex peels particles off a CAD titanium band and reseats them. Halo lifts two rings of light off textured stone and seats them on reverse, on a page composed from `docs/kit/`, not Vortex's section list.
+Give each page its own motion language. Three pages that all rotate and zoom
+read as one template.
 
-## Do not show the user until this gate is green
+## The gate before anyone sees it
 
-Vortex burned rounds on a cracked Meshy ring, a model under the headline, and a halo that hugged the mesh. **Do not ask the visitor (or the client) to judge a WebGL hero until every item below is true in a visible tab.** Background tabs throttle `requestAnimationFrame` and GSAP — never gate the loader on `rAF`; use `setTimeout`. Then run `references/qa.md` → **WebGL hero**.
+Do not ask a client to judge a WebGL hero until every item is true in a visible
+tab. Background tabs throttle `requestAnimationFrame` and GSAP, so never gate
+the loader on `requestAnimationFrame`; use `setTimeout`. Then run the
+**WebGL hero** section of `qa.md`.
 
-1. **Asset path chosen on purpose** — see the decision tree. If Meshy produced clay, seams, or a hole that looks cracked, **throw the GLB away** and switch path. Do not light it better and ship it.
-2. **License checked** before promising a third-party file. Sketchfab `isDownloadable: false` or empty `license` means **do not rip the viewer**. Ask for a downloadable CC file or build CAD.
-3. **Framing contract (desktop)** — reading lane left, product in the right third. Longest on-screen axis of the product is **about 35–50% of hero height**. The model does not sit under the headline or crop the top of the object.
-4. **Supporting field fills the hero after intro** — particles / peel shards appear on the object first, then expand across the hero (~0.5s delay). At rest they must not be a tight shell that reads as noise on the mesh.
-5. **Motion language is the vertical's** — Harbor orbit, Vortex particle peel→seat. Halo is not a third orbit and not another particle halo. Do not clone the last demo's camera.
-6. **One body mesh** — extra liner/inlay tori z-fight and look cracked. Lights and env maps do not fix intersecting geometry.
-7. **Poster is a real `<img>`**; canvas fades in; `data-motion` starts `static`. Phones get the animation.
+1. **The asset path was chosen on purpose.** See the decision tree. If image-to-3D produced clay, seams or a hole that looks cracked, discard the GLB and change path. Better lighting does not fix it.
+2. **The licence was checked** before promising a third-party file. A Sketchfab model with `isDownloadable: false` or no named licence cannot be shipped. Record the source and terms in `docs/examples/ASSETS.md`.
+3. **Framing on desktop.** Reading lane on the left, product in the right third. The product's longest on-screen axis is about 35–50% of the hero's height. It never sits under the headline or crops at the top.
+4. **The supporting field fills the hero after the intro.** Particles appear on the object first, then spread across the hero after about half a second. At rest they are not a tight shell that makes a good mesh look noisy.
+5. **One body mesh.** Extra liner or inlay meshes z-fight and look cracked. Lighting does not fix intersecting geometry.
+6. **Poster is a real `<img>`**, the canvas fades in over it, and `data-motion` starts at `static`. Phones get the animation.
 
 ## Asset decision tree
 
 | Product shape | Path | Why |
 |---|---|---|
-| Sculptural, 2–3 materials, no hole (loaf, over-ear cups, speaker) | Unsplash/Recraft still → cutout → Meshy v7 + PBR, then `scripts/compress_glb.sh` | Harbor proved this when the still is clean |
-| Genus-1 / thin tube (rings, bangles) | **CAD in Three.js** (high-segment torus / lathe) | Image-to-3D reconstructs cracked clay even at Meshy ultra |
-| Mixed plastics, sticks, hollow cups, DualSense | **Skip Meshy** — CAD, licensed CAD, or frame-scrub | Sticks and cavities turn into grit |
-| Someone sent a Sketchfab / store link | Fetch the API/page **first**: downloadable + named license | Vortex's U&W Viz Smart Ring was CAD-quality and **not downloadable** |
+| Sculptural, two or three materials, no hole (loaf, over-ear cups, speaker) | Clean still → background removal → Meshy image-to-3D with PBR → `scripts/compress_glb.sh` | Works when the still shows the product alone |
+| Genus-1 or thin tube (rings, bangles) | Build it in Three.js: a high-segment torus or lathe | Image-to-3D reconstructs a hole as cracked clay, even at the highest setting |
+| Mixed plastics, sticks, hollow cups, game controllers | Skip image-to-3D: licensed CAD, code, or frame scrub | Sticks and cavities turn into grit |
+| Someone sent a Sketchfab or store link | Check the API or page first for a download and a named licence | CAD-quality models are often view-only |
 
-## WebGL craft checklist (Harbor + Vortex → Halo)
+## Scene and GLB
 
-Learnings locked in after Harbor and Vortex — apply these before calling a WebGL demo “done”:
+1. **Start from a clean still.** The product alone, fully in frame, three-quarter view. Racks, trays and props get baked into the mesh; a cooling rack under a loaf becomes a black ring.
+2. **Generate** (Higgsfield MCP): import the image with `media_import_url`, run `remove_background` if it sits on a surface, then `generate_3d` with `meshy_v7_image_to_3d`, `should_texture: true`, `enable_pbr: true`, `symmetry_mode: 'on'` for symmetric products and `target_polycount` around 40–80k. Preflight with `get_cost: true` and check `balance` before regenerating. Download URLs expire; fetch again through `job_status` if one returns 403.
+3. **Compress.** Image-to-3D GLBs are often 10–20 MB. Harbor's loaf arrived at 15.7 MB, of which 12.4 MB was two 2048² textures and 1.6 MB geometry.
 
-### Layout & chrome
-- **Two-lane hero on desktop** — dark reading lane left, product right. Never park the model under the headline.
-- **Mobile** — full-bleed top/bottom scrim (not a left strip); larger headline (`clamp` from ~2.35rem); full-width copy; touch CTAs ≥ ~44px tall.
-- **Proximity meta** (eyebrow / proof) lives **bottom-left above the status rail**, not under the topbar. Fade in on scroll as the product draws near (earlier thresholds on mobile).
-- **Headline lines** — keep intentional rows (`white-space: nowrap` on lines that must not wrap). Drop `max-width: Nch` that forces awkward breaks.
-- **In-page `#` links** — Lenis owns scroll; wire `lenis.scrollTo(el)` (Harbor: `window.__harborLenis` + capture click handler). Native hash alone will feel broken under pin + Lenis.
-- **Menu** — paper body matching brand paper/ink; **top chrome matches the hero topbar** (dark frosted bar, white brand, glass close). Animate open/close; static nav HTML as fallback; `role="dialog"` + `aria-modal` + focus trap + Escape + restore focus.
+   ```bash
+   scripts/compress_glb.sh loaf.glb models/loaf.glb
+   # meshopt geometry, WebP textures at 1024px, no simplification: ~1.0 MB
+   ```
 
-### Scene / GLB
-1. **Still** — product alone on a clean background (or a cutout). Avoid racks, trays, consoles, props that Meshy will bake into the mesh (Harbor's first pass included a cooling rack as a black ring). **Skip DualSense-class controllers** — sticks, mixed plastics, and translucent buttons turn into clay + grit. Prefer a sculptural object with two or three materials (loaf, over-ear cups, speaker).
-2. Prefer the **Unsplash → cutout → Meshy** path below over inventing geometry in Three.js — **except genus-1 rings**. A thin tube with a hole reconstructs as cracked clay (tried Unsplash still + Recraft + Meshy v7 ultra). The Sketchfab Smart Ring look target (`4fdc3424f54d4e1cb5942af310fc1a17`, U&W Viz) is CAD: 0 textures, 8 materials, 24k tris, **not downloadable**. Vortex ships a high-segment torus with inner sensors instead of ripping the viewer.
-3. Download the GLB into the site tree (`models/product.glb`). Composite the cutout onto a dark field for the poster `<img>` (LCP).
-4. Wire `config.js`:
+   The loader must call `setMeshoptDecoder(MeshoptDecoder)` or the file will not parse. `scripts/check_example_budget.py` in the repository caps each GLB at 2 MiB and fails on a model no page references.
+4. **Poster.** Composite the cutout onto the hero's background as the poster `<img>`. It is the LCP element and the fallback.
+5. **Wire `config.js`.**
 
-```js
-motion: {
-  engine: 'webgl',
-  modelUrl: 'models/product.glb',
-  scrollLengthVh: 3.4,
-  scrub: 0.6,
-  maxDpr: 2,
-}
-```
+   ```js
+   motion: {
+     modelUrl: 'models/product.glb',
+     scrollLengthVh: 3.4,
+     scrub: 0.6,
+     maxDpr: 2,
+     lenisDuration: 1.1,
+     mobileBreakpoint: 1023,   // match the layout switch in styles.css
+   }
+   ```
 
-5. Runtime lives in Harbor's / Vortex's `src/scene.js` + `src/motion.js` (Three r170 + `GLTFLoader` via import map). **Copy that pair** when you need the WebGL path; do not fold it into the frame-scrub `template/src/motion.js`.
-6. Soft **flour / dust / assemble particles** — additive, brand-tinted, continuous RAF. Harbor: motes orbit the loaf. Vortex: particles **peel off and reseat** the CAD band (sampled from the torus surface), then **fill the hero** after intro. Halo must not be a third particle halo. Do not send DualSense / hollow cups / rings through image-to-3D. Untextured CAD primitives failed on the ring and on the deleted cups. Next object: Meshy PBR or a licensed textured GLB.
-7. No decorative plinths / void caps that intersect the mesh — they read as rings on dark backgrounds. Soft bounce light under the object helps baked AO; it does not fix a prop baked into the GLB.
+6. **Runtime.** Each example's `motion.js` is a few lines that call `startWebGLHero()` from `shared/hero.js` with its scene factory. Brand logic lives in `scene.js` and `config.js`; do not fold it into the frame template's engine.
+7. **Draw only when something changed.** Wrap the scene's draw in `createFrameDriver()` from `shared/lifecycle.js`. Pass `continuous: true` only when a shader animates on its own clock, as Harbor's flour motes do. A scene that only responds to scroll should submit no GPU work while idle.
+8. **Release everything.** Call `releaseRenderer()` from `shared/lifecycle.js`, and dispose any post-processing pass yourself before it. `EffectComposer.dispose()` does not free an `UnrealBloomPass`. After a bfcache restore the next scene reuses the same canvas and context, so anything missed accumulates.
+9. **No decorative plinths** that intersect the mesh. They read as rings on a dark background.
 
-### Unsplash → Higgsfield 3D (Harbor recipe; skip for rings)
+## Layout and chrome
 
-Use this when you need a **realistic PBR product mesh** and do not already have a clean studio GLB.
+- **Two lanes on desktop:** a dark reading lane on the left, the product on the right.
+- **Phones:** a full-bleed scrim top and bottom rather than a side strip, a larger headline, full-width copy and touch targets at least 44px tall.
+- **Proximity copy** (eyebrow, proof) sits bottom-left and fades in as the product draws near. Timings are in `config.js` under `motion.proximity`.
+- **In-page links** go through `shared/smooth-scroll.js`, which scrolls once with Lenis when it is running and natively when it is not.
+- **Menu:** `role="dialog"`, `aria-modal`, a focus trap, Escape to close, focus restored, and `lockScroll()` while open. Hiding the root's overflow alone does not stop Lenis.
 
-1. **Find a still** on Unsplash (or equivalent) of the **product alone** — full object in frame, no sibling hardware, no trays. Three-quarter product shots work best. DualSense / gamepads fail this path; over-ear headphones and bakery loaves do not.
-2. **`media_import_url`** the HTTPS image into Higgsfield. Never pass raw Unsplash URLs into `generate_3d` medias.
-3. **`remove_background`** on that media_id when the subject sits on wood/cloth/desk — Meshy will otherwise extrude the surface into the mesh.
-4. **`generate_3d`** with `meshy_v7_image_to_3d` (or `image_to_3d`): `should_texture: true`, `enable_pbr: true`, `symmetry_mode: 'on'` for bilateral products, `target_polycount` ~40–80k. Preflight with `get_cost: true` (often ~38 credits on Plus).
-5. Download the `.glb` into `docs/examples/<demo>/models/`. Keep the cutout + a dark-composited JPEG/AVIF as `images/` poster.
-6. Wire `modelUrl` and a motion language that fits a **single mesh** (coalesce / orbit / peel) — do not fake multi-part explode with box primitives.
+## Fallback chain
 
-Check `balance` before regenerating. CloudFront GLB URLs expire; re-fetch via `job_status` if a download 403s.
+The same contract as the frame engine, plus the WebGL exits:
 
-### Credits and size
+1. `prefers-reduced-motion: reduce` → poster
+2. `navigator.connection.saveData` → poster
+3. Effective type `slow-2g` or `2g` → poster
+4. No WebGL, a lost context, or a failed GLB load → poster (`data-fallback-reason` says which)
+5. No model at all → use the frame engine with the same poster rather than an empty canvas
 
-Meshy GLBs are often **10–20 MB** on download (Harbor loaf was 15.7 MB: 7.5 MB PNG normal + 4.9 MB JPEG albedo at 2048²; geometry was only 1.6 MB). That sits outside the **8 MB sequence** budget in `motion.config.json`. Compress before shipping:
+The loader stays hidden until the engine commits to running. Phones are never
+excluded by width.
 
-```bash
-./scripts/compress_glb.sh docs/examples/local/models/loaf.glb /tmp/loaf-opt.glb
-# meshopt + WebP @ 1024px, no simplify — Harbor loaf lands ~1.0 MB
-```
+## Accessibility
 
-Canonical models live under `docs/examples/*/models/` (GitHub Pages). `examples/*/models/*.glb` are symlinks so git does not store the binary twice. `GLTFLoader` must call `setMeshoptDecoder(MeshoptDecoder)` from `three/addons/libs/meshopt_decoder.module.js` or the compressed file will fail to parse.
-
-Check remaining Higgsfield credits with the MCP `balance` tool before batch regenerations.
-
-## Fallback chain (required)
-
-Same accessibility contract as the frame engine. Live WebGL adds two more exits:
-
-1. `prefers-reduced-motion: reduce` → poster only  
-2. `navigator.connection.saveData` → poster only  
-3. Effective type `slow-2g` / `2g` → poster only  
-4. No WebGL / context lost / GLB load failure → poster only (`data-fallback="no-webgl"` / `webgl-failed`)  
-5. Optional product choice: if you never generated a GLB, **fall back to the frame-scrub engine** with the same poster — do not leave a broken canvas
-
-Loader invariant still holds: `data-motion` starts at `static`; set `preloading` only after the engine has committed to running.
-
-Poster is a real `<img>`; the canvas fades in over it (`aria-hidden` on canvas). Never make the canvas the LCP candidate. Phones get the animation — never gate on viewport width.
-
-## Accessibility bar (Harbor verified patterns)
-
-- `html lang`, skip link → `#content`, one `<main>`, labelled `<nav>`
-- Focus-visible on links/buttons; menu dialog focus trap + Escape
-- Touch targets ≥ 24×24 CSS px (Harbor cards use ~44×44 icon buttons)
-- Status / proximity text must keep contrast on the dark hero (avoid pure mid-grey on charcoal)
-- Reduced-motion: skip menu motion, show proximity at full opacity, static poster path
-
-## Starting Vortex
-
-1. Live craft reference: `docs/examples/saas/` (Vortex). Do **not** reskin Harbor's bakery sections — chrome should read as a dark hardware / GetLayers-style landing (floating glass pill nav, numbered module list, finish cards, Baseline-style full-screen menu).
-2. Motion language: **peel → seat** on a CAD titanium band. The band stays visible (Harbor lesson). Cyan motes sample the torus surface, puff along normals, then reseat. A short yaw shows the inner sensors — not a full loaf orbit. Image-to-3D of a ring stays cracked; do not ship that mesh.
-3. Poster is a real `<img>` of the Recraft ring (cutout composited onto a dark field). `data-motion` starts `static`; once JS commits, the canvas fades in over it. Same fallback chain as Harbor.
-4. Reuse Harbor **a11y / Lenis / menu dialog / loader** patterns only; brand tokens and section composition stay Vortex-specific in `config.js`.
-5. Gate: ring readable on the dark field (not a glowing primitive); halo fills the hero after intro; scroll reverse peels then reseats; Slow 4G; real phone; axe on default + menu-open states.
-
-## Halo (shipped)
-
-Halo is a **studio**, not a SKU (`docs/examples/commerce/`). The page is a content brief (`kind: 'studio'`) and `planPage()` maps it to `featured-work` / `ascent-steps` / `work-rail` / `faq-rule` / `statement-cta`. Motion: two rings of light lift off a textured stone and seat on reverse.
-
-1. Do **not** copy Vortex HTML or bind `modules` / `feel` / `builds` / `about` / `cta`.
-2. Reuse Harbor / Vortex loader, Lenis, menu, poster/canvas, fallbacks only.
-3. Stone is a Meshy PBR GLB (`models/pillar.glb`, meshopt + WebP, ~1.1 MB). Rings are CAD emissive (genus-1). Untextured product primitives stay banned.
-4. Camera stays put. The rings move. That is not Harbor orbit and not a particle halo.
-5. Gate in a visible tab. Reverse must seat the rings. Poster is a real `<img>`; canvas fades in and the poster drops out once `data-motion="ready"`.
+- `html lang`, a skip link to `#content`, one `<main>`, a labelled `<nav>`
+- Visible focus on every link and button
+- Touch targets at least 24×24 CSS px; the examples use 44×44
+- Copy over the hero keeps 4.5:1 contrast against the brightest frame, not just the poster
+- Under reduced motion: no menu animation, proximity copy at full opacity, the static poster
 
 ## Verification
 
 ```bash
-cd docs && python3 -m http.server 8080
-# open /examples/local/ — hero should reach data-motion="ready"; loaf.glb ~1 MB
-# open /examples/saas/ — CAD band visible at rest, off the headline; halo fills the hero after intro; scroll peels then reseats; reverse opens the halo
-# open /kit/ — page families must not read as Vortex (no 3-up cards, no modules/feel/builds)
-# open /examples/commerce/ — Halo studio: rings lift off the stone; reverse seats; kit families below the hero
-# mobile width ~390px: headline readable, CTAs tappable, product not under type
-# scroll reverse; throttle Slow 4G; confirm poster path with reduced-motion
-# visible tab only — rAF/GSAP stall in background and fake a broken loader
+python3 -m http.server 8080 --directory docs
+# /examples/local/     Harbor reaches data-motion="ready"; the loaf GLB is about 1 MB
+# /examples/saas/      the band is visible at rest and clear of the headline; scroll peels, reverse reseats
+# /examples/commerce/  the rings lift off the stone and seat on reverse; page-kit sections below
+# At 390px wide: headline readable, CTAs tappable, product not under the type.
+# Scroll back up, throttle to Slow 4G, and check the reduced-motion poster.
+npm run test:motion --prefix scripts/hero-clip   # idle draws, GPU leaks, menu lock, fallbacks
 ```

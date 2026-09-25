@@ -174,7 +174,7 @@ def main() -> None:
     print(f"encoded {len(sources)} frames -> {args.out}")
     for width in widths:
         parts = "  ".join(
-            f"{fmt}: {manifest['bytes'][str(width)][fmt] / 1_048_576:6.2f} MB" for fmt in formats
+            f"{fmt}: {manifest['bytes'][str(width)][fmt] / 1_048_576:6.2f} MiB" for fmt in formats
         )
         print(f"  {width:>4}px   {parts}")
     print(f"poster: frame {poster_index}, written to {args.out / 'poster'}/{{width}}.{poster_format}")

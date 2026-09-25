@@ -38,8 +38,8 @@ CUT_ORDER = """
 When this fails, work down this list — ordered by weight removed per unit of
 visible quality lost:
 
-  1. Frame count 120 -> 90            (~25% off, no perceptible change)
-  2. AVIF quality 60 -> 50            (~15-25% off; inspect one frame first)
+  1. Frame count 120 -> 90            (~25% off on the demo; no perceptible change)
+  2. AVIF quality 60 -> 50            (~20% off on the demo; inspect one frame first)
   3. Crop tighter                     (background pixels cost the same as product pixels)
   4. Simplify the source motion       (inter-frame difference is what you are paying for)
   5. Max width 1600 -> 1280           (last resort; visible on large displays)

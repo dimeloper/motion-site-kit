@@ -158,7 +158,7 @@ def main() -> None:
 
     total = sum(f.stat().st_size for f in args.out.glob("*.png"))
     print(f"extracted {written} frames at {args.width}px from {duration:.2f}s -> {args.out}")
-    print(f"intermediate PNG weight: {total / 1_048_576:.1f} MB (not shipped; run optimize_frames.py next)")
+    print(f"intermediate PNG weight: {total / 1_048_576:.1f} MiB (not shipped; run optimize_frames.py next)")
 
 
 if __name__ == "__main__":
