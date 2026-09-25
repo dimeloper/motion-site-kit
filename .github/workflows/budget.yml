@@ -7,7 +7,6 @@ on:
       - 'template'
       - 'motion.config.json'
       - 'docs/**'
-      - 'examples/**'
       - 'tests/**'
       - 'scripts/**'
       - 'requirements.txt'
@@ -18,7 +17,6 @@ on:
       - 'template'
       - 'motion.config.json'
       - 'docs/**'
-      - 'examples/**'
       - 'tests/**'
       - 'scripts/**'
       - 'requirements.txt'
@@ -44,10 +42,8 @@ jobs:
         run: |
           python3 skills/motion-website/scripts/check_budget.py --config motion.config.json --verbose
           python3 skills/motion-website/scripts/check_budget.py --config motion.config.json --frames docs/frames --strict --verbose
-      # Example frame ladders are ignored legacy artifacts. Their live engines
-      # use GLBs, so checking nonexistent frame folders would prove nothing.
-      - name: Check generated copies
-        run: python3 scripts/sync_examples.py --check
+      - name: Check the docs copy of the frame engine
+        run: python3 scripts/sync_engine.py --check
       - name: Check example models and source budgets
         run: python3 scripts/check_example_budget.py
       - uses: actions/setup-node@v4

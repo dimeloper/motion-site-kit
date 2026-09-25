@@ -17,3 +17,7 @@ examples/*/frames/
 docs/examples/*/frames/
 skills/motion-website/assets/template/vendor/
 frames/clips/
+
+# Personal editor and agent config (MCP servers, rules). Kept local.
+.cursor/
+.codex/

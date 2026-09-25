@@ -44,27 +44,27 @@ Native poster rendering is not required to serve the committed fallback.
 - DPR is capped at 1.5 to bound render-target pixels on dense phone screens.
   Width alone never disables motion.
 
-## Evidence, 10 September 2026
+## Size limits and evidence
 
-Pinned vgpu 0.4.1 and Vite 8.2.2. The current production build contains 44,377
-bytes of JavaScript after gzip level 9 across both chunks. Silver, champagne
-and graphite posters are 211,111, 212,279 and 203,531 bytes respectively.
-These are build sizes, not measured HTTP transfer
-or an assurance that every host enables gzip. The separate limits are 56 KiB
-gzip JS and 400 KiB per poster, unchanged from the original prototype.
-Manrope is self-hosted with its OFL license. Finish selection works in the
-static fallback too, using the corresponding rendered poster.
+Pinned vgpu 0.4.1 and Vite 8.2.2. The limits are 56 KiB of gzip-compressed
+JavaScript across both chunks and 400 KiB per poster, unchanged from the
+original prototype. `npm run check` rebuilds the demo, compares it byte for
+byte with the published copy and prints the current sizes against those
+limits, so this guide does not repeat numbers that would go stale. They are
+build sizes, not measured HTTP transfer or a promise that every host enables
+gzip. Manrope is self-hosted with its OFL license. Finish selection works in
+the static fallback too, using the corresponding rendered poster.
 
-Native Metal rendering passed on macOS 26.6.2 arm64. Chromium tested forward,
-reverse and device-loss fallback with WebGPU enabled; unsupported-GPU behavior
-is tested separately. Browser tests explicitly report when WebGPU is unavailable
-and only the fallback could run. Software rendering allowances in the test
-runner make these behavior checks unsuitable as GPU-speed benchmarks.
+Native Metal rendering passed on macOS 26.6.2 arm64, and live rendering with
+finish selection passed in macOS Safari 26.6.2 in September 2026. Chromium
+tests forward, reverse and device-loss fallback with WebGPU enabled;
+unsupported-GPU behaviour is tested separately. Browser tests report when
+WebGPU is unavailable and only the fallback could run. Software rendering in
+the test runner makes these behaviour checks, not GPU-speed benchmarks.
 
-Firefox 151.0.3 passed the no-WebGPU poster smoke check; this does not
-verify live WebGPU in Firefox. Real-phone power use and actual cellular transfer
-remain unverified. Live rendering and finish selection pass in macOS Safari 26.6.2; see
-[release QA](../../RELEASE-QA.md). Frame-time percentiles remain unmeasured. Compare an equivalent rendered sequence before
+Firefox 151.0.3 passed the no-WebGPU poster smoke check, which does not verify
+live WebGPU in Firefox. Real-phone power use, cellular transfer and frame-time
+percentiles remain unmeasured. Compare an equivalent rendered sequence before
 claiming this is faster or lighter than the frame engine. A procedural shader
 does not replace the default engine's ability to display arbitrary footage.
 

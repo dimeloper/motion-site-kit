@@ -7,6 +7,7 @@ example. These are separate ceilings, not increases to the frame budget.
 External CDN modules and actual page transfer still need browser measurement.
 """
 import json
+import re
 from pathlib import Path
 import struct
 import sys
@@ -16,13 +17,38 @@ MODEL_LIMIT = 2 * 1024 * 1024
 JS_LIMIT = 128 * 1024
 
 
+def referenced_text(root):
+    """Everything that can point at an example asset: pages, styles, scripts, the kit."""
+    docs = root / 'docs'
+    files = [p for pattern in ('**/*.js', '**/*.html', '**/*.css') for p in docs.glob(pattern)
+             if 'node_modules' not in p.parts and '/vgpu/' not in str(p)]
+    text = '\n'.join(p.read_text(errors='ignore') for p in files)
+    optimisation = docs / 'image-optimization.json'
+    if optimisation.exists():
+        # Retained masters the delivery WebPs are encoded from.
+        text += '\n'.join(Path(item['source']).name for item in json.loads(optimisation.read_text()))
+    return text
+
+
 def check(root=ROOT):
     failures = []
+    everything = referenced_text(root)
     for name in ('local', 'saas', 'commerce'):
         folder = root / 'docs/examples' / name
         models = list((folder / 'models').glob('*.glb'))
-        if not models:
-            failures.append(f'{name}: no model assets found')
+        scripts = list((folder / 'src').glob('*.js')) + list(folder.glob('*.js'))
+        # A GLB nothing loads is dead weight in every clone. Vortex builds its
+        # band in code and ships no model at all, which is fine.
+        source = '\n'.join(path.read_text() for path in scripts)
+        for path in models:
+            if path.name not in source:
+                failures.append(f'{name}/{path.name}: not referenced by the example; delete it')
+        for image in sorted((folder / 'images').glob('*')):
+            if image.is_file() and image.name not in everything:
+                failures.append(f'{name}/images/{image.name}: not referenced by any page, style or script; delete it')
+        for referenced in sorted(set(re.findall(r'models/([\w.-]+\.glb)', source))):
+            if not (folder / 'models' / referenced).is_file():
+                failures.append(f'{name}: references models/{referenced}, which does not exist')
         for path in models:
             data = path.read_bytes()
             if len(data) > MODEL_LIMIT:
@@ -37,7 +63,6 @@ def check(root=ROOT):
             except (ValueError, struct.error, UnicodeDecodeError) as error:
                 failures.append(f'{name}/{path.name}: {error}')
             print(f'{name}/{path.name}: {len(data):,} / {MODEL_LIMIT:,} bytes')
-        scripts = list((folder / 'src').glob('*.js')) + list(folder.glob('*.js'))
         scripts += list((root / 'docs/examples/shared').glob('*.js'))
         size = sum(path.stat().st_size for path in scripts)
         if not scripts or size > JS_LIMIT:

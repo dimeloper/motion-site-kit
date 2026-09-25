@@ -32,5 +32,14 @@
     "quality": 82,
     "date": "2026-09-10",
     "renderer": "Chromium, live WebGL, 1440x1000 at DPR 1"
+  },
+  {
+    "name": "social",
+    "source": "Composite of the Harbor, Vortex and Halo previews above and Fold's silver poster, built by scripts/build_social_preview.py",
+    "outputSha256": "a9e6b6447e06f54f8244713d316c5091041a77b2c71ed913a27c95096877b1ce",
+    "output": "docs/assets/social-preview.jpg",
+    "bytes": 86653,
+    "width": 1280,
+    "height": 640
   }
 ]

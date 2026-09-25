@@ -1,119 +1,87 @@
 # Measurements and their limits
 
-Observed locally on 9 September 2026. These measurements separate transfer,
-bitmap storage and GPU behavior so one metric does not stand in for another.
+Observed locally on 25 September 2026 with Chrome 153. Each section says what
+was measured, how, and what it does not establish. Transfer, bitmap storage and
+GPU behaviour are kept apart so that one number does not stand in for another.
 
 ## Cold initial resources
 
-`scripts/hero-clip/measure-pages.mjs` opens each page at 390×844, DPR 2, disables
-cache, waits for the hero and network idle, and records CDP encoded network
-bytes. It serves pinned npm modules locally without compression and includes
-successful external font requests. It does not scroll to load every lazy image.
-
-[Recorded observations](page-resource-measurements.json):
-
-- Root frame demo: 1,206,899 bytes.
-- Harbor before image optimization: 6,577,522 bytes; after: 4,185,866 bytes.
-- Vortex: 2,227,701 bytes.
-- Halo: 4,350,822 bytes.
-- Fold v1 live prototype: 448,534 bytes (historical).
-- Fold v1 baked-frame template: 1,231,477 bytes (historical).
-- Fold v2 sculptural page: 570,204 bytes, including its local font and
-  initially requested material imagery. The page has more content than v1.
-
-All observed heroes reached ready and these runs recorded no network failures.
-Different pages contain different content, so the totals are not an engine
-speed ranking. In particular, the harness serves the full uncompressed Three.js
-ES module; a production host may bundle and compress it. The Fold build already
-bundles its dependencies. HTTP overhead is included in these observed figures.
-
-Harbor's original JPEGs totaled 3,158,919 bytes. Its new delivery WebPs total
-766,074 bytes, a 75.7% asset reduction. The script keeps the originals and records
-source hashes, dimensions and encoding settings in [image-optimization.json](image-optimization.json).
-The two images were visually inspected after encoding. Initial page bytes fell
-36.4% in this harness, rather than the larger image-only percentage.
-
-```bash
-npm ci --prefix scripts/hero-clip
-node scripts/hero-clip/measure-pages.mjs
-# Optional: a reskin built with the Fold comparison instructions
-MOTION_DOCS_ROOT=out/fold-site MOTION_ROUTES=/ \
-  MOTION_METRICS_OUT=out/fold-page-measurements.json \
-  node scripts/hero-clip/measure-pages.mjs
-```
-
-Outputs default to ignored `out/`. `CHROME_PATH` overrides the local macOS
-Chrome path. These are unthrottled local observations, not real-cellular tests.
-
-## Decoded storage
-
-The frame tests wrap bitmap creation and close to sum live width × height × 4.
-The default hero peaked at 126.6 MiB for the phone-sized 960px rung and 126.3 MiB
-for desktop 1600px, below the 128 MiB ceiling. Retaining all 120 16:9 bitmaps
-would calculate to 237.3 and 659.2 MiB respectively. These figures exclude
-compressed blobs, canvas buffers, decoder internals and browser process overhead.
-
-[Embedded model texture inspection](model-texture-measurements.json) finds three
-1024×1024 textures each in Harbor's loaf and Halo's pillar: 12 MiB base RGBA,
-approximately 16 MiB with a full mip chain. Environment maps and scene-created
-textures/render targets are excluded. This is an estimate, not queried GPU
-residency. Vortex's similarly sized stored ring textures are unused by its
-current procedural CAD scene and must not be counted as live page resources.
-
-```bash
-# Requires Pillow
-python3 scripts/measure_model_textures.py
-python3 scripts/optimize_example_images.py
-python3 scripts/sync_examples.py --write
-```
-
-KTX2/Basis may reduce texture residency, but a justified adoption still needs
-visual comparison, transcode cost and real-device measurements. No KTX2 or
-Three.js WebGPU migration is claimed here.
-
-## Same-source shader and frames
-
-The [Fold comparison](examples/vgpu/FRAME-COMPARISON.md) contains all six sequence
-byte totals, provenance, generation commands and the config-only frame reskin.
-Its [build check](examples/vgpu/check-build.mjs) verifies the published bundle
-against source and separate ceilings without changing any default frame budget.
-
-## Still required before production claims
-
-Actual cellular conditions, Android hardware and broader Firefox behavior,
-production LCP, frame-time distributions and power use. Chromium's software-GPU
-allowances make the automated checks portable enough to verify failure/recovery;
-they do not establish hardware throughput or battery efficiency. Subsequent
-Safari, physical-device and CI evidence is tracked in [release QA](RELEASE-QA.md).
-Firefox 151.0.3 passed three local smoke checks: frame forward/reverse, Fold
-with WebGPU disabled, and the frame reduced-motion fallback. This is limited
-behavior coverage, not cross-browser visual or performance parity.
-
-## Docs and example design pass
-
-A later cold-harness observation after the docs/catalog redesign recorded:
+`scripts/hero-clip/measure-pages.mjs` opens each page at 390×844, DPR 2, with
+the cache disabled. It waits for the hero to reach ready and the network to go
+idle, then sums the encoded bytes Chrome's DevTools protocol reports. Pinned npm
+modules replace the CDN imports and are served uncompressed. External font
+requests are included. The script does not scroll, so lazy images below the
+fold are excluded. [Raw observations](page-resource-measurements.json).
 
 | Page | Observed bytes |
 | --- | ---: |
-| Docs home | 1,234,333 |
-| Harbor | 4,189,061 |
-| Vortex | 2,232,254 |
-| Halo | 4,354,568 |
+| Docs home (frame scrub) | 1,235,548 |
+| Harbor | 4,196,181 |
+| Vortex | 2,239,785 |
+| Halo | 3,919,456 |
+| Fold | 600,932 |
 
-All four reached ready with no failed requests in this run. These numbers use
-the same uncompressed local-vendor method described above, not production
-compression or actual cellular transfer. They supersede the earlier page totals
-for this design revision; the earlier rows remain historical observations.
-The three new gallery preview WebPs total 102,340 bytes and load lazily. Their
-source screenshots, dimensions and encoder settings are recorded in
-[preview provenance](assets/preview-provenance.json). The docs font is now local.
+Every page reached ready with no failed requests. The pages carry different
+content, so these totals are not an engine speed ranking. The harness serves
+the full uncompressed Three.js module; a production host that bundles and
+compresses it will transfer less. Fold is already bundled.
 
-## Composition revision, 10 September 2026
+Harbor's delivery images are WebP encodings of the original JPEGs, which cut
+those two assets by 75.7%. [image-optimization.json](image-optimization.json)
+records the source hashes, dimensions and encoder settings.
 
-The page-resource totals above describe the earlier design revisions. Halo's
-new portfolio, the four recipe previews and Fold v3 change the requested
-content; those historical totals must not be quoted as current transfer sizes.
-Fold v3's reproducible build check measures 44,377 bytes of gzip-level-9 JS.
-Its three posters are 211,111, 212,279 and 203,531 bytes (silver, champagne,
-graphite), within the unchanged limits. These are file/build measurements,
-not measured cellular downloads. See [poster provenance](examples/vgpu/poster-provenance.json).
+```bash
+npm ci --prefix scripts/hero-clip
+node scripts/hero-clip/measure-pages.mjs          # writes out/page-measurements.json
+```
+
+`CHROME_PATH` overrides the macOS Chrome location. These are unthrottled local
+observations, not cellular downloads.
+
+## Decoded frame storage
+
+The browser tests wrap `createImageBitmap` and `close` and sum live
+width × height × 4. The docs hero peaked at 126.6 MiB on a phone-sized viewport
+(960px rung) and 126.3 MiB at desktop width (1600px rung), under the 128 MiB
+ceiling. Retaining all 120 frames would take 237.3 MiB and 659.2 MiB
+respectively. The figures exclude compressed blobs, canvas buffers, decoder
+internals and browser process overhead.
+
+## WebGL resources
+
+[Embedded model texture inspection](model-texture-measurements.json) finds three
+1024×1024 textures each in Harbor's loaf and Halo's pillar: 12 MiB of base RGBA,
+about 16 MiB with a full mip chain. This is calculated from the GLB, not queried
+GPU residency, and excludes environment maps and render targets created in code.
+Vortex builds its band procedurally and ships no model.
+
+The browser tests count WebGL texture and framebuffer creation and deletion.
+Across three bfcache restore cycles each example releases everything it
+allocated, apart from four 1×1 placeholder textures that three.js r170 creates
+per renderer and never deletes. Vortex and Halo submit no draw calls while idle;
+Harbor draws every visible frame because its flour motes move on a clock. All
+three stop drawing when the hero is offscreen or the tab is hidden.
+
+```bash
+python3 scripts/measure_model_textures.py        # requires Pillow
+```
+
+KTX2/Basis could reduce texture residency. Adopting it would need a visual
+comparison, transcode cost and real-device numbers first.
+
+## Fold
+
+Fold's [build check](examples/vgpu/check-build.mjs) rebuilds the demo and
+compares it byte for byte with the published copy. It also reports the gzip
+size of the JavaScript bundle and each poster against separate ceilings. The
+[frame comparison](examples/vgpu/FRAME-COMPARISON.md) records the same scene
+rendered as a frame sequence, with generation commands and byte totals.
+
+## Not measured
+
+Real cellular conditions, Android hardware, production LCP, frame-time
+distributions and power use. Chromium's software-GPU flags make the automated
+checks portable enough to verify failure and recovery. They do not establish
+hardware throughput or battery life. The pre-ship checklist in
+[qa.md](../skills/motion-website/references/qa.md) covers the manual checks
+that do.
