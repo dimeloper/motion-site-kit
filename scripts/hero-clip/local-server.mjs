@@ -4,13 +4,21 @@ import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const modules = fileURLToPath(new URL('./node_modules', import.meta.url));
 
-/** Local test server; replaces pinned CDN modules with the matching npm files. */
+/** Local test server; replaces pinned CDN modules with the matching npm files.
+ * holdFrames() parks frame-ladder responses until releaseFrames(), so a test can
+ * act while the hero is still preloading in browsers without request interception.
+ */
 export async function startLocalServer(docs) {
+  let holding = false;
+  const held = [];
   const mime = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.html': 'text/html',
     '.css': 'text/css', '.png': 'image/png', '.json': 'application/json', '.avif': 'image/avif', '.webp': 'image/webp' };
   const server = createServer(async (req, res) => {
     try {
       const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+      if (holding && /^\/frames\/\d+\//.test(pathname)) {
+        await new Promise(resolve => held.push(resolve));
+      }
       const vendor = pathname.startsWith('/vendor/');
       const base = vendor ? modules : docs;
       const path = resolve(base, '.' + (vendor ? pathname.slice(7) : pathname.endsWith('/') ? pathname + 'index.html' : pathname));
@@ -30,5 +38,10 @@ export async function startLocalServer(docs) {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const url = `http://127.0.0.1:${server.address().port}`;
-  return { server, url };
+  return {
+    server,
+    url,
+    holdFrames() { holding = true; },
+    releaseFrames() { holding = false; held.splice(0).forEach(resolve => resolve()); },
+  };
 }

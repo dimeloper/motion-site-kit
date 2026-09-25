@@ -167,6 +167,11 @@ function bindScrollTrigger({ hero, canvas, renderer, frameCount, lenis }) {
     ScrollTrigger.refresh();
     const shift = after.getBoundingClientRect().top - anchorTop;
     if (Math.abs(shift) >= 1) {
+      // Lenis clamps targets to a page height it caches and only re-measures
+      // from a ResizeObserver, which Safari delivers after this runs. Without
+      // re-measuring, the spacer's new height is out of reach and the page
+      // still jumps by the difference.
+      lenis.resize();
       lenis.scrollTo(window.scrollY + shift, { immediate: true, force: true });
       ScrollTrigger.update();
     }

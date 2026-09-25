@@ -7,6 +7,7 @@ import { startLocalServer } from './local-server.mjs';
 import { resolve } from 'node:path';
 import { mkdir, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import { FAMILIES } from '../../docs/kit/compose.js';
 const endpoint = process.env.SAFARI_WEBDRIVER_URL ?? 'http://127.0.0.1:4444';
 const device = process.env.SAFARI_DEVICE_UDID;
 if (device && !process.env.SAFARI_BASE_URL) throw new Error('Physical-device tests require a reachable SAFARI_BASE_URL');
@@ -83,12 +84,29 @@ try {
     console.log(`PASS Safari ${name}: ${JSON.stringify(observations.at(-1))}`);
   }
   await command(`/session/${session}/url`, { url: url + '/kit/index.html' });
-  await until(`return document.querySelectorAll('.catalog-families button').length===34;`);
+  await until(`return document.querySelectorAll('.catalog-families button').length===${FAMILIES.length};`);
   await run(`const s=document.querySelector('#family-search');s.value='material';s.dispatchEvent(new Event('input'));document.querySelector('.catalog-families button:not([hidden])').click();`);
   assert.equal(await run(`return document.querySelector('.catalog-preview [data-family]').dataset.family;`), 'material-board');
   await screenshot('catalog');
   observations.push({ name: 'catalog', searchAndSelection: 'passed' });
   console.log('PASS Safari catalog search and selection');
+  if (local) {
+    // Safari has no scroll anchoring, so this is where a late pin would move
+    // the page under a visitor who scrolled past the hero while it loaded.
+    local.holdFrames();
+    await command(`/session/${session}/url`, { url: `${url}/?pin=${Date.now()}` });
+    await until(`return document.querySelector('[data-hero]').dataset.motion === 'preloading';`);
+    await run(`window.scrollTo({ top: 2400, behavior: 'instant' });`);
+    await until(`return Math.abs(scrollY - 2400) < 2;`);
+    const before = await run(`const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2); el.dataset.probe = '1'; return el.getBoundingClientRect().top;`);
+    local.releaseFrames();
+    await until(`return document.querySelector('[data-hero]').dataset.motion === 'ready';`);
+    await new Promise(resolve => setTimeout(resolve, 700));
+    const moved = await run(`return document.querySelector('[data-probe]').getBoundingClientRect().top;`) - before;
+    assert.ok(Math.abs(moved) <= 2, `content moved ${moved}px when the pin engaged`);
+    observations.push({ name: 'late-pin', contentMoved: Math.round(moved) });
+    console.log(`PASS Safari late pin keeps the page still: moved ${Math.round(moved)}px`);
+  }
   await writeFile(resolve(output, 'results.json'), JSON.stringify({ observedAt: new Date().toISOString(), capabilities: created.capabilities,
     scope: device ? 'Physical iPhone Safari via USB WebDriver. Network type not established; no cellular or performance claim.' : 'Real macOS Safari. No physical-phone, cellular or performance claim.', baseUrl: url, observations }, null, 2) + '\n');
 } finally {

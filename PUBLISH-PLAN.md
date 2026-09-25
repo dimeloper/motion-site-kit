@@ -4,6 +4,37 @@ Working document for taking motion-site-kit from its current state to a public
 v1.0. Derived from the September 2026 review. Delete this file once the release
 is tagged; it is not a permanent doc.
 
+## Status — 25 September 2026, branch `publish-readiness`
+
+Phases 0 to 6 are done, one commit per phase. Phase 7 is done except for the
+items only you can do, listed at the end of this section. On the last full run:
+
+| Suite | Result |
+|---|---|
+| Python (gate, example gate, end-to-end pipeline) | 25 pass |
+| Node (decode cache, config, rung selection, page kit) | 91 pass |
+| Chrome browser suite | 41 pass |
+| Safari 26.6.2 via safaridriver | 7 pass, including the new late-pin check |
+| Frame gate on `docs/frames`, example gate, engine sync, Fold build check | pass |
+| Skill copied from the commit into an empty project, SKILL.md followed | pipeline, gate and page all work; a 3x phone fetched only the 960 AVIF rung |
+
+Where the work differs from the plan below, and why:
+
+- **Poster (1.2):** setting the poster from JavaScript would hide it from the preload scanner and delay LCP. The pipeline writes `frames/poster/{width}.webp` instead and the HTML uses a fixed `srcset`.
+- **Pin shift (1.3):** a reserved margin would show several blank screens. The engine keeps the content under the viewport in place when the pin engages. Testing in real Safari found the first version still jumped about 900px, because Lenis clamps to a stale page height; it now calls `lenis.resize()` first, and the Safari suite checks it.
+- **Mobile resize (1.5):** GSAP already ignores height-only resizes on touch devices. The template's own handler was undoing that, so the fix is in the handler and the pin length now uses the `svh` hero height.
+- **Frame cap (1.6):** the runtime bound is now a documented 1000-frame sanity check, separate from the budget.
+- **Family count (4.7):** instead of rendering the count from JavaScript, `tests/test_kit.mjs` fails if any page states a count that differs from the renderers.
+- **Kit tests (6.1)** found three real selector bugs, now fixed.
+
+Still open, and yours to do:
+
+1. **Real-phone QA on cellular** (7.2): portrait crop, URL-bar collapse, fling feel, battery. Nothing automated covers these.
+2. **Physical iPhone Safari run:** `SAFARI_DEVICE_UDID=… SAFARI_BASE_URL=… node scripts/hero-clip/test-safari.mjs` with the phone unlocked.
+3. **Asset provenance:** `docs/examples/ASSETS.md` marks the Unsplash photographers, the Halo images and the Meshy and Recraft plan terms as not recorded. Fill them in or replace the files before calling the assets reusable.
+4. **Push, let CI run, merge, then tag `v1.0.0` and delete this file** (7.6). CI has not run on this branch yet; it now installs ffmpeg and Pillow and requires the pipeline test.
+5. **v1.1 candidates:** a portrait 9:16 ladder, and starting the scrub before every frame has downloaded.
+
 Each phase leaves `main` green. Run the full check list at the end of every
 phase, not just at the end:
 

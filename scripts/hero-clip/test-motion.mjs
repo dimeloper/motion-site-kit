@@ -220,7 +220,8 @@ test('pinning after a slow preload keeps the content the visitor scrolled to', a
   });
   await page.goto(url);
   await page.waitForFunction(() => document.querySelector('[data-hero]').dataset.motion === 'preloading');
-  await page.evaluate(() => window.scrollTo(0, 2400));
+  await page.evaluate(() => window.scrollTo({ top: 2400, behavior: 'instant' }));
+  await page.waitForFunction(() => Math.abs(scrollY - 2400) < 2);
   const before = await page.evaluate(() => {
     const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
     el.dataset.anchorProbe = '1';

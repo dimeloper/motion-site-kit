@@ -102,6 +102,10 @@ past the hero in the meantime would see the page jump by the full pin length
 when ScrollTrigger inserts its spacer above them. Chrome and Firefox hide this
 with scroll anchoring; Safari does not anchor. The template measures the
 element after the hero before and after pinning and scrolls by the difference.
+It calls `lenis.resize()` first: Lenis clamps a scroll target to a page height
+it caches, and re-measures only from a ResizeObserver that Safari delivers
+later. Without it the compensating scroll stopped about 900px short in Safari
+26.6.
 A visitor still inside the hero is left where they are and picks up the
 sequence at that point.
 

@@ -65,7 +65,8 @@ Release through `releaseRenderer()` and dispose post-processing passes yourself.
 - **GSAP incl. ScrollTrigger**: free for commercial use since 30 Apr 2025. One carve-out — no building a competing no-code animation builder.
 - **CSS scroll-driven animations** (`animation-timeline`): Chrome/Edge 115+, Safari 26+, **not Firefox** → not Baseline. Used behind `@supports` for the progress bar only. The hero stays on ScrollTrigger.
 - **GSAP `ignoreMobileResize`** defaults to true on touch devices, so GSAP itself ignores height-only resizes there. Our own resize handlers must not undo that.
-- **Lenis 1.3** ignores `overflow: hidden` on the root unless `autoToggle` is set, and cancels wheel events while `stop()`ped. Menus lock scroll with `lenis.stop()`.
+- **Lenis 1.3** ignores `overflow: hidden` on the root unless `autoToggle` is set, and cancels wheel events while `stop()`ped. Menus lock scroll with `lenis.stop()`. `scrollTo()` clamps to a page height Lenis caches until its ResizeObserver fires; call `lenis.resize()` before scrolling into space that was just added.
+- **Safari 26.6** has no scroll anchoring (`overflow-anchor` is unsupported), so layout inserted above the viewport moves the page. Chrome and Firefox anchor. The late-pin test therefore lives in the Safari suite; the Chrome version switches anchoring off to approximate it.
 - **three r170** `EffectComposer.dispose()` does not dispose passes, and `WebGLState` leaves four 1×1 placeholder textures per renderer that `renderer.dispose()` never deletes.
 - **Remotion**: not MIT. Free up to 3 people, Company License at 4+. A solo freelancer is free if the deliverable is rendered output; handing over the Remotion project aggregates both headcounts. Optional path only — ffmpeg extraction is the license-free default.
 - **Pinned versions**: gsap 3.15.0, lenis 1.3.26, three 0.170.0, Pillow ≥11.3 (AVIF), vgpu 0.4.1.
@@ -79,7 +80,7 @@ Release through `releaseRenderer()` and dispose post-processing passes yourself.
 5. Halo below-hero sections painted as raw HTML (`1. 01` on an `<ol>`, Grain at intrinsic 1200px). Kit families must not use `<ol>`/`<ul>` for designed lists, the demo CSS must constrain `[data-kit] img` plus any rail, and every kit URL shares one version.
 6. The phone budget sat on the 640 rung while every real phone fetched 960, which had the 8 MiB desktop ceiling.
 7. The poster `<img>` named `0039.webp`; any other frame count left the LCP image 404ing.
-8. When the pin engaged after a slow preload, Safari jumped the page by the full pin length under a visitor who had scrolled past the hero.
+8. When the pin engaged after a slow preload, Safari jumped the page by the full pin length under a visitor who had scrolled past the hero. The first fix still fell about 900px short in Safari until Lenis re-measured before scrolling.
 9. The frame engine's resize handler called `ScrollTrigger.refresh()` unconditionally and the pin length used `innerHeight`, so a collapsing mobile URL bar jumped the sequence.
 10. The examples' menus set `overflow: hidden`, which Lenis ignores; the hero scrolled behind the open dialog.
 11. Halo never disposed its bloom pass, and no scene freed its PMREM target or rect-area lookup textures, so each bfcache restore leaked GPU memory on the reused context.
