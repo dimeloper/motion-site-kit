@@ -11,7 +11,7 @@ items only you can do, listed at the end of this section. On the last full run:
 
 | Suite | Result |
 |---|---|
-| Python (gate, example gate, end-to-end pipeline) | 25 pass |
+| Python (gate, example gate, end-to-end pipeline) | 26 pass |
 | Node (decode cache, config, rung selection, page kit) | 91 pass |
 | Chrome browser suite | 41 pass |
 | Safari 26.6.2 via safaridriver | 7 pass, including the new late-pin check |
