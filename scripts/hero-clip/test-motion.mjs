@@ -195,6 +195,70 @@ test('pagehide releases pin and pageshow restores exactly one animation', async 
   assert.equal(await page.$$eval('.pin-spacer', els => els.length), 1);
 });
 
+test('the poster loads from its fixed path without JavaScript', async page => {
+  await page.setJavaScriptEnabled(false);
+  await page.goto(url);
+  const poster = await page.$eval('.hero__poster', img => ({ ok: img.complete && img.naturalWidth > 0, src: img.currentSrc }));
+  assert.ok(poster.ok, 'poster image must decode');
+  assert.match(poster.src, /\/frames\/poster\/\d+\.webp$/);
+});
+
+test('pinning after a slow preload keeps the content the visitor scrolled to', async page => {
+  // Chrome's scroll anchoring would hide the jump. Safari does not anchor, so
+  // switch it off to test what Safari visitors see.
+  await page.evaluateOnNewDocument(() => document.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style');
+    style.textContent = '*, html, body { overflow-anchor: none !important; }';
+    document.head.append(style);
+  }));
+  const held = [];
+  let release = false;
+  await page.setRequestInterception(true);
+  page.on('request', req => {
+    if (!release && /\/frames\/\d+\/(avif|webp)\//.test(req.url())) held.push(req);
+    else req.continue();
+  });
+  await page.goto(url);
+  await page.waitForFunction(() => document.querySelector('[data-hero]').dataset.motion === 'preloading');
+  await page.evaluate(() => window.scrollTo(0, 2400));
+  const before = await page.evaluate(() => {
+    const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+    el.dataset.anchorProbe = '1';
+    return el.getBoundingClientRect().top;
+  });
+  release = true;
+  held.splice(0).forEach(req => req.continue());
+  await ready(page);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const after = await page.evaluate(() => {
+    const el = document.querySelector('[data-anchor-probe]');
+    return { top: el.getBoundingClientRect().top, same: document.elementFromPoint(innerWidth / 2, innerHeight / 2) === el };
+  });
+  assert.ok(Math.abs(after.top - before) <= 2, `content moved ${after.top - before}px when the pin engaged`);
+  assert.equal(after.same, true);
+});
+
+test('a resize that leaves the hero size unchanged does not re-measure the pin', async page => {
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await page.goto(url);
+  await ready(page);
+  const refreshes = await page.evaluate(async () => {
+    const { ScrollTrigger } = await import('/vendor/gsap/ScrollTrigger.js');
+    // Let load, font and image refreshes finish first: count only what the resize causes.
+    if (document.readyState !== 'complete') await new Promise(resolve => addEventListener('load', resolve, { once: true }));
+    await document.fonts.ready;
+    let last = performance.now();
+    ScrollTrigger.addEventListener('refresh', () => { last = performance.now(); });
+    while (performance.now() - last < 700) await new Promise(resolve => setTimeout(resolve, 100));
+    let count = 0;
+    ScrollTrigger.addEventListener('refresh', () => count++);
+    window.dispatchEvent(new Event('resize'));
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return count;
+  });
+  assert.equal(refreshes, 0);
+});
+
 test('desktop 1600px sequence stays within the same bitmap budget', async page => {
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await tests[0][1](page);

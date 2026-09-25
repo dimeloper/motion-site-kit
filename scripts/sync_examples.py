@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def sync(write=False):
     pairs = [(ROOT / 'template/src' / name, ROOT / 'docs/src' / name)
-             for name in ('motion.js', 'frame-cache.js', 'validate-config.js')]
+             for name in ('motion.js', 'frame-cache.js', 'validate-config.js', 'ladder.js')]
     for name in ('local', 'saas', 'commerce', 'shared'):
         source = ROOT / 'docs/examples' / name
         for path in source.rglob('*'):

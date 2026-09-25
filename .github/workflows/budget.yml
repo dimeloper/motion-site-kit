@@ -3,24 +3,26 @@ name: motion checks
 on:
   push:
     paths:
-      - 'template/**'
+      - 'skills/**'
+      - 'template'
+      - 'motion.config.json'
       - 'docs/**'
       - 'examples/**'
-      - 'motion.config.json'
       - 'tests/**'
       - 'scripts/**'
+      - 'requirements.txt'
       - '.github/workflows/budget.yml'
-      - 'skills/motion-website/scripts/**'
   pull_request:
     paths:
-      - 'template/**'
+      - 'skills/**'
+      - 'template'
+      - 'motion.config.json'
       - 'docs/**'
       - 'examples/**'
-      - 'motion.config.json'
       - 'tests/**'
       - 'scripts/**'
+      - 'requirements.txt'
       - '.github/workflows/budget.yml'
-      - 'skills/motion-website/scripts/**'
 
 jobs:
   budget:
@@ -30,7 +32,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Budget regression tests
+      - name: Install pipeline dependencies
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python3 -m pip install -q -r requirements.txt
+      - name: Budget and pipeline regression tests
+        env:
+          REQUIRE_PIPELINE: '1'
         run: python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Check frame budgets
         run: |
@@ -51,7 +59,7 @@ jobs:
       - run: npm ci --prefix docs/examples/vgpu
       - name: Verify vgpu published build and bundle budgets
         run: npm run check --prefix docs/examples/vgpu
-      - name: Frame cache regression tests
+      - name: Frame cache, ladder and config unit tests
         run: node --test tests/*.mjs
       - name: Browser regression tests
         env:

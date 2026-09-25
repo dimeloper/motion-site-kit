@@ -11,12 +11,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 PAD = 4
+# Names this script writes. Anything else in --out is not ours to delete.
+OWNED = re.compile(rf"^(tmp_|stage_)?\d{{{PAD}}}\.png$")
 
 
 def die(msg: str) -> None:
@@ -54,10 +57,21 @@ def probe_duration(src: Path) -> float:
     die("could not determine clip duration from ffprobe output")
 
 
-def extract(src: Path, out_dir: Path, count: int, width: int, duration: float) -> list[Path]:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    for stale in out_dir.glob(f"*.png"):
+def clear_previous(out_dir: Path, force: bool) -> None:
+    """Delete frames from an earlier run, refusing to touch PNGs we did not write."""
+    foreign = sorted(p.name for p in out_dir.glob("*.png") if not OWNED.match(p.name))
+    if foreign and not force:
+        die(
+            f"{out_dir} contains PNGs this script did not create (first: {foreign[0]}). "
+            "Choose an empty --out directory, or pass --force to delete every PNG in it."
+        )
+    for stale in out_dir.glob("*.png"):
         stale.unlink()
+
+
+def extract(src: Path, out_dir: Path, count: int, width: int, duration: float, force: bool) -> list[Path]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    clear_previous(out_dir, force)
 
     # Ask for slightly more than needed; reconciliation below trims to exact count.
     rate = f"{count + 2}/{duration:.6f}"
@@ -120,22 +134,26 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True, help="output directory for PNG frames")
     parser.add_argument("--count", type=int, default=120, help="exact number of frames to produce (default: 120)")
     parser.add_argument("--width", type=int, default=1600, help="output width in pixels, height auto (default: 1600)")
+    parser.add_argument("--force", action="store_true",
+                        help="delete every PNG in --out, including files this script did not write")
     args = parser.parse_args()
 
     if not args.input.exists():
         die(f"input not found: {args.input}")
     if args.count < 2:
         die("--count must be at least 2")
-    if not 60 <= args.count <= 300:
+    # Matches frameCountMin and frameCountMax in motion.config.json, so the
+    # warning appears before the budget gate would fail on the same count.
+    if not 60 <= args.count <= 150:
         print(
-            f"warning: --count {args.count} is outside the recommended 90-150 range. "
-            "Above ~150 adds weight without perceptible smoothness at scroll speed.",
+            f"warning: --count {args.count} is outside the 60-150 range the budget gate accepts. "
+            "Below 60 looks steppy; above 150 adds weight without perceptible smoothness at scroll speed.",
             file=sys.stderr,
         )
 
     require_ffmpeg()
     duration = probe_duration(args.input)
-    raw = extract(args.input, args.out, args.count, args.width, duration)
+    raw = extract(args.input, args.out, args.count, args.width, duration, args.force)
     written = reconcile(raw, args.out, args.count)
 
     total = sum(f.stat().st_size for f in args.out.glob("*.png"))

@@ -66,24 +66,26 @@ function bindText() {
   }
 }
 
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  node.className = className;
+  if (text != null) node.textContent = text;
+  return node;
+}
+
+/** Built from nodes, not an HTML string, so copy containing `<` or `&` stays text. */
 function renderSections() {
   const host = document.querySelector('[data-sections]');
   if (!host) return;
-  host.innerHTML = CONFIG.sections
-    .map((section) => {
-      const kicker = section.kicker
-        ? `<p class="panel__kicker">${section.kicker}</p>`
-        : '';
-      return `
-      <section class="panel" id="${section.id}">
-        <div class="panel__card">
-          ${kicker}
-          <h2 class="panel__title">${section.title}</h2>
-          <p class="panel__body">${section.body}</p>
-        </div>
-      </section>`;
-    })
-    .join('');
+  host.replaceChildren(...CONFIG.sections.map((section) => {
+    const panel = element('section', 'panel');
+    panel.id = section.id;
+    const card = element('div', 'panel__card');
+    if (section.kicker) card.append(element('p', 'panel__kicker', section.kicker));
+    card.append(element('h2', 'panel__title', section.title), element('p', 'panel__body', section.body));
+    panel.append(card);
+    return panel;
+  }));
 }
 
 loadFonts();

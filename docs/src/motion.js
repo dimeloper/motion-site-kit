@@ -12,6 +12,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '../config.js';
 import { createFrameCache } from './frame-cache.js';
 import { validateMotionConfig } from './validate-config.js';
+import { frameUrl, pickWidth, validateManifest } from './ladder.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,17 +49,6 @@ function shouldUseStaticFallback() {
   return null;
 }
 
-function pickWidth(manifest) {
-  const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
-  const target = window.innerWidth * dpr;
-  return manifest.widths.find((w) => w >= target) ?? manifest.widths.at(-1);
-}
-
-function frameUrl(manifest, base, width, format, index) {
-  const padded = String(index).padStart(manifest.padding, '0');
-  return `${base}/${width}/${format}/${padded}.${format}`;
-}
-
 /** Fetch compressed frames with a concurrency window; decoding has its own memory budget. */
 async function preload(urls, concurrency, onProgress, controller) {
   const blobs = new Array(urls.length);
@@ -93,12 +83,18 @@ function makeRenderer(canvas, frames) {
   if (!ctx) throw new Error('2D canvas unavailable');
   let current = -1;
 
+  /** Returns false when the backing store already matches, so callers can skip work. */
   function resize() {
     const dpr = clamp(window.devicePixelRatio || 1, 1, CONFIG.motion.maxDpr);
     const rect = canvas.getBoundingClientRect();
-    canvas.width = Math.round(rect.width * dpr);
-    canvas.height = Math.round(rect.height * dpr);
+    const width = Math.round(rect.width * dpr);
+    const height = Math.round(rect.height * dpr);
+    // Assigning canvas.width clears the canvas even when the value is unchanged.
+    if (width === canvas.width && height === canvas.height) return false;
+    canvas.width = width;
+    canvas.height = height;
     if (current >= 0) draw(current, true);
+    return true;
   }
 
   function draw(index, force = false) {
@@ -130,13 +126,23 @@ function initSmoothScroll() {
   // Default lag smoothing jumps the timeline after a stall, which on a scrubbed
   // sequence shows as a frame skip right after the preloader finishes.
   gsap.ticker.lagSmoothing(0);
-  return () => {
-    gsap.ticker.remove(tick);
-    lenis.destroy();
+  return {
+    lenis,
+    stop() {
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+    },
   };
 }
 
-function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
+function bindScrollTrigger({ hero, canvas, renderer, frameCount, lenis }) {
+  // A visitor who scrolled past the hero while frames downloaded would see the
+  // page jump when the pin spacer is inserted above them. Measure the content
+  // after the hero before and after pinning, and scroll by the difference.
+  const after = hero.nextElementSibling;
+  const scrolledPast = hero.getBoundingClientRect().bottom <= 0;
+  const anchorTop = after?.getBoundingClientRect().top;
+
   const playhead = { frame: 0 };
   const tween = gsap.to(playhead, {
     frame: frameCount - 1,
@@ -145,7 +151,10 @@ function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
     scrollTrigger: {
       trigger: hero,
       start: 'top top',
-      end: () => `+=${window.innerHeight * CONFIG.motion.scrollLengthVh}`,
+      // The hero's own height, not innerHeight. The hero is sized in svh, which
+      // does not change when a mobile URL bar collapses; innerHeight does, and
+      // a pin length tied to it jumps the sequence mid-scroll on phones.
+      end: () => `+=${hero.clientHeight * CONFIG.motion.scrollLengthVh}`,
       pin: true,
       anticipatePin: 1,
       scrub: CONFIG.motion.scrub,
@@ -153,9 +162,20 @@ function bindScrollTrigger({ hero, canvas, renderer, frameCount }) {
     },
   });
 
-  const onResize = () => {
-    renderer.resize();
+  if (scrolledPast && after) {
     ScrollTrigger.refresh();
+    const shift = after.getBoundingClientRect().top - anchorTop;
+    if (Math.abs(shift) >= 1) {
+      lenis.scrollTo(window.scrollY + shift, { immediate: true, force: true });
+      ScrollTrigger.update();
+    }
+  }
+
+  // Refresh only when the hero actually changed size. GSAP already ignores
+  // height-only resizes on touch devices; an unconditional refresh here would
+  // undo that and re-measure the pin every time the URL bar moves.
+  const onResize = () => {
+    if (renderer.resize()) ScrollTrigger.refresh();
   };
   window.addEventListener('resize', onResize, { passive: true });
   canvas.classList.add('is-ready');
@@ -231,22 +251,14 @@ export async function initMotion() {
   try {
     const response = await fetch(`${base}/manifest.json`, { signal: controller.signal });
     if (!response.ok) throw new Error('Manifest request failed');
-    manifest = await response.json();
-    if (!Number.isInteger(manifest.count) || manifest.count < 1 || manifest.count > 150 ||
-        !Array.isArray(manifest.widths) || !manifest.widths.length ||
-        !manifest.widths.every((w, i, all) => Number.isInteger(w) && w > 0 && (!i || w > all[i - 1])) ||
-        !Array.isArray(manifest.formats) || !manifest.formats.length ||
-        !manifest.formats.every((f) => ['avif', 'webp'].includes(f)) ||
-        !Number.isInteger(manifest.padding) || manifest.padding < 1 || manifest.padding > 12) {
-      throw new Error('Invalid frame manifest');
-    }
+    manifest = validateManifest(await response.json());
   } catch {
     cleanup();
     if (run === generation) showStaticFallback(root, 'manifest-unavailable');
     return;
   }
 
-  const width = pickWidth(manifest);
+  const width = pickWidth(manifest.widths, window.innerWidth, window.devicePixelRatio, CONFIG.motion.maxDpr);
   const format =
     manifest.formats.includes('avif') && (await supportsAvif()) ? 'avif' : manifest.formats.at(-1);
 
@@ -296,8 +308,9 @@ export async function initMotion() {
     renderer.draw = (index, force) => { requested = index; draw(index, force); };
     renderer.resize();
     renderer.draw(0, true);
-    stopSmooth = initSmoothScroll();
-    stopScroll = bindScrollTrigger({ hero: root, canvas, renderer, frameCount: manifest.count });
+    const smooth = initSmoothScroll();
+    stopSmooth = smooth.stop;
+    stopScroll = bindScrollTrigger({ hero: root, canvas, renderer, frameCount: manifest.count, lenis: smooth.lenis });
     window.clearTimeout(timeout);
     root.dataset.motion = 'ready';
     loader?.remove();
