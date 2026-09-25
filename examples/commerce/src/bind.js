@@ -2,7 +2,7 @@
  * Halo chrome binders. Sections come from the page kit.
  */
 
-import { CONFIG } from '../config.js?v=11';
+import { CONFIG } from '../config.js?v=12';
 import { compose, planPage } from '../../../kit/compose.js?v=11';
 
 const SYSTEM_FONTS = new Set([

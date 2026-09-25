@@ -165,5 +165,17 @@ export const CONFIG = {
     scrub: 0.6,
     maxDpr: 2,
     lenisDuration: 1.1,
+    // Matches the 1023px layout switch in styles.css.
+    mobileBreakpoint: 1023,
+    // Below this canvas aspect ratio the band moves to centre-frame, because a
+    // portrait canvas has no room beside the copy. Aspect, not width: a narrow
+    // desktop window is portrait too.
+    portraitAspect: 0.92,
+    proximity: {
+      desktop: { start: 0.22, step: 0.18, span: 0.16 },
+      mobile: { start: 0.1, step: 0.14, span: 0.14 },
+    },
+    // Halo particles sampled from the band surface. Phones draw fewer.
+    particles: { desktop: 5600, mobile: 2600 },
   },
 };

@@ -1,4 +1,4 @@
-import { disposeTree } from '../../shared/lifecycle.js';
+import { createFrameDriver, disposeTree, releaseRenderer } from '../../shared/lifecycle.js';
 /**
  * Vortex — CAD titanium band. Particles peel off the mesh and reseat.
  * Distinct from Harbor's loaf orbit: the band stays put, the halo moves.
@@ -282,14 +282,17 @@ export async function createVortexScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.012);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  const envScene = studioEnvironment();
+  const envTarget = pmrem.fromScene(envScene, 0.04);
+  scene.environment = envTarget.texture;
+  const lookupTextures = ['LTC_FLOAT_1', 'LTC_FLOAT_2', 'LTC_HALF_1', 'LTC_HALF_2'].map(key => THREE.UniformsLib[key]);
   let released = false;
   const release = () => {
     if (released) return;
     released = true;
-    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+    releaseRenderer({ renderer, scene, pmrem, envScene, envTarget, lookupTextures });
   };
   opts.signal?.addEventListener('abort', release, { once: true });
-  scene.environment = pmrem.fromScene(studioEnvironment(), 0.04).texture;
   scene.environmentIntensity = 1.35;
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 40);
@@ -335,7 +338,9 @@ export async function createVortexScene(canvas, opts = {}) {
 
   onProgress(0.78);
 
-  const count = window.innerWidth < 720 ? 2600 : 5600;
+  const particles = opts.motion?.particles ?? { desktop: 5600, mobile: 2600 };
+  const count = opts.mobile?.matches ? particles.mobile : particles.desktop;
+  const portraitAspect = opts.motion?.portraitAspect ?? 0.92;
   const field = createHaloField(mesh, count);
   field.points.renderOrder = 2;
   mesh.add(field.points);
@@ -343,30 +348,31 @@ export async function createVortexScene(canvas, opts = {}) {
   const home = { x: 0.56, y: 0.08, z: 0 };
   const look = new THREE.Vector3();
   let scrollProgress = 0;
-  let rafId = 0;
   const intro = { arrive: 0, fill: 0 };
   let introTween = null;
-  let fillTween = null;
 
   function layoutLock() {
-    const mobile = camera.aspect < 0.92;
+    const mobile = camera.aspect < portraitAspect;
     home.x = mobile ? 0.04 : 1.05;
     home.y = mobile ? -0.14 : 0;
     lock.position.set(home.x, home.y, home.z);
   }
 
+  /** Returns true when the drawing buffer changed size. */
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
     const rect = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(rect.width * dpr));
     const h = Math.max(1, Math.round(rect.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
+    const changed = canvas.width !== w || canvas.height !== h;
+    if (changed) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
     field.material.uniforms.uPixelRatio.value = dpr;
     layoutLock();
+    return changed;
   }
 
   function drawFrame() {
@@ -396,59 +402,45 @@ export async function createVortexScene(canvas, opts = {}) {
     renderer.render(scene, camera);
   }
 
+  // Nothing in the band animates on its own clock, so Vortex draws only when
+  // scroll, resize, visibility or the intro tween changes something.
+  const driver = createFrameDriver(drawFrame);
+
   function render(progress) {
     scrollProgress = progress;
-    if (active) drawFrame();
+    driver.draw();
   }
 
   function playIntro() {
     introTween?.kill();
-    fillTween?.kill();
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || scrollProgress > 0.04) {
       intro.arrive = 1;
       intro.fill = 1;
       canvas.style.opacity = '1';
-      drawFrame();
+      driver.draw();
       return;
     }
     intro.arrive = 0;
     intro.fill = 0;
     canvas.style.opacity = '0';
     gsap.to(canvas, { opacity: 1, duration: 0.5, ease: 'power2.out', overwrite: true });
-    introTween = gsap.timeline();
+    introTween = gsap.timeline({ onUpdate: driver.draw });
     introTween.to(intro, { arrive: 1, duration: 0.85, ease: 'power2.out' }, 0);
     introTween.to(intro, { fill: 1, duration: 1.5, ease: 'power2.inOut' }, 0.5);
-    fillTween = null;
   }
 
-  let active = true;
   let disposed = false;
-  function loop() {
-    if (!active || disposed) return;
-    rafId = requestAnimationFrame(loop);
-    drawFrame();
-  }
-  function setActive(value) {
-    if (disposed || value === active) return;
-    active = value;
-    if (active) loop();
-    else cancelAnimationFrame(rafId);
-  }
-  loop();
-
   function dispose() {
     if (disposed) return;
     disposed = true;
-    active = false;
+    driver.dispose();
     opts.signal?.removeEventListener('abort', release);
     release();
     gsap.killTweensOf(canvas);
     introTween?.kill();
-    fillTween?.kill();
-    cancelAnimationFrame(rafId);
   }
 
   onProgress(1);
-  return { resize, render, playIntro, setActive, dispose };
+  return { resize, render, playIntro, setActive: driver.setActive, dispose };
 }

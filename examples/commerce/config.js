@@ -64,5 +64,7 @@ export const CONFIG = {
     scrub: 0.6,
     maxDpr: 2,
     lenisDuration: 1.1,
+    // Matches the 767px layout switch in styles.css.
+    mobileBreakpoint: 767,
   },
 };

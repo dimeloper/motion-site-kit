@@ -19,10 +19,9 @@ export function createLifecycle(root, canvas, fallback, timeoutMs = 30000) {
     if (active) cleanups.push(cleanup);
     else cleanup();
   }
-  canvas.addEventListener('webglcontextlost', event => {
-    event.preventDefault();
-    stop('context-lost');
-  }, { signal: controller.signal });
+  // No preventDefault: that asks the browser to restore the context, and the
+  // examples never rebuild a scene in place. They fall back to the poster.
+  canvas.addEventListener('webglcontextlost', () => stop('context-lost'), { signal: controller.signal });
   window.addEventListener('pagehide', () => stop('page-hidden'), { signal: controller.signal });
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   motion.addEventListener('change', event => { if (event.matches) stop('reduced-motion'); }, { signal: controller.signal });
@@ -78,6 +77,24 @@ export function disposeTree(scene) {
   images.forEach(image => image.close());
 }
 
+/**
+ * Free everything a scene's renderer allocated, in the order three.js needs.
+ *
+ * renderer.dispose() does not free render targets or textures it uploaded.
+ * The PMREM result is a render target, so disposing only its texture leaves a
+ * framebuffer behind; the rect-area light lookup textures are shared globals
+ * that every new renderer uploads again. On a bfcache restore the next scene
+ * reuses the same canvas and context, so anything missed here accumulates.
+ */
+export function releaseRenderer({ renderer, scene, pmrem, envScene, envTarget, lookupTextures = [] }) {
+  disposeTree(scene);
+  if (envScene) disposeTree(envScene);
+  envTarget?.dispose();
+  pmrem?.dispose();
+  for (const texture of lookupTextures) texture?.dispose();
+  renderer.dispose();
+}
+
 export async function loadGlb(loader, url, signal) {
   const response = await fetch(url, { signal });
   if (!response.ok) throw new Error(`Model request failed: ${response.status}`);
@@ -89,4 +106,54 @@ export async function loadGlb(loader, url, signal) {
     signal.throwIfAborted();
   }
   return gltf;
+}
+
+/**
+ * Decide when a scene submits GPU work.
+ *
+ * On demand (the default), a draw happens only when something changed: scroll
+ * progress, a resize, a tween, or the hero becoming visible again. A scene
+ * whose shader animates on its own clock passes `continuous: true` and draws
+ * every frame while visible. Either way nothing is drawn while the hero is
+ * offscreen or the tab is hidden, which is most of a phone's battery budget.
+ */
+export function createFrameDriver(draw, { continuous = false } = {}) {
+  let active = true;
+  let disposed = false;
+  let rafId = 0;
+  const tick = () => {
+    rafId = 0;
+    if (!active || disposed) return;
+    draw();
+    if (continuous) rafId = requestAnimationFrame(tick);
+  };
+  const schedule = () => {
+    if (!rafId && active && !disposed) rafId = requestAnimationFrame(tick);
+  };
+  schedule();
+  return {
+    /** Draw now. A continuous driver picks the change up on its next frame instead. */
+    draw() {
+      if (!active || disposed) return;
+      if (continuous) schedule();
+      else draw();
+    },
+    /** Draw once on the next animation frame, coalescing repeated calls. */
+    invalidate: schedule,
+    setActive(value) {
+      if (disposed || value === active) return;
+      active = value;
+      if (active) schedule();
+      else {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    },
+    dispose() {
+      disposed = true;
+      active = false;
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    },
+  };
 }

@@ -78,12 +78,6 @@ function renderNav() {
     items,
     (item) => `<li><a href="${item.href}">${item.label}</a></li>`,
   );
-  renderList(
-    '[data-nav-mobile]',
-    items,
-    (item, index) =>
-      `<li><a href="${item.href}"><span class="nav-menu__idx">${String(index + 1).padStart(2, '0')}</span><span class="nav-menu__label">${item.label}</span></a></li>`,
-  );
 }
 
 function renderBoard() {

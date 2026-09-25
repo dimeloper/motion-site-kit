@@ -205,5 +205,16 @@ export const CONFIG = {
     scrub: 0.6,
     lenisDuration: 1.15,
     maxDpr: 2,
+    // Matches the 1023px layout switch in styles.css.
+    mobileBreakpoint: 1023,
+    // When each [data-proximity] line fades in, as fractions of hero progress:
+    // line n starts at start + n * step and takes span to reach full opacity.
+    // Phones reveal earlier so the copy reads while the loaf fills the lower half.
+    proximity: {
+      desktop: { start: 0.28, step: 0.2, span: 0.16 },
+      mobile: { start: 0.12, step: 0.16, span: 0.14 },
+    },
+    // Flour motes around the loaf. Each is one point sprite, so this is cheap.
+    flourCount: 980,
   },
 };

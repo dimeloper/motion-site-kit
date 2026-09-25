@@ -321,6 +321,80 @@ for (const name of ['local', 'saas', 'commerce']) {
   });
 }
 
+const countGpuWork = () => {
+  window.gpuDraws = 0;
+  window.liveTextures = 0;
+  window.liveFramebuffers = 0;
+  const proto = WebGL2RenderingContext.prototype;
+  const wrap = (name, effect) => {
+    const original = proto[name];
+    proto[name] = function (...args) { effect(args); return original.apply(this, args); };
+  };
+  wrap('drawArrays', () => window.gpuDraws++);
+  wrap('drawElements', () => window.gpuDraws++);
+  wrap('createTexture', () => window.liveTextures++);
+  wrap('deleteTexture', ([t]) => { if (t) window.liveTextures--; });
+  wrap('createFramebuffer', () => window.liveFramebuffers++);
+  wrap('deleteFramebuffer', ([f]) => { if (f) window.liveFramebuffers--; });
+};
+
+for (const name of ['saas', 'commerce']) {
+  test(`${name}: an idle hero stops submitting GPU draws`, async page => {
+    await page.evaluateOnNewDocument(countGpuWork);
+    await page.goto(`${url}/examples/${name}/index.html`);
+    await ready(page);
+    // Vortex plays a two-second intro that legitimately needs frames.
+    await new Promise(resolve => setTimeout(resolve, 2600));
+    const idle = await page.evaluate(async () => {
+      const before = window.gpuDraws;
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return window.gpuDraws - before;
+    });
+    assert.equal(idle, 0, `${name} submitted ${idle} draws with nothing changing`);
+    const before = await page.evaluate(() => window.gpuDraws);
+    await page.evaluate(() => window.scrollBy(0, 300));
+    await page.waitForFunction(before => window.gpuDraws > before, {}, before);
+  });
+}
+
+for (const name of ['local', 'saas', 'commerce']) test(`${name}: re-initialising the hero does not leak GPU textures or framebuffers`, async page => {
+  await page.evaluateOnNewDocument(countGpuWork);
+  await page.goto(`${url}/examples/${name}/index.html`);
+  await ready(page);
+  const first = await page.evaluate(() => ({ textures: window.liveTextures, framebuffers: window.liveFramebuffers }));
+  const cycles = 3;
+  for (let cycle = 0; cycle < cycles; cycle++) {
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })));
+    await page.waitForFunction(() => document.querySelector('[data-hero]').dataset.motion === 'static');
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+    await ready(page);
+  }
+  const last = await page.evaluate(() => ({ textures: window.liveTextures, framebuffers: window.liveFramebuffers }));
+  // three r170's WebGLState creates four 1x1 placeholder textures per renderer
+  // and renderer.dispose() never deletes them. Anything beyond those is ours.
+  const placeholders = 4 * cycles;
+  assert.deepEqual(last, { textures: first.textures + placeholders, framebuffers: first.framebuffers },
+    'each cycle must release what it allocated');
+});
+
+for (const demo of ['local', 'saas', 'commerce']) {
+  test(`${demo}: an open menu stops the page scrolling behind it`, async page => {
+    await page.goto(`${url}/examples/${demo}/index.html`);
+    await ready(page);
+    await page.click('[data-menu-open]');
+    await page.waitForFunction(() => document.querySelector('[data-nav-menu]').classList.contains('is-open'));
+    const before = await page.evaluate(() => scrollY);
+    await page.mouse.move(195, 600);
+    await page.mouse.wheel({ deltaY: 800 });
+    await new Promise(resolve => setTimeout(resolve, 700));
+    assert.equal(await page.evaluate(() => scrollY), before, 'page scrolled behind the open menu');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.querySelector('[data-nav-menu]').hidden);
+    await page.mouse.wheel({ deltaY: 800 });
+    await page.waitForFunction(before => scrollY > before + 100, {}, before);
+  });
+}
+
 test('failed Halo model returns to the real poster', async page => {
   await page.setRequestInterception(true);
   page.on('request', req => req.url().endsWith('.glb') ? req.respond({ status: 404 }) : req.continue());
