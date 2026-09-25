@@ -1,5 +1,5 @@
-import { RECIPES } from './recipes.js';
-import { compose, planPage } from './compose.js?v=11';
+import { RECIPES } from './recipes.js?v=12';
+import { compose, planPage } from './compose.js?v=12';
 const key = new URLSearchParams(location.search).get('recipe') || 'studio';
 const recipe = RECIPES[key] || RECIPES.studio;
 document.body.dataset.recipe = RECIPES[key] ? key : 'studio';

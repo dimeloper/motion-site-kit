@@ -1,5 +1,5 @@
-import { compose, FAMILIES } from './compose.js?v=11';
-import { CATALOG } from './catalog.js?v=11';
+import { compose, FAMILIES } from './compose.js?v=12';
+import { CATALOG } from './catalog.js?v=12';
 const list = document.querySelector('.catalog-families');
 const search = document.querySelector('#family-search');
 const preview = document.querySelector('[data-kit]');

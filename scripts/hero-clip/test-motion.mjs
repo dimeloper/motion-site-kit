@@ -640,6 +640,17 @@ test('docs copy controls and catalog search, selection and config work', async p
   assert.deepEqual(await audit(), []);
 });
 
+test('falsy renderer guards never print as text', async page => {
+  await page.goto(`${url}/kit/preview.html?recipe=studio`);
+  const text = await page.evaluate(async () => {
+    const { compose } = await import('/kit/compose.js?v=12');
+    const host = document.createElement('div');
+    compose(host, [{ type: 'spotlight-stage', id: 's', headline: 'Stage', image: { src: 'x.webp', alt: '' }, thumbs: [] }], { warn: false });
+    return host.textContent.trim();
+  });
+  assert.equal(text, 'Stage');
+});
+
 test('recipe browser selects compositions, changes viewport and exports the selected brief', async page => {
   await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
   await page.evaluateOnNewDocument(() => Object.defineProperty(navigator, 'clipboard', {

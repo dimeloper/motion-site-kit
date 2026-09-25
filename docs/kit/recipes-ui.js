@@ -1,4 +1,4 @@
-import { RECIPES } from './recipes.js';
+import { RECIPES } from './recipes.js?v=12';
 const select = document.querySelector('#recipe-select');
 const frame = document.querySelector('#recipe-frame');
 for (const [key, recipe] of Object.entries(RECIPES)) {

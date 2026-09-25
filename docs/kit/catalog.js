@@ -127,6 +127,7 @@ export const CATALOG = {
         { title: 'Loaf', body: 'Scroll sideways. Snap each still.', image: loaf },
         { title: 'Board', body: 'Different ratio on purpose.', image: board },
         { title: 'Band', body: 'A third frame. Keep going.', image: lock },
+        { title: 'Crust', body: 'Four or more stills make a rail; three make a colonnade.', image: loaf },
       ],
     },
     {
@@ -204,6 +205,7 @@ export const CATALOG = {
       type: 'film-strip',
       id: 'strip',
       headline: 'A contact sheet',
+      strip: true,
       items: [
         { image: loaf },
         { image: board },

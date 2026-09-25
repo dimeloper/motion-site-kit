@@ -1,4 +1,4 @@
-@import url('./story-sections.css');
+@import url('./story-sections.css?v=12');
 :root {
   color-scheme: dark;
   --kit-bg: #0e1014;
