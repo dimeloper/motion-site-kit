@@ -12,8 +12,8 @@ __pycache__/
 .netlify/
 
 # Generated per project — regenerate with optimize_frames.py
-template/frames/
+skills/motion-website/assets/template/frames/
 examples/*/frames/
 docs/examples/*/frames/
-template/vendor/
+skills/motion-website/assets/template/vendor/
 frames/clips/

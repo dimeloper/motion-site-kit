@@ -1,0 +1,20 @@
+{
+  "output": "template/frames",
+  "frames": {
+    "count": 120,
+    "widths": [640, 960, 1600]
+  },
+  "formats": ["avif", "webp"],
+  "quality": {
+    "avif": 60,
+    "webp": 78
+  },
+  "budget": {
+    "sequenceBytes": 8388608,
+    "singleFrameBytes": 120000,
+    "narrowRungBytes": 1500000,
+    "narrowRungWidth": 640,
+    "frameCountMin": 60,
+    "frameCountMax": 150
+  }
+}
