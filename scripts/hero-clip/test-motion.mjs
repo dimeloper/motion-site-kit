@@ -344,14 +344,21 @@ for (const name of ['saas', 'commerce']) {
     await page.evaluateOnNewDocument(countGpuWork);
     await page.goto(`${url}/examples/${name}/index.html`);
     await ready(page);
-    // Vortex plays a two-second intro that legitimately needs frames.
-    await new Promise(resolve => setTimeout(resolve, 2600));
-    const idle = await page.evaluate(async () => {
-      const before = window.gpuDraws;
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return window.gpuDraws - before;
+    // Vortex's intro, late ScrollTrigger refreshes after the page's images
+    // load, and a scrub easing out all legitimately draw. On a slow CI runner
+    // they land seconds later than locally, so wait for a full second with no
+    // draws. A scene that draws every frame never gets one and fails here.
+    const quiet = await page.evaluate(async () => {
+      const deadline = performance.now() + 15000;
+      let last = window.gpuDraws, since = performance.now();
+      while (performance.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (window.gpuDraws !== last) { last = window.gpuDraws; since = performance.now(); }
+        else if (performance.now() - since >= 1000) return { settled: true };
+      }
+      return { settled: false, draws: window.gpuDraws };
     });
-    assert.equal(idle, 0, `${name} submitted ${idle} draws with nothing changing`);
+    assert.ok(quiet.settled, `${name} never stopped drawing with nothing changing: ${JSON.stringify(quiet)}`);
     const before = await page.evaluate(() => window.gpuDraws);
     await page.evaluate(() => window.scrollBy(0, 300));
     await page.waitForFunction(before => window.gpuDraws > before, {}, before);
