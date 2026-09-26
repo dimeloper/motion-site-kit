@@ -128,9 +128,11 @@ section[id]{
 .button:hover{
   filter:brightness(.95)
 }
+/* Exactly one small viewport, never more: the hero is pinned while it plays,
+   so anything below the fold stays below it for the whole sequence. Content
+   scales with height instead of forcing a taller hero. */
 .hero{
   height:100svh;
-  min-height:720px;
   max-height:1200px;
   position:relative;
   isolation:isolate;
@@ -205,7 +207,7 @@ section[id]{
 .hero__copy{
   position:relative;
   z-index:2;
-  margin:clamp(70px,10vh,135px) var(--pad) 0;
+  margin:clamp(16px,10svh,135px) var(--pad) 0;
   max-width:780px;
   pointer-events:none
 }
@@ -213,7 +215,7 @@ section[id]{
   pointer-events:auto
 }
 .hero h1{
-  font-size:clamp(80px,9.5vw,152px);
+  font-size:min(clamp(80px,9.5vw,152px),15svh);
   line-height:.93;
   letter-spacing:-.075em
 }
@@ -607,7 +609,6 @@ section[id]{
 }
 @media(max-width:800px){
   .hero{
-    min-height:820px;
     max-height:none
   }
   .site-nav{
@@ -621,7 +622,7 @@ section[id]{
     max-width:100%
   }
   .hero h1{
-    font-size:clamp(70px,12vw,100px)
+    font-size:min(clamp(70px,12vw,100px),11svh)
   }
   .hero__poster,.hero__canvas{
     left:0;
@@ -782,6 +783,21 @@ section[id]{
 .steps article > div { min-width: 0; }
 .rungs { max-width: 100%; }
 .rungs span { min-width: 0; flex-shrink: 1; }
+
+/* Short viewports: a landscape phone, a small laptop window, an iPhone SE.
+   Drop the decorative caption and the subheading before anything collides. */
+@media(max-height:680px){
+  .site-nav{height:68px}
+  .hero__copy{margin-top:clamp(12px,5svh,40px)}
+  .hero__sub{display:none}
+  .hero__actions{margin-top:20px}
+  .hero__caption{display:none}
+  .hero__bottom{min-height:56px}
+}
+@media(max-height:460px){
+  .hero .eyebrow{display:none}
+  .site-nav{height:56px}
+}
 
 /* Safari's bar tint, driven by edge-tint.js. Only iOS WebKit samples fixed
    edge elements for its bars, so nowhere else draws them. Mostly offscreen:

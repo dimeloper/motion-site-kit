@@ -601,6 +601,31 @@ test('vgpu renders, reverses and falls back after device loss when available', a
   assert.ok(await page.$eval('.stage img', img => img.complete && img.naturalWidth > 0));
 });
 
+test('the landing hero and everything in it fit the viewport it is pinned in', async page => {
+  // A pinned hero taller than the viewport hides its own bottom for the whole
+  // sequence. On an iPhone (714px small viewport) the old 820px minimum cut the
+  // caption in half and put the bottom bar entirely off-screen.
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  for (const [width, height] of [[402, 714], [375, 560], [874, 402], [1280, 600], [1440, 900]]) {
+    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.goto(url);
+    const boxes = await page.evaluate(() => Object.fromEntries(['.hero', '.hero__actions', '.hero__caption', '.hero__bottom'].map(selector => {
+      const el = document.querySelector(selector);
+      const r = el.getBoundingClientRect();
+      return [selector, getComputedStyle(el).display === 'none' ? null : { top: r.top, bottom: r.bottom, left: r.left, right: r.right }];
+    })));
+    const size = `${width}x${height}`;
+    assert.ok(boxes['.hero'].bottom <= height + 0.5, `${size}: hero is ${boxes['.hero'].bottom - height}px taller than the viewport`);
+    for (const key of ['.hero__actions', '.hero__caption', '.hero__bottom']) {
+      if (boxes[key]) assert.ok(boxes[key].top >= 0 && boxes[key].bottom <= height + 0.5, `${size}: ${key} is outside the viewport`);
+    }
+    const overlap = (a, b) => a && b && a.top < b.bottom && b.top < a.bottom && a.left < b.right && b.left < a.right;
+    assert.ok(!overlap(boxes['.hero__actions'], boxes['.hero__bottom']), `${size}: actions overlap the bottom bar`);
+    assert.ok(!overlap(boxes['.hero__caption'], boxes['.hero__bottom']), `${size}: caption overlaps the bottom bar`);
+    assert.ok(!overlap(boxes['.hero__caption'], boxes['.hero__actions']), `${size}: caption overlaps the actions`);
+  }
+});
+
 test('Safari bar tint strips follow the dark hero and step aside for light sections', async page => {
   // Only iOS WebKit renders the strips (see edge-tint.js); this checks the
   // logic that decides when each edge is claimed and in what colour.
