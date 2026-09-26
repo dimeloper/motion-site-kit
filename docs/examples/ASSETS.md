@@ -21,8 +21,8 @@ Vortex ships no model. Its band is built in code in `saas/src/scene.js`.
 
 | File | Used by | Source | Terms |
 | --- | --- | --- | --- |
-| `local/images/loaf.jpg` | Master for `loaf.webp` | Unsplash, per the Harbor footer credit | Unsplash License. Photographer and URL: **not recorded** |
-| `local/images/board.jpg` | Master for `board.webp` | Unsplash, per the Harbor footer credit | Unsplash License. Photographer and URL: **not recorded** |
+| `local/images/loaf.jpg` | Master for `loaf.webp` | [Fernando Delgado on Unsplash](https://unsplash.com/photos/brown-bread-on-black-table-AO6j8f8xXHw), downloaded at 2400×3600 | Unsplash License (free photo, not Unsplash+) |
+| `local/images/board.jpg` | Master for `board.webp` | [Vicky Ng on Unsplash](https://unsplash.com/photos/bread-on-brown-wooden-round-tray-JlwXPO7DStM), downloaded at 1800×2400 | Unsplash License (free photo, not Unsplash+) |
 | `local/images/loaf.webp`, `board.webp` | Harbor page, page kit | Encoded from the masters above; settings in [image-optimization.json](../image-optimization.json) | As the masters |
 | `saas/images/lock.jpg` | Vortex poster, page kit | Recraft render of the ring, cut out and composited on a dark field (per `webgl-model.md`) | Recraft plan and output terms: **not recorded** |
 | `saas/images/lock-night.jpg` | Vortex config | **not recorded** | **not recorded** |

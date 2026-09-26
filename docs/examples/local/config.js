@@ -195,7 +195,7 @@ export const CONFIG = {
   footer: {
     place: 'North Shore',
     credit:
-      'Hero loaf: Higgsfield Meshy GLB from a clean studio still. Supporting photos from Unsplash.',
+      'Hero loaf: Higgsfield Meshy GLB from a clean studio still. Supporting photos by Fernando Delgado and Vicky Ng on Unsplash.',
   },
 
   motion: {
