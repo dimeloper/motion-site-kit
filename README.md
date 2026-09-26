@@ -40,6 +40,13 @@ If you already have a product turntable clip, follow the [product-reveal use cas
 
 ## Quick start
 
+This kit turns a few seconds of product video into a page where scrolling plays the video forward and back, frame by frame, at a download size a phone on cellular can take. To build one you need:
+
+- **A source clip.** One continuous camera move with no cuts, because visitors also scroll backwards. A turntable shot of the product is the typical case.
+- **An agent that can run shell commands**, such as Claude Code or Codex, or Python 3.10+ if you run the scripts yourself.
+- **ffmpeg and Pillow 11.3 or newer** to extract and encode the frames. Previewing the included demo needs only Python.
+- **Any static host** to publish the result. There is no build step or server code.
+
 ### Give this to your agent
 
 Paste this into Claude Code, Codex or any agent that can run shell commands. Fill in your product and clip first.
