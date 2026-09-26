@@ -2,6 +2,9 @@
  * Run safaridriver -p 4444 first, with Safari's Allow remote automation enabled.
  * Set SAFARI_DEVICE_UDID and SAFARI_BASE_URL to test a connected physical iPhone.
  * The base URL must be reachable from the phone; HTTPS is required for live WebGPU.
+ * Or set SAFARI_DEVICE_UDID and SAFARI_LAN_HOST (this Mac's address on the phone's
+ * network) to serve the local build to the phone, which also runs the late-pin
+ * check that needs this script to hold frame responses.
  */
 import { startLocalServer } from './local-server.mjs';
 import { resolve } from 'node:path';
@@ -10,8 +13,12 @@ import assert from 'node:assert/strict';
 import { FAMILIES } from '../../docs/kit/compose.js';
 const endpoint = process.env.SAFARI_WEBDRIVER_URL ?? 'http://127.0.0.1:4444';
 const device = process.env.SAFARI_DEVICE_UDID;
-if (device && !process.env.SAFARI_BASE_URL) throw new Error('Physical-device tests require a reachable SAFARI_BASE_URL');
-const local = process.env.SAFARI_BASE_URL ? null : await startLocalServer(resolve('docs'));
+const lanHost = process.env.SAFARI_LAN_HOST;
+if (device && !process.env.SAFARI_BASE_URL && !lanHost) {
+  throw new Error('Physical-device tests need SAFARI_BASE_URL or SAFARI_LAN_HOST; 127.0.0.1 is the Mac, not the phone');
+}
+const local = process.env.SAFARI_BASE_URL ? null
+  : await startLocalServer(resolve('docs'), lanHost ? { host: '0.0.0.0', publicHost: lanHost } : {});
 const url = (process.env.SAFARI_BASE_URL ?? local.url).replace(/\/$/, '');
 const output = resolve(process.env.SAFARI_OUT ?? (device ? 'out/iphone-qa' : 'out/safari-qa'));
 await mkdir(output, { recursive: true });

@@ -96,7 +96,19 @@ SAFARI_BASE_URL="https://dimeloper.github.io/motion-site-kit" \
 node scripts/hero-clip/test-safari.mjs
 ```
 
-The explicit UDID keeps the run off the simulator.
+To test the local build instead, give the Mac's address on the phone's Wi-Fi.
+The script then serves `docs/` on that address itself, which also runs the
+late-pin check (it has to hold frame responses, so it cannot run against a
+URL it does not serve). `xcrun devicectl list devices` shows the UDID.
+
+```bash
+SAFARI_DEVICE_UDID="your-device-udid" \
+SAFARI_LAN_HOST="$(ipconfig getifaddr en0)" \
+node scripts/hero-clip/test-safari.mjs
+```
+
+The explicit UDID keeps the run off the simulator. Plain HTTP on a LAN address
+is not a secure context, so Fold stays on its poster in both LAN runs.
 [Apple's WebDriver guide](https://webkit.org/blog/9395/webdriver-is-coming-to-safari-in-ios-13/)
 covers the device setting.
 

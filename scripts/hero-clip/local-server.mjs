@@ -8,7 +8,7 @@ const modules = fileURLToPath(new URL('./node_modules', import.meta.url));
  * holdFrames() parks frame-ladder responses until releaseFrames(), so a test can
  * act while the hero is still preloading in browsers without request interception.
  */
-export async function startLocalServer(docs) {
+export async function startLocalServer(docs, { host = '127.0.0.1', publicHost = host } = {}) {
   let holding = false;
   const held = [];
   const mime = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.html': 'text/html',
@@ -36,8 +36,8 @@ export async function startLocalServer(docs) {
       res.end(content);
     } catch { res.writeHead(404).end(); }
   });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const url = `http://127.0.0.1:${server.address().port}`;
+  await new Promise(resolve => server.listen(0, host, resolve));
+  const url = `http://${publicHost}:${server.address().port}`;
   return {
     server,
     url,
