@@ -13,7 +13,9 @@ that is most of what this skill is about.
 
 ## What this skill contains
 
-Paths below are relative to this skill's directory.
+Paths in this table are relative to this skill's directory. The commands in the
+build order run from the project root, with `<skill>` standing for this skill's
+directory.
 
 | Path | What it is |
 |---|---|
@@ -27,6 +29,11 @@ Paths below are relative to this skill's directory.
 
 The WebGL examples and the section-layout kit are larger than a skill and live
 in the repository: <https://github.com/dimeloper/motion-site-kit>.
+
+The pipeline needs `ffmpeg` and `ffprobe` on PATH and Pillow 11.3 or newer,
+which adds AVIF. Where the system Python refuses `pip install` (current macOS
+and Debian do), install Pillow into a virtual environment and run the scripts
+with its `python3`.
 
 ## The pipeline
 
@@ -74,7 +81,7 @@ budget to make room for a model.
 ### 2. Get the frames
 
 ```bash
-python3 scripts/extract_frames.py input.mp4 --out frames/raw --count 120 --width 1600
+python3 <skill>/scripts/extract_frames.py input.mp4 --out frames/raw --count 120 --width 1600
 ```
 
 Extraction samples evenly across the clip, so a 3-second and a 6-second clip
@@ -85,7 +92,7 @@ licensed and has a headcount threshold.
 ### 3. Build the responsive ladder
 
 ```bash
-python3 scripts/optimize_frames.py frames/raw --out template/frames --config motion.config.json
+python3 <skill>/scripts/optimize_frames.py frames/raw --out template/frames --config motion.config.json
 ```
 
 This writes `frames/{width}/{format}/{index}.{format}`, one poster per rung at
@@ -95,7 +102,7 @@ guessing file names. Each run clears the previous ladder first.
 ### 4. Gate on the budget
 
 ```bash
-python3 scripts/check_budget.py --config motion.config.json
+python3 <skill>/scripts/check_budget.py --config motion.config.json
 ```
 
 Exit code 1 on a breach, with a per-rung table. Put it in CI so a heavy sequence
@@ -111,7 +118,10 @@ not commit frames.
 
 If the gate fails, in order: drop the frame count to 90, lower AVIF quality from
 60 to 50, crop tighter, simplify the source motion, and only then reduce the
-maximum width to 1280.
+maximum width to 1280. The ladder takes its count from the PNGs in `frames/raw`,
+not from the config, so drop the count by re-running step 2 with `--count 90`
+and then step 3. Set `frames.count` in `motion.config.json` to match so the
+config still describes the site. Quality and widths live in that file too.
 
 ### 5. Wire the site
 

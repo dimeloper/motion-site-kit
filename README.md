@@ -49,11 +49,12 @@ Clone https://github.com/dimeloper/motion-site-kit into a temporary folder and
 copy its skills/motion-website directory into your skills folder
 (~/.claude/skills for Claude Code, ~/.agents/skills for Codex). Then follow
 that skill's SKILL.md to build a scroll-driven hero page for <product> in this
-directory, from my clip at <path/to/clip.mp4>. Change only template/config.js,
-and don't stop until check_budget.py passes.
+directory, from my clip at <path/to/clip.mp4>. Install ffmpeg and Pillow 11.3+
+if they are missing. Leave template/src unchanged; the copy and styling go in
+template/config.js. Don't stop until check_budget.py passes.
 ```
 
-The machine needs ffmpeg and Pillow 11.3 or newer. The skill runs extraction, encoding and the budget gate, then builds the page. Its QA checklist lists the checks left for a real phone.
+The skill runs extraction, encoding and the budget gate, then builds the page in `template/`, which is the directory to serve. Its QA checklist lists the checks left for a real phone.
 
 ### Run it yourself
 
