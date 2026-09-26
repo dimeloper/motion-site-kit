@@ -16,9 +16,9 @@ Harbor, Vortex and Halo share their runtime in `shared/`:
 | `smooth-scroll.js` | The one Lenis instance, the scroll lock, in-page anchors |
 | `page-chrome.js` | Loader numerals, reveals and the mobile menu dialog |
 
-Each example keeps only its brand in `config.js`, `src/scene.js`, `src/page.js`
-and `src/bind.js`. To start a new one, copy an example folder next to `shared/`
-and change those four files.
+Each example keeps only its brand in `config.js` and `src/bind.js`, `motion.js`,
+`page.js`, `scene.js` and `styles.css`. To start a new one, copy an example
+folder next to `shared/` and change those files.
 
 ```bash
 python3 -m http.server 8080 --directory docs

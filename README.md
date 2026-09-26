@@ -40,6 +40,24 @@ If you already have a product turntable clip, follow the [product-reveal use cas
 
 ## Quick start
 
+### Give this to your agent
+
+Paste this into Claude Code, Codex or any agent that can run shell commands. Fill in your product and clip first.
+
+```text
+Clone https://github.com/dimeloper/motion-site-kit into a temporary folder and
+copy its skills/motion-website directory into your skills folder
+(~/.claude/skills for Claude Code, ~/.agents/skills for Codex). Then follow
+that skill's SKILL.md to build a scroll-driven hero page for <product> in this
+directory, from my clip at <path/to/clip.mp4>. Install ffmpeg and Pillow 11.3+
+if they are missing. Leave template/src unchanged; the copy and styling go in
+template/config.js. Don't stop until check_budget.py passes.
+```
+
+The skill runs extraction, encoding and the budget gate, then builds the page in `template/`, which is the directory to serve. Its QA checklist lists the checks left for a real phone.
+
+### Run it yourself
+
 A clone already contains a committed frame ladder under `docs/`, which is what GitHub Pages serves. You do not need ffmpeg, Pillow or a source clip to see the site move.
 
 ```bash
@@ -59,9 +77,9 @@ To reskin the standalone template with that same ladder:
 cd template && python3 -m http.server 8080
 ```
 
-Then edit `template/config.js`: copy, colours, fonts, section order. Nothing else needs to change.
+Then edit `template/config.js`: copy, colours, fonts, section order. Set the `<title>` and meta description in `template/index.html` to match, for crawlers and visitors without JavaScript. Nothing else needs to change.
 
-### Bring your own clip
+#### Bring your own clip
 
 ```bash
 pip install -r requirements.txt     # Pillow >= 11.3, for AVIF and WebP
@@ -78,7 +96,7 @@ python3 skills/motion-website/scripts/check_budget.py --config motion.config.jso
 
 `optimize_frames.py` also writes one poster per rung to `template/frames/poster/`, which the page's `<img>` loads by fixed name, so a different frame count never breaks the hero image.
 
-### No CDN
+#### No CDN
 
 The template resolves GSAP and Lenis through an import map pointed at a CDN, so it runs from any static host with no toolchain. To drop the third-party runtime dependency:
 

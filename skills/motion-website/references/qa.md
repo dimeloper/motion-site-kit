@@ -66,7 +66,7 @@ opacity 1. Background tabs throttle `requestAnimationFrame` and GSAP.
 
 ## Budget
 
-- [ ] `python3 scripts/check_budget.py --config motion.config.json` passes.
+- [ ] `python3 <skill>/scripts/check_budget.py --config motion.config.json` passes.
 - [ ] Lighthouse on mobile: performance ≥ 90, LCP < 2.5 s.
 
 ## Automated checks

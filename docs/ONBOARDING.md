@@ -50,7 +50,7 @@ Image paths in copied recipes are relative to `docs/kit/`. When moving a recipe 
 
 ### A live WebGL example
 
-Edit `docs/examples/local`, `saas` or `commerce`. Each example keeps its brand logic in `config.js`, `src/scene.js`, `src/page.js` and `src/bind.js`. The runtime they share (fallbacks, loader, pin, Lenis, menu and GPU cleanup) is in `docs/examples/shared/`, so a fix there reaches all three. Halo uses the page kit for its lower sections.
+Edit `docs/examples/local`, `saas` or `commerce`. Each example keeps its brand logic in `config.js` and `src/bind.js`, `motion.js`, `page.js` and `scene.js`. The runtime they share (fallbacks, loader, pin, Lenis, menu and GPU cleanup) is in `docs/examples/shared/`, so a fix there reaches all three. Halo uses the page kit for its lower sections.
 
 Bump the `?v=` on any script or stylesheet you change in the example's `index.html`, then check the examples' budgets:
 

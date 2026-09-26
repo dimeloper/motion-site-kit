@@ -18,13 +18,16 @@ page, not here.
 - `skills/motion-website/` is self-contained: `SKILL.md`, `references/`, `scripts/`, and `assets/` holding the template and `motion.config.json`. A copied skill directory must work on its own, so nothing inside it may be a symlink or point outside it.
 - Root `template/` and `motion.config.json` are symlinks into `skills/motion-website/assets/`, so commands and CI read naturally from the root.
 - `docs/` is what GitHub Pages serves. Pages cannot follow a symlink out of `docs/`, so `docs/src/` holds a copy of the frame engine. `scripts/sync_engine.py --write` updates it; CI fails on drift. Never edit `docs/src/{motion,frame-cache,validate-config,ladder}.js` directly.
-- `docs/examples/{local,saas,commerce}` are Harbor, Vortex and Halo. They share one runtime in `docs/examples/shared/`: `hero.js`, `page-chrome.js`, `smooth-scroll.js` and `lifecycle.js`. Each example keeps only brand logic in its own `motion.js`, `page.js`, `scene.js` and `config.js`.
+- `docs/examples/{local,saas,commerce}` are Harbor, Vortex and Halo. They share one runtime in `docs/examples/shared/`: `hero.js`, `page-chrome.js`, `smooth-scroll.js` and `lifecycle.js`. Each example keeps only brand logic in its own `config.js` and `src/{bind,motion,page,scene}.js`.
 - `docs/examples/vgpu/` is Fold. Its published build in `demo/` is committed, and `npm run check` there proves it matches the source byte for byte.
 
 ## Invariants — don't break these without a deliberate decision
 
 **`template/config.js` is the only file that changes per frame-scrub project.**
-Copy, colours, fonts, section order. If you find yourself editing
+Copy, colours, fonts, section order. The one exception is the static `<title>`
+and meta description in `template/index.html`: `bind.js` rewrites both from
+config, but crawlers and no-JS visitors read them before it runs, so they are
+set by hand to match. If you find yourself editing
 `template/src/motion.js` to build a specific site, something has leaked; push
 it back into config. The WebGL examples are explicit forks with their own
 runtime in `docs/examples/shared/`. Do not fold them into the frame engine.

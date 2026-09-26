@@ -71,7 +71,7 @@ fades in over it once frames are ready.
 ## Measuring
 
 ```bash
-python3 scripts/check_budget.py --config motion.config.json --verbose
+python3 <skill>/scripts/check_budget.py --config motion.config.json --verbose
 ```
 
 For real numbers, throttle DevTools to Slow 4G with the cache disabled and watch

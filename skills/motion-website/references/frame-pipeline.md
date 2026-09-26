@@ -18,7 +18,7 @@ a 6-second source both produce exactly `--count` frames covering the whole
 motion.
 
 ```bash
-python3 scripts/extract_frames.py hero.mp4 --out frames/raw --count 120 --width 1600
+python3 <skill>/scripts/extract_frames.py hero.mp4 --out frames/raw --count 120 --width 1600
 ```
 
 Frames are written zero-padded (`0000.png` … `0119.png`) so lexical and numeric
