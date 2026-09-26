@@ -69,8 +69,8 @@ export const CONFIG = {
     // Glide. Above ~1.4 reads as laggy on trackpads.
     lenisDuration: 1.1,
 
-    // Parallel frame fetches. All 120 at once saturates the connection and
-    // delays the frames the visitor sees first.
+    // Parallel frame fetches. Fetching every frame at once saturates the
+    // connection and delays the frames the visitor sees first.
     concurrency: 8,
 
     // Bound loader ownership when a server never finishes a request.

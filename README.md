@@ -77,7 +77,7 @@ To reskin the standalone template with that same ladder:
 cd template && python3 -m http.server 8080
 ```
 
-Then edit `template/config.js`: copy, colours, fonts, section order. Nothing else needs to change.
+Then edit `template/config.js`: copy, colours, fonts, section order. Set the `<title>` and meta description in `template/index.html` to match, for crawlers and visitors without JavaScript. Nothing else needs to change.
 
 #### Bring your own clip
 

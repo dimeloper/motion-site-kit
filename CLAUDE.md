@@ -24,7 +24,10 @@ page, not here.
 ## Invariants — don't break these without a deliberate decision
 
 **`template/config.js` is the only file that changes per frame-scrub project.**
-Copy, colours, fonts, section order. If you find yourself editing
+Copy, colours, fonts, section order. The one exception is the static `<title>`
+and meta description in `template/index.html`: `bind.js` rewrites both from
+config, but crawlers and no-JS visitors read them before it runs, so they are
+set by hand to match. If you find yourself editing
 `template/src/motion.js` to build a specific site, something has leaked; push
 it back into config. The WebGL examples are explicit forks with their own
 runtime in `docs/examples/shared/`. Do not fold them into the frame engine.

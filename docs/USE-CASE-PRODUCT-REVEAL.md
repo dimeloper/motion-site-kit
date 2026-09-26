@@ -42,6 +42,8 @@ Edit `template/config.js`. For this speaker page, replace the placeholder fields
 | Second section | Give a measured specification or link to test methodology. |
 | Final CTA | Link to a retailer, preorder page or product sheet. |
 
+Set the `<title>` and meta description in `template/index.html` to `Arc One - Sound from every side.` and the `hero.sub` text. The page rewrites both from config at runtime, but crawlers and visitors without JavaScript read the static tags.
+
 Keep `animationDescription` literal. The canvas is hidden from assistive technology, so this text is the description of the motion sequence.
 
 Preview the result:

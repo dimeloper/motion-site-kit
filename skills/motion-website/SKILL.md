@@ -19,7 +19,7 @@ directory.
 
 | Path | What it is |
 |---|---|
-| `assets/template/` | The frame-scrub site. Copy it into the project; edit only `config.js` |
+| `assets/template/` | The frame-scrub site. Copy it into the project; edit `config.js`, plus the `<title>` and description in `index.html` |
 | `assets/motion.config.json` | Frame counts, widths and the budget the gate enforces |
 | `scripts/extract_frames.py` | Clip → evenly sampled PNG frames (ffmpeg) |
 | `scripts/optimize_frames.py` | PNGs → AVIF/WebP ladder, posters and manifest (Pillow ≥ 11.3) |
@@ -99,6 +99,10 @@ This writes `frames/{width}/{format}/{index}.{format}`, one poster per rung at
 `frames/poster/{width}.webp`, and a `manifest.json` the runtime reads instead of
 guessing file names. Each run clears the previous ladder first.
 
+`frames/raw` is intermediate: 90 PNGs at 1600px came to about 24 MiB in a test
+run. Add `frames/raw/` to `.gitignore` and keep it until the gate passes, since a
+cut means encoding again. The site never loads it.
+
 ### 4. Gate on the budget
 
 ```bash
@@ -128,6 +132,11 @@ config still describes the site. Quality and widths live in that file too.
 Edit only `template/config.js`: copy, colours, fonts, section order. `src/motion.js` is the
 engine and must not need changes between projects. If it does, something
 belongs in config instead.
+
+Then set the static `<title>` and meta description in `template/index.html` to
+the same text: `brand.name - hero.headline` and `hero.sub`. `bind.js` rewrites
+both at runtime, but crawlers and visitors without JavaScript read the static
+tags, which ship as an Acme placeholder.
 
 The template loads GSAP and Lenis from a CDN through an import map, so it runs
 from any static host with no build step.
