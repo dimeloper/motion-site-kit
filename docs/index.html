@@ -7,7 +7,7 @@
   <meta name="description" content="An open-source motion toolkit for developers. A frame pipeline, a reskinnable template, and distinct WebGL and WebGPU examples." />
   <link rel="preload" as="font" href="assets/manrope-latin.woff2" type="font/woff2" crossorigin />
   <link rel="preload" as="image" href="frames/poster/960.webp" imagesrcset="frames/poster/640.webp 640w, frames/poster/960.webp 960w, frames/poster/1600.webp 1600w" imagesizes="100vw" fetchpriority="high" />
-  <link rel="stylesheet" href="src/styles.css?v=design-2" />
+  <link rel="stylesheet" href="src/styles.css?v=design-4" />
   <script type="importmap">
   {
     "imports": {
@@ -20,7 +20,7 @@
 </head>
 <body>
 <a class="skip-link" href="#content">Skip to content</a>
-<header class="hero" data-hero data-motion="static" id="top">
+<header class="hero" data-hero data-motion="static" data-edge-tint="#0e130b" id="top">
   <img class="hero__poster" src="frames/poster/960.webp" srcset="frames/poster/640.webp 640w, frames/poster/960.webp 960w, frames/poster/1600.webp 1600w" sizes="100vw" alt="Titanium phone, the frame sequence used in this demonstration" fetchpriority="high" decoding="async" />
   <canvas class="hero__canvas" data-canvas aria-hidden="true"></canvas>
   <div class="hero__shade" aria-hidden="true"></div>
@@ -75,7 +75,7 @@ python3 -m http.server 8080 --directory docs
 </main>
 <footer class="footer wrap"><div><a class="wordmark" href="#top"><span class="motion-mark" aria-hidden="true">m.</span>motion site kit</a><p>Source, examples and setup guides.</p></div><nav aria-label="Footer"><a href="#examples">Examples</a><a href="#start">Get started</a><a href="https://github.com/dimeloper/motion-site-kit">Source ↗</a></nav><span>Open source / MIT</span></footer>
 <div class="progress" aria-hidden="true"></div>
-<script type="module" src="src/docs.js?v=design-2"></script>
+<script type="module" src="src/docs.js?v=design-3"></script>
 <script type="module" src="src/motion.js"></script>
 </body>
 </html>

@@ -41,6 +41,7 @@ opacity 1. Background tabs throttle `requestAnimationFrame` and GSAP.
 ## Phones
 
 - [ ] **Portrait at 390×844.** The subject stays readable in the centre strip the cover crop leaves visible, about a quarter of the frame's width. See "Portrait phones" in `frame-pipeline.md`.
+- [ ] **Safari's status bar and toolbar match what is under them.** Safari 26 ignores `theme-color` and tints its bars from the body's background, so a dark hero on a light page gets light bars. The landing page fixes this with thin fixed strips; see `docs/src/edge-tint.js`.
 - [ ] **Collapse and expand the URL bar mid-sequence** in iOS Safari and Android Chrome. The frame must not jump.
 - [ ] **A real phone on real cellular data.** Not the DevTools emulator, which uses your desktop's connection and decoder. This is the most skipped step and the one that most often shows the site is unusable.
 - [ ] **A low-end Android device** if you can get one. Drawing a 960px frame every scroll update is not free.

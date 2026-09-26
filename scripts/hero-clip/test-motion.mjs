@@ -601,6 +601,18 @@ test('vgpu renders, reverses and falls back after device loss when available', a
   assert.ok(await page.$eval('.stage img', img => img.complete && img.naturalWidth > 0));
 });
 
+test('Safari bar tint strips follow the dark hero and step aside for light sections', async page => {
+  // Only iOS WebKit renders the strips (see edge-tint.js); this checks the
+  // logic that decides when each edge is claimed and in what colour.
+  await page.goto(url);
+  const strips = () => page.$$eval('.edge-tint', els => els.map(el => el.hidden ? 'hidden' : el.style.backgroundColor));
+  await page.waitForFunction(() => document.querySelectorAll('.edge-tint').length === 2);
+  assert.deepEqual(await strips(), ['rgb(14, 19, 11)', 'rgb(14, 19, 11)']);
+  await page.evaluate(() => window.scrollTo({ top: document.querySelector('#start').offsetTop, behavior: 'instant' }));
+  await page.waitForFunction(() => [...document.querySelectorAll('.edge-tint')].every(el => el.hidden));
+  assert.equal(await page.$eval('.edge-tint', el => getComputedStyle(el).display), 'none');
+});
+
 test('docs remains readable without JavaScript and exposes real example links', async page => {
   await page.setViewport({ width: 320, height: 800, deviceScaleFactor: 1 });
   await page.setJavaScriptEnabled(false);
