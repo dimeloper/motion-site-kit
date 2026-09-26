@@ -13,7 +13,6 @@ __pycache__/
 
 # Generated per project — regenerate with optimize_frames.py
 skills/motion-website/assets/template/frames/
-examples/*/frames/
 docs/examples/*/frames/
 skills/motion-website/assets/template/vendor/
 frames/clips/

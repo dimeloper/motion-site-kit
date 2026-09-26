@@ -4,9 +4,9 @@ Working document for taking motion-site-kit from its current state to a public
 v1.0. Derived from the September 2026 review. Delete this file once the release
 is tagged; it is not a permanent doc.
 
-## Status — 25 September 2026, branch `publish-readiness`
+## Status — 26 September 2026, `main`
 
-Phases 0 to 6 are done, one commit per phase. Phase 7 is done except for the
+PR #1 (`publish-readiness`) is merged. Phases 0 to 6 are done, one commit per phase. Phase 7 is done except for the
 items only you can do, listed at the end of this section. On the last full run:
 
 | Suite | Result |
@@ -32,7 +32,7 @@ Still open, and yours to do:
 1. **Real-phone QA on cellular** (7.2): portrait crop, URL-bar collapse, fling feel, battery. Nothing automated covers these.
 2. ~~**Physical iPhone Safari run.**~~ Done 2026-09-26 on an iPhone 17, iOS 26.6.2 (Safari reports 26.6.1), over Wi-Fi with `SAFARI_LAN_HOST`: all 7 checks pass, including the late pin at 0px moved. Control: `main`'s engine moved the page 2499px on the same phone, so the check can fail there. Fold stayed on its poster, as expected over plain HTTP.
 3. **Asset provenance:** `docs/examples/ASSETS.md` marks the Unsplash photographers, the Halo images and the Meshy and Recraft plan terms as not recorded. Fill them in or replace the files before calling the assets reusable.
-4. **Push, let CI run, merge, then tag `v1.0.0` and delete this file** (7.6). CI has not run on this branch yet; it now installs ffmpeg and Pillow and requires the pipeline test.
+4. ~~**Push, let CI run, merge.**~~ Done: PR #1 merged 2026-09-26. Still to do: tag `v1.0.0` and delete this file in the same commit (7.6).
 5. **v1.1 candidates:** a portrait 9:16 ladder, and starting the scrub before every frame has downloaded.
 
 Each phase leaves `main` green. Run the full check list at the end of every
@@ -43,7 +43,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 node --test tests/*.mjs
 python3 skills/motion-website/scripts/check_budget.py --frames docs/frames --strict
 python3 scripts/check_example_budget.py
-python3 scripts/sync_examples.py --check
+python3 scripts/sync_engine.py --check
 npm run check --prefix docs/examples/vgpu
 npm run test:motion --prefix scripts/hero-clip
 ```
