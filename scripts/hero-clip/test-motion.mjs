@@ -626,6 +626,41 @@ test('the landing hero and everything in it fit the viewport it is pinned in', a
   }
 });
 
+// Every pinned hero must fit the viewport it is pinned in, at phone, landscape,
+// short-laptop, tablet and desktop sizes. Secondary pieces may step aside on
+// short screens; whatever is shown must sit inside the hero and not collide.
+const HERO_PARTS = {
+  local: ['.hero__headline', '.hero__sub', '.hero__ctas', '.hero__aside', '.hero__proximity', '.hero__status'],
+  saas: ['.hero__eyebrow', '.hero__headline', '.hero__lead', '.hero__sub', '.hero__ctas', '.hero__stats', '.hero__tags', '.hero__status'],
+  commerce: ['.hero__headline', '.hero__sub', '.hero__ctas', '.hero__status'],
+};
+for (const [name, parts] of Object.entries(HERO_PARTS)) {
+  test(`${name}: the hero and everything shown in it fit the viewport it is pinned in`, async page => {
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    for (const [width, height] of [[402, 714], [375, 560], [874, 402], [1024, 700], [1280, 600], [1440, 900], [820, 1180]]) {
+      await page.setViewport({ width, height, deviceScaleFactor: 1 });
+      await page.goto(`${url}/examples/${name}/index.html`);
+      const issues = await page.evaluate(selectors => {
+        const box = el => { const r = el.getBoundingClientRect(); return { t: r.top + scrollY, b: r.bottom + scrollY, l: r.left, r: r.right }; };
+        const hero = box(document.querySelector('[data-hero]'));
+        const found = [];
+        if (hero.b > innerHeight + 0.5) found.push(`hero is ${Math.round(hero.b - innerHeight)}px taller than the viewport`);
+        const shown = selectors.map(s => [s, document.querySelector(s)])
+          .filter(([, el]) => el && getComputedStyle(el).display !== 'none' && el.getClientRects().length)
+          .map(([s, el]) => [s, box(el), el]);
+        for (const [s, b] of shown) if (b.b > hero.b + 0.5 || b.t < hero.t - 0.5) found.push(`${s} is cut off by the hero's edge`);
+        for (let i = 0; i < shown.length; i++) for (let j = i + 1; j < shown.length; j++) {
+          const [sa, a, ea] = shown[i], [sb, b, eb] = shown[j];
+          if (ea.contains(eb) || eb.contains(ea)) continue;
+          if (a.t < b.b - 1 && b.t < a.b - 1 && a.l < b.r - 1 && b.l < a.r - 1) found.push(`${sa} overlaps ${sb}`);
+        }
+        return found;
+      }, parts);
+      assert.deepEqual(issues, [], `${name} at ${width}x${height}`);
+    }
+  });
+}
+
 test('Safari bar tint strips follow the dark hero and step aside for light sections', async page => {
   // Only iOS WebKit renders the strips (see edge-tint.js); this checks the
   // logic that decides when each edge is claimed and in what colour.

@@ -161,9 +161,12 @@ button {
   transform: rotate(-90deg);
 }
 
+/* Exactly one small viewport, never more: the hero is pinned while it plays,
+   so anything below the fold stays below it for the whole sequence. Short
+   screens tighten and drop the subheading (see the end of this file). */
 .hero {
   position: relative;
-  min-height: 100svh;
+  height: 100svh;
   overflow: hidden;
   background: var(--brand-paper);
 }
@@ -794,3 +797,23 @@ button {
 [data-kit] .visual-chapters { background: #171a18; --kit-mute: #b3b8aa; }
 [data-kit] .expanding-image { background: #e9e6dc; --kit-ink: #262821; color: var(--kit-ink); }
 [data-kit] .chapter h3 { font-family: Georgia, serif; }
+
+/* Short viewports: a landscape phone, a small laptop window, an iPhone SE.
+   The headline is capped by height and the spacing tightens, so the actions
+   and status line stay inside the fixed-height hero. Each cap wraps the size
+   its width already uses, so nothing changes where the cap does not bind. */
+@media (max-height: 640px) {
+  .hero__headline { font-size: min(clamp(3.8rem, 7vw, 7rem), 13svh); }
+}
+@media (max-height: 640px) and (max-width: 767px) {
+  .hero__headline { font-size: min(clamp(3.5rem, 15vw, 5rem), 13svh); }
+}
+@media (max-height: 640px) {
+  .hero__copy { padding-top: 5.5rem; padding-bottom: 3rem; }
+  .hero__sub { margin-top: 1rem; }
+  .hero__ctas { margin-top: 1.1rem; }
+}
+@media (max-height: 460px) {
+  .hero__sub { display: none; }
+  .hero__copy { padding-top: 4.5rem; }
+}

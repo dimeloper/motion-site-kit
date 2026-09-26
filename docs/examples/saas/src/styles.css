@@ -269,9 +269,13 @@ img { display: block; max-width: 100%; }
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
+/* Exactly the viewport minus the frame, never more: the hero is pinned while
+   it plays, so anything below the fold stays below it for the whole sequence.
+   Short screens drop secondary pieces (see the end of this file). */
 .hero {
   position: relative;
-  min-height: inherit;
+  height: calc(100svh - 2 * var(--shell-pad));
+  overflow: hidden;
   color: #fff;
 }
 
@@ -350,7 +354,7 @@ img { display: block; max-width: 100%; }
   grid-template-columns: 1fr;
   gap: 1.5rem;
   padding: 5.5rem 1.25rem 8.5rem;
-  min-height: inherit;
+  height: 100%;
   align-content: center;
 }
 @media (min-width: 768px) {
@@ -1375,4 +1379,16 @@ main {
 }
 @media (max-width: 767px) {
   .build-card:first-child::after { width: 100%; background-size: auto 280%; }
+}
+
+/* Short viewports: a landscape phone, a small laptop window, an iPhone SE.
+   The hero has a fixed height, so secondary pieces step aside here rather
+   than being cut off by its edge or colliding with the rail. */
+@media (max-height: 640px) {
+  .hero__grid { padding-top: 4.75rem; padding-bottom: 7rem; gap: 1rem; }
+  .hero__sub, .hero__tags { display: none; }
+}
+@media (max-height: 460px) {
+  .hero__eyebrow, .hero__lead, .hero__rail { display: none; }
+  .hero__grid { padding-top: 4.25rem; padding-bottom: 2.75rem; }
 }
