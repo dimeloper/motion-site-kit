@@ -12,8 +12,8 @@ anyone reuses it outside these demos.
 
 | File | Source | Terms |
 | --- | --- | --- |
-| `local/models/loaf.glb` | Meshy image-to-3D (through the Higgsfield MCP) from a studio still of a loaf, then compressed with `skills/motion-website/scripts/compress_glb.sh` | Higgsfield paid plan. [Higgsfield's terms](https://higgsfield.ai/terms-of-use-agreement) (updated 26 July 2026) claim no ownership of outputs and do not restrict their commercial use; Meshy's acceptable-use policy also applies. Source still: **not recorded** |
-| `commerce/models/pillar.glb` | Meshy image-to-3D with PBR textures (through the Higgsfield MCP), compressed with meshopt and WebP textures | Higgsfield paid plan. [Higgsfield's terms](https://higgsfield.ai/terms-of-use-agreement) (updated 26 July 2026) claim no ownership of outputs and do not restrict their commercial use; Meshy's acceptable-use policy also applies. Source still: **not recorded** |
+| `local/models/loaf.glb` | Meshy image-to-3D (through the Higgsfield MCP) from a studio still of a loaf, then compressed with `skills/motion-website/scripts/compress_glb.sh` | Higgsfield paid plan. [Higgsfield's terms](https://higgsfield.ai/terms-of-use-agreement) (updated 26 July 2026) claim no ownership of outputs and do not restrict their commercial use; Meshy's acceptable-use policy also applies. Source still: generated on the same Higgsfield plan |
+| `commerce/models/pillar.glb` | Meshy image-to-3D with PBR textures (through the Higgsfield MCP), compressed with meshopt and WebP textures | Higgsfield paid plan. [Higgsfield's terms](https://higgsfield.ai/terms-of-use-agreement) (updated 26 July 2026) claim no ownership of outputs and do not restrict their commercial use; Meshy's acceptable-use policy also applies. Source still: generated on the same Higgsfield plan |
 
 Vortex ships no model. Its band is built in code in `saas/src/scene.js`.
 
