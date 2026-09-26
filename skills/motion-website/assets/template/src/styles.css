@@ -1,0 +1,301 @@
+/* Motion site template — cinematic treatment over a pinned canvas.
+   Brand tokens are injected by bind.js from config.js; the fallbacks here are
+   only what paints before that module runs. */
+
+:root {
+  --brand-primary: #0b5fff;
+  --brand-ink: #000000;
+  --brand-paper: #f4f1ea;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+  --measure: 38rem;
+  --frame: 14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--brand-ink);
+  color: var(--brand-paper);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute; top: -3rem; left: 1rem; z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--brand-paper); color: var(--brand-ink);
+  text-decoration: none; font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip-link:focus-visible { top: 1rem; }
+
+:where(a, button, [tabindex]):focus-visible {
+  outline: 1px solid var(--brand-paper);
+  outline-offset: 4px;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__poster,
+.hero__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* The canvas fades in over the poster once frames are decoded, so the swap is
+   never a visible pop. Until then the poster is what the visitor (and the LCP
+   measurement) sees. */
+.hero__canvas {
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.hero__canvas.is-ready { opacity: 1; }
+
+/* Static fallback path: poster only, and the hero stops eating scroll length. */
+.hero[data-motion="static"] .hero__canvas,
+.hero[data-motion="static"] .hero__scroll-hint { display: none; }
+
+.hero__grain {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.hero__vignette {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(90% 70% at 55% 42%, transparent 48%, rgb(0 0 0 / 0.38) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 42%);
+}
+
+/* Hairline glint frame — the object sits in a void, the page has an edge. */
+.hero__frame {
+  position: absolute;
+  inset: var(--frame);
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+.hero__mark {
+  position: absolute;
+  top: calc(var(--frame) + 1.15rem);
+  left: calc(var(--frame) + 1.25rem);
+  z-index: 4;
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: lowercase;
+  font-weight: 400;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.hero__copy {
+  position: absolute;
+  left: calc(var(--frame) + 1.25rem);
+  bottom: calc(var(--frame) + 2.4rem);
+  z-index: 4;
+  max-width: min(28rem, 78vw);
+  padding: 0;
+  text-align: left;
+}
+
+.hero__eyebrow {
+  margin: 0 0 0.7rem;
+  font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgb(255 255 255 / 0.48);
+}
+
+.hero__headline {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4.2vw, 3.15rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.hero__sub {
+  margin: 0 0 1.35rem;
+  max-width: 32rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.hero .button { margin-top: 0.15rem; }
+
+.hero__scroll-hint {
+  position: absolute;
+  right: calc(var(--frame) + 1.25rem);
+  bottom: calc(var(--frame) + 1.15rem);
+  z-index: 4;
+  font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgb(255 255 255 / 0.42);
+}
+
+/* ── Loader ───────────────────────────────────────────────────────────── */
+
+/* Hidden unless motion.js has taken ownership of the hero. A loader that shows
+   by default is a loader that runs forever when the script never arrives. */
+.loader { display: none; }
+.hero[data-motion="preloading"] .loader {
+  position: absolute;
+  left: calc(var(--frame) + 1.25rem);
+  bottom: calc(var(--frame) + 5.6rem);
+  z-index: 5;
+  display: grid; gap: 0.5rem; justify-items: start;
+}
+
+.loader__bar {
+  --progress: 0;
+  width: min(12rem, 40vw); height: 1px;
+  background: rgb(255 255 255 / 0.16);
+  overflow: hidden;
+}
+.loader__bar::after {
+  content: ""; display: block; height: 100%;
+  width: calc(var(--progress) * 100%);
+  background: var(--brand-paper);
+  transition: width 0.2s linear;
+}
+.loader__label {
+  margin: 0; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgb(255 255 255 / 0.4);
+}
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+
+.panel {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-height: 78svh;
+  padding: clamp(4rem, 12vw, 9rem) clamp(1.75rem, 8vw, 6.5rem);
+}
+
+.panel__card {
+  max-width: var(--measure);
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.panel__card::before {
+  content: "";
+  display: block;
+  width: 2.25rem;
+  height: 1px;
+  margin-bottom: 1.6rem;
+  background: rgb(255 255 255 / 0.28);
+}
+
+.panel__kicker {
+  margin: 0 0 0.85rem;
+  font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgb(255 255 255 / 0.42);
+}
+.panel__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.12; letter-spacing: -0.02em;
+}
+.panel__body {
+  margin: 0;
+  max-width: 36rem;
+  color: rgb(255 255 255 / 0.62);
+}
+
+/* ── CTA ──────────────────────────────────────────────────────────────── */
+
+.cta {
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
+  padding: clamp(5rem, 14vw, 10rem) clamp(1.75rem, 8vw, 6.5rem);
+  text-align: left;
+  background: var(--brand-ink);
+}
+.cta h2 {
+  margin: 0; max-width: 16ch; text-wrap: balance;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 4vw, 2.7rem); line-height: 1.08;
+}
+.cta p { margin: 0; max-width: 38ch; color: rgb(255 255 255 / 0.58); }
+
+.button {
+  display: inline-block;
+  padding: 0.72rem 1.15rem;
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: 0;
+  background: transparent;
+  color: var(--brand-paper);
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.button:hover {
+  border-color: rgb(255 255 255 / 0.7);
+  background: rgb(255 255 255 / 0.04);
+}
+.button--large { padding: 0.85rem 1.4rem; }
+@media (prefers-reduced-motion: reduce) { .button:hover { background: rgb(255 255 255 / 0.04); } }
+
+/* ── Native scroll-driven progress bar ────────────────────────────────── */
+/*
+   Wrapped in @supports on purpose. Chrome and Safari 26+ support scroll
+   timelines; Firefox does not, which is why the hero sequence stays on
+   ScrollTrigger. A progress bar is the right kind of thing to put here — a
+   Firefox visitor losing it costs nothing.
+*/
+.progress { display: none; }
+
+@supports (animation-timeline: scroll()) {
+  .progress {
+    display: block;
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    height: 1px;
+    transform-origin: 0 50%;
+    background: rgb(255 255 255 / 0.72);
+    animation: progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes progress-grow { from { scale: 0 1; } to { scale: 1 1; } }
+
+  @media (prefers-reduced-motion: reduce) { .progress { display: none; } }
+}

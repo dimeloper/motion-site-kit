@@ -21,23 +21,31 @@ from pathlib import Path
 DEFAULTS = {
     "sequenceBytes": 8 * 1024 * 1024,
     "singleFrameBytes": 120_000,
-    "narrowRungBytes": 1_500_000,
-    "narrowRungWidth": 640,
+    # Every rung at or below this width gets the tighter phone ceiling. A
+    # 390px phone at 2x selects 960 and a 1x or 1.5x small screen selects 640,
+    # so both rungs are phone downloads. See references/performance-budget.md.
+    "phoneRungBytes": 1_500_000,
+    "phoneRungWidth": 960,
     "frameCountMax": 150,
     "frameCountMin": 60,
 }
+
+# Names used before the phone ceiling moved from the 640 rung to every rung
+# phones select. Accepted so older configs keep working.
+LEGACY_KEYS = {"narrowRungBytes": "phoneRungBytes", "narrowRungWidth": "phoneRungWidth"}
 
 CUT_ORDER = """
 When this fails, work down this list — ordered by weight removed per unit of
 visible quality lost:
 
-  1. Frame count 120 -> 90            (~25% off, no perceptible change)
-  2. AVIF quality 65 -> 55            (~20-30% off; inspect one frame first)
+  1. Frame count 120 -> 90            (~25% off on the demo; no perceptible change)
+  2. AVIF quality 60 -> 50            (~20% off on the demo; inspect one frame first)
   3. Crop tighter                     (background pixels cost the same as product pixels)
   4. Simplify the source motion       (inter-frame difference is what you are paying for)
   5. Max width 1600 -> 1280           (last resort; visible on large displays)
 
-Do not drop the 640 rung. It is the cheapest one and it serves the most visitors.
+Do not drop the phone rungs. Phones select 640 or 960; removing them sends
+phones a wider, heavier sequence rather than a static image.
 """
 
 
@@ -47,7 +55,7 @@ def die(msg: str, code: int = 2) -> None:
 
 
 def human(size: int) -> str:
-    return f"{size / 1_048_576:.2f} MB" if size >= 1_048_576 else f"{size / 1024:.0f} KB"
+    return f"{size / 1_048_576:.2f} MiB" if size >= 1_048_576 else f"{size / 1024:.0f} KiB"
 
 
 def require(condition: bool) -> None:
@@ -72,7 +80,11 @@ def main() -> None:
         config = json.loads(args.config.read_text())
     except (OSError, ValueError) as error:
         die(f"cannot read config: {error}")
-    budget = {**DEFAULTS, **config.get("budget", {})}
+    configured = dict(config.get("budget", {}))
+    for old, new in LEGACY_KEYS.items():
+        if old in configured:
+            configured.setdefault(new, configured.pop(old))
+    budget = {**DEFAULTS, **configured}
 
     frames_root = args.frames or Path(config.get("output", "template/frames"))
     manifest_path = frames_root / "manifest.json"
@@ -98,7 +110,18 @@ def main() -> None:
             for fmt in manifest["formats"]:
                 value = manifest["bytes"][str(width)][fmt]
                 require(type(value) is int and value >= 0)
-    except (OSError, ValueError, KeyError, TypeError, AssertionError) as error:
+        # A legacy string poster names a frame inside the ladder and needs no
+        # extra checks. The current form lists one poster file per rung.
+        poster = manifest.get("poster")
+        posters: set[Path] = set()
+        if isinstance(poster, dict):
+            files = poster["files"]
+            require(isinstance(files, dict) and set(files) == {str(w) for w in manifest["widths"]})
+            require(all(isinstance(f, str) and f.startswith("poster/") and ".." not in f for f in files.values()))
+            posters = {Path(f) for f in files.values()}
+        else:
+            require(poster is None or isinstance(poster, str))
+    except (OSError, ValueError, KeyError, TypeError) as error:
         die(f"invalid manifest at {manifest_path}: {error}")
 
     failures: list[str] = []
@@ -110,8 +133,8 @@ def main() -> None:
     primary = manifest["formats"][0]
     worst = (0, "")
     measured = {}
-    if budget["narrowRungWidth"] not in manifest["widths"]:
-        failures.append(f"required narrow rung {budget['narrowRungWidth']}px is missing")
+    if not any(w <= budget["phoneRungWidth"] for w in manifest["widths"]):
+        failures.append(f"no rung at or below {budget['phoneRungWidth']}px; phones would download a desktop sequence")
     expected_all = set()
     for width in manifest["widths"]:
         measured[width] = {}
@@ -139,13 +162,19 @@ def main() -> None:
             recorded = manifest["bytes"][str(width)][fmt]
             if size != recorded:
                 failures.append(f"{width}px {fmt}: manifest records {recorded} bytes, files contain {size}; regenerate manifest")
-            limit = budget["narrowRungBytes"] if width <= budget["narrowRungWidth"] else budget["sequenceBytes"]
+            limit = budget["phoneRungBytes"] if width <= budget["phoneRungWidth"] else budget["sequenceBytes"]
             rows.append((f"{width}px", fmt, human(size), human(limit)))
             if size > limit:
                 failures.append(f"{width}px {fmt} sequence is {human(size)}, budget {human(limit)} ({size / limit:.1f}x over)")
+    for relative in sorted(posters):
+        path = frames_root / relative
+        if not path.is_file():
+            failures.append(f"poster {relative} is listed in the manifest but missing")
+        elif path.stat().st_size > budget["singleFrameBytes"]:
+            failures.append(f"poster {relative} is {human(path.stat().st_size)}, budget {human(budget['singleFrameBytes'])}")
     extras = sorted(str(p.relative_to(frames_root)) for p in frames_root.rglob("*")
                     if p.is_file() and p.suffix.lstrip(".") in ("avif", "webp")
-                    and p.relative_to(frames_root) not in expected_all)
+                    and p.relative_to(frames_root) not in expected_all | posters)
     if extras:
         failures.append(f"{len(extras)} unadvertised frame files (first: {extras[0]}); remove stale outputs")
     if worst[0] > budget["singleFrameBytes"]:

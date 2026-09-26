@@ -17,7 +17,7 @@ class ExampleBudgetTests(unittest.TestCase):
         for name in ('local', 'saas', 'commerce'):
             folder = self.root / 'docs/examples' / name
             (folder / 'models').mkdir(parents=True)
-            (folder / 'config.js').write_text('export const CONFIG = {};')
+            (folder / 'config.js').write_text("export const CONFIG = { modelUrl: 'models/model.glb' };")
             self.write_model(name, {'asset': {'version': '2.0'}})
 
     def write_model(self, name, doc):
@@ -44,6 +44,24 @@ class ExampleBudgetTests(unittest.TestCase):
         path.write_bytes(b'x' * (MODEL_LIMIT + 1))
         self.assertTrue(any('exceeds' in error for error in self.errors()))
 
-    def test_missing_model_fails(self):
+    def test_missing_referenced_model_fails(self):
         (self.root / 'docs/examples/local/models/model.glb').unlink()
-        self.assertTrue(any('no model' in error for error in self.errors()))
+        self.assertTrue(any('does not exist' in error for error in self.errors()))
+
+    def test_unreferenced_model_fails(self):
+        (self.root / 'docs/examples/saas/config.js').write_text('export const CONFIG = {};')
+        self.assertTrue(any('saas/model.glb: not referenced' in error for error in self.errors()))
+
+    def test_unreferenced_image_fails(self):
+        images = self.root / 'docs/examples/local/images'
+        images.mkdir()
+        (images / 'orphan.webp').write_bytes(b'x')
+        self.assertTrue(any('orphan.webp' in error for error in self.errors()))
+        (self.root / 'docs/examples/local/config.js').write_text(
+            "export const CONFIG = { modelUrl: 'models/model.glb', image: 'images/orphan.webp' };")
+        self.assertEqual(self.errors(), [])
+
+    def test_example_without_models_passes(self):
+        (self.root / 'docs/examples/saas/models/model.glb').unlink()
+        (self.root / 'docs/examples/saas/config.js').write_text('export const CONFIG = {};')
+        self.assertEqual(self.errors(), [])

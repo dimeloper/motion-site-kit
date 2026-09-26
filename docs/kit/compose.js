@@ -4,50 +4,12 @@
  * Prefer planPage() when the brief is content, not types.
  */
 
-import { renderChapters, renderExpand, renderProjectIndex, renderComparison, disposeStory } from './story-sections.js';
+import { renderChapters, renderExpand, renderProjectIndex, renderComparison, disposeStory } from './story-sections.js?v=13';
 
-import { inferFamily, inferKind, planPage } from './select.js';
+import { inferFamily, inferKind, planPage } from './select.js?v=13';
 
 export { inferFamily, inferKind, planPage };
 
-export const FAMILIES = [
-  'hero-cinematic',
-  'hero-editorial',
-  'stat-stack',
-  'editorial-split',
-  'featured-work',
-  'flank-statement',
-  'material-board',
-  'process-columns',
-  'work-rail',
-  'colonnade',
-  'ascent-steps',
-  'bleed-line',
-  'faq-rule',
-  'statement-cta',
-  'quote-pull',
-  'contact-split',
-  'pair-stills',
-  'note-margin',
-  'hours-list',
-  'film-strip',
-  'invert-band',
-  'rule-list',
-  'measure-band',
-  'chapter-index',
-  'caption-still',
-  'peek-overlap',
-  'sign-off',
-  'client-marks',
-  'spotlight-stage',
-  'claim-stack',
-  'visual-chapters',
-  'expanding-image',
-  'project-index',
-  'image-comparison',
-];
-
-const BANNED_VORTEX_SEQUENCE = ['modules', 'feel', 'builds', 'about', 'cta'];
 
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -58,7 +20,9 @@ function el(tag, attrs = {}, children = []) {
     else node.setAttribute(key, String(value));
   }
   for (const child of children.flat()) {
-    if (child == null) continue;
+    // Renderers write `value && el(...)`. Skip whatever a falsy guard leaves
+    // behind (null, false, 0, '') so it never renders as literal text.
+    if (child == null || child === false || child === 0 || child === '') continue;
     node.append(typeof child === 'string' ? document.createTextNode(child) : child);
   }
   return node;
@@ -480,7 +444,7 @@ function renderSpotlightStage(section) {
   const root = el('section', { class: 'sec-spot', id: section.id || 'spot', 'data-family': 'spotlight-stage' }, [
     section.headline && el('h2', { class: 'spot__headline', text: section.headline }),
     figure(section.image, 'spot__stage'),
-    thumbs.length && el('div', { class: 'spot__thumbs' }, thumbs.map((thumb, i) =>
+    thumbs.length > 0 && el('div', { class: 'spot__thumbs' }, thumbs.map((thumb, i) =>
       el('button', {
         class: 'spot__thumb',
         type: 'button',
@@ -555,10 +519,8 @@ const RENDERERS = {
   'image-comparison': renderComparison,
 };
 
-function looksLikeVortexClone(sections) {
-  const ids = sections.map((s) => s.id).filter(Boolean);
-  return BANNED_VORTEX_SEQUENCE.every((id) => ids.includes(id));
-}
+/** Every family the kit can render, in catalog order. */
+export const FAMILIES = Object.freeze(Object.keys(RENDERERS));
 
 export function compose(root, sections, { warn = true } = {}) {
   if (!root) throw new Error('page-kit: missing mount root');
@@ -566,9 +528,6 @@ export function compose(root, sections, { warn = true } = {}) {
   root.replaceChildren();
 
   const used = new Set();
-  if (warn && looksLikeVortexClone(sections)) {
-    console.warn('page-kit: this sequence matches Vortex (modules / feel / builds / about / cta). Pick different families.');
-  }
 
   for (const section of sections) {
     const type = section?.type || inferFamily(section);

@@ -1,4 +1,7 @@
 /** Docs chrome stays independent of the config-only frame template. */
+import { syncEdgeTint } from './edge-tint.js?v=design-3';
+
+syncEdgeTint();
 for (const button of document.querySelectorAll('[data-copy]')) {
   button.addEventListener('click', async () => {
     const text = document.getElementById(button.dataset.copy).textContent;

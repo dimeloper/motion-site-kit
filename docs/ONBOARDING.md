@@ -34,7 +34,7 @@ bash scripts/use-demo-frames.sh
 python3 -m http.server 8081 --directory template
 ```
 
-Open <http://localhost:8081>. Edit `template/config.js` to change the copy, colors, fonts and sections. Reload to see the change. The frame runtime stays unchanged between projects.
+Open <http://localhost:8081>. Edit `template/config.js` to change the copy, colors, fonts and sections. Reload to see the change. The frame runtime stays unchanged between projects. The landing page runs a copy of it; if you change `template/src`, run `python3 scripts/sync_engine.py --write`.
 
 When you have a source clip, follow the [frame pipeline](../skills/motion-website/references/frame-pipeline.md). That step requires FFmpeg and Pillow with AVIF support. Run the budget gate before publishing the new frames.
 
@@ -50,13 +50,15 @@ Image paths in copied recipes are relative to `docs/kit/`. When moving a recipe 
 
 ### A live WebGL example
 
-Edit the canonical source under `docs/examples/local`, `saas` or `commerce`. Their scene code is independent of the frame template. Halo uses the shared page kit for its lower sections.
+Edit `docs/examples/local`, `saas` or `commerce`. Each example keeps its brand logic in `config.js`, `src/scene.js`, `src/page.js` and `src/bind.js`. The runtime they share (fallbacks, loader, pin, Lenis, menu and GPU cleanup) is in `docs/examples/shared/`, so a fix there reaches all three. Halo uses the page kit for its lower sections.
 
-After editing, update the development mirrors:
+Bump the `?v=` on any script or stylesheet you change in the example's `index.html`, then check the examples' budgets:
 
 ```bash
-python3 scripts/sync_examples.py --write
+python3 scripts/check_example_budget.py
 ```
+
+Record the source and terms of any new image or model in [the asset register](examples/ASSETS.md).
 
 ### Fold's WebGPU study
 

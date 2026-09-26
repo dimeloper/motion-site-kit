@@ -5,6 +5,10 @@ Reads PNG frames produced by extract_frames.py (or Remotion's --sequence output)
 and writes frames/{width}/{format}/{index}.{format} plus a manifest.json the
 runtime reads instead of guessing at filenames.
 
+It also writes frames/poster/{width}.webp, one copy of the poster frame per
+rung. The page's <img> points at those fixed names, so changing the frame count
+or poster position never leaves the LCP image pointing at a file that is gone.
+
     python3 optimize_frames.py frames/raw --out template/frames --config motion.config.json
 """
 
@@ -12,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -60,9 +65,8 @@ def available_formats(requested: list[str]) -> list[str]:
 def encode_one(src: Path, index: int, out_root: Path, widths: list[int], formats: list[str], quality: dict) -> None:
     with Image.open(src) as im:
         im = im.convert("RGB")
-        source_width = im.width
         for width in widths:
-            resized = im if width >= source_width else im.resize(
+            resized = im if width == im.width else im.resize(
                 (width, round(im.height * width / im.width)), Image.LANCZOS
             )
             for fmt in formats:
@@ -76,8 +80,23 @@ def encode_one(src: Path, index: int, out_root: Path, widths: list[int], formats
                 resized.save(target, format=fmt.upper(), **save_kwargs)
 
 
-def directory_bytes(path: Path) -> int:
-    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+def sequence_bytes(root: Path, width: int, fmt: str, count: int) -> int:
+    return sum((root / str(width) / fmt / f"{i:0{PAD}d}.{fmt}").stat().st_size for i in range(count))
+
+
+def clear_outputs(root: Path) -> None:
+    """Remove ladders and posters from a previous run.
+
+    Only the directories this script owns are removed. Without this, a run at
+    90 frames over a 120-frame ladder leaves frames 0090-0119 behind, and the
+    budget gate fails on files nobody meant to ship.
+    """
+    if not root.exists():
+        return
+    for child in root.iterdir():
+        if child.is_dir() and (child.name.isdigit() or child.name == "poster"):
+            shutil.rmtree(child)
+    (root / "manifest.json").unlink(missing_ok=True)
 
 
 def main() -> None:
@@ -102,7 +121,22 @@ def main() -> None:
 
     with Image.open(sources[0]) as probe:
         aspect = round(probe.width / probe.height, 6)
+        source_width = probe.width
 
+    # Upscaling adds bytes without adding detail. Drop rungs wider than the
+    # source; the runtime already falls back to the widest rung available.
+    too_wide = [w for w in widths if w > source_width]
+    if too_wide:
+        print(
+            f"warning: source frames are {source_width}px wide; skipping rungs {too_wide}. "
+            "Extract at a larger --width if large displays need them.",
+            file=sys.stderr,
+        )
+        widths = [w for w in widths if w <= source_width]
+    if not widths:
+        die(f"every configured width exceeds the {source_width}px source")
+
+    clear_outputs(args.out)
     args.out.mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         list(pool.map(
@@ -110,19 +144,28 @@ def main() -> None:
             enumerate(sources),
         ))
 
-    poster_index = min(len(sources) - 1, round((len(sources) - 1) * args.poster_at))
+    count = len(sources)
+    poster_index = min(count - 1, round((count - 1) * args.poster_at))
+    # WebP for the poster: it is the LCP image and every browser that can run
+    # the engine decodes it, so no <picture> negotiation is needed.
     poster_format = "webp" if "webp" in formats else formats[0]
+    poster_files = {}
+    (args.out / "poster").mkdir()
+    for width in widths:
+        name = f"poster/{width}.{poster_format}"
+        shutil.copyfile(args.out / str(width) / poster_format / f"{poster_index:0{PAD}d}.{poster_format}", args.out / name)
+        poster_files[str(width)] = name
 
     manifest = {
-        "count": len(sources),
+        "count": count,
         "formats": formats,
         "widths": widths,
         "aspect": aspect,
         "pattern": "{width}/{format}/{index}.{format}",
         "padding": PAD,
-        "poster": f"{widths[len(widths) // 2]}/{poster_format}/{poster_index:0{PAD}d}.{poster_format}",
+        "poster": {"frame": poster_index, "files": poster_files},
         "bytes": {
-            str(width): {fmt: directory_bytes(args.out / str(width) / fmt) for fmt in formats}
+            str(width): {fmt: sequence_bytes(args.out, width, fmt, count) for fmt in formats}
             for width in widths
         },
     }
@@ -131,10 +174,14 @@ def main() -> None:
     print(f"encoded {len(sources)} frames -> {args.out}")
     for width in widths:
         parts = "  ".join(
-            f"{fmt}: {manifest['bytes'][str(width)][fmt] / 1_048_576:6.2f} MB" for fmt in formats
+            f"{fmt}: {manifest['bytes'][str(width)][fmt] / 1_048_576:6.2f} MiB" for fmt in formats
         )
         print(f"  {width:>4}px   {parts}")
-    print(f"poster: {manifest['poster']}")
+    print(f"poster: frame {poster_index}, written to {args.out / 'poster'}/{{width}}.{poster_format}")
+    if widths != DEFAULT_WIDTHS or poster_format != "webp":
+        srcset = ", ".join(f"frames/{poster_files[str(w)]} {w}w" for w in widths)
+        print("note: the ladder differs from the template's defaults. Set the hero <img> and its preload to:")
+        print(f'  srcset="{srcset}"')
 
 
 if __name__ == "__main__":

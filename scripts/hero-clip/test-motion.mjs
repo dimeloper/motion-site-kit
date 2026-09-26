@@ -195,6 +195,71 @@ test('pagehide releases pin and pageshow restores exactly one animation', async 
   assert.equal(await page.$$eval('.pin-spacer', els => els.length), 1);
 });
 
+test('the poster loads from its fixed path without JavaScript', async page => {
+  await page.setJavaScriptEnabled(false);
+  await page.goto(url);
+  const poster = await page.$eval('.hero__poster', img => ({ ok: img.complete && img.naturalWidth > 0, src: img.currentSrc }));
+  assert.ok(poster.ok, 'poster image must decode');
+  assert.match(poster.src, /\/frames\/poster\/\d+\.webp$/);
+});
+
+test('pinning after a slow preload keeps the content the visitor scrolled to', async page => {
+  // Chrome's scroll anchoring would hide the jump. Safari does not anchor, so
+  // switch it off to test what Safari visitors see.
+  await page.evaluateOnNewDocument(() => document.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style');
+    style.textContent = '*, html, body { overflow-anchor: none !important; }';
+    document.head.append(style);
+  }));
+  const held = [];
+  let release = false;
+  await page.setRequestInterception(true);
+  page.on('request', req => {
+    if (!release && /\/frames\/\d+\/(avif|webp)\//.test(req.url())) held.push(req);
+    else req.continue();
+  });
+  await page.goto(url);
+  await page.waitForFunction(() => document.querySelector('[data-hero]').dataset.motion === 'preloading');
+  await page.evaluate(() => window.scrollTo({ top: 2400, behavior: 'instant' }));
+  await page.waitForFunction(() => Math.abs(scrollY - 2400) < 2);
+  const before = await page.evaluate(() => {
+    const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+    el.dataset.anchorProbe = '1';
+    return el.getBoundingClientRect().top;
+  });
+  release = true;
+  held.splice(0).forEach(req => req.continue());
+  await ready(page);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const after = await page.evaluate(() => {
+    const el = document.querySelector('[data-anchor-probe]');
+    return { top: el.getBoundingClientRect().top, same: document.elementFromPoint(innerWidth / 2, innerHeight / 2) === el };
+  });
+  assert.ok(Math.abs(after.top - before) <= 2, `content moved ${after.top - before}px when the pin engaged`);
+  assert.equal(after.same, true);
+});
+
+test('a resize that leaves the hero size unchanged does not re-measure the pin', async page => {
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await page.goto(url);
+  await ready(page);
+  const refreshes = await page.evaluate(async () => {
+    const { ScrollTrigger } = await import('/vendor/gsap/ScrollTrigger.js');
+    // Let load, font and image refreshes finish first: count only what the resize causes.
+    if (document.readyState !== 'complete') await new Promise(resolve => addEventListener('load', resolve, { once: true }));
+    await document.fonts.ready;
+    let last = performance.now();
+    ScrollTrigger.addEventListener('refresh', () => { last = performance.now(); });
+    while (performance.now() - last < 700) await new Promise(resolve => setTimeout(resolve, 100));
+    let count = 0;
+    ScrollTrigger.addEventListener('refresh', () => count++);
+    window.dispatchEvent(new Event('resize'));
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return count;
+  });
+  assert.equal(refreshes, 0);
+});
+
 test('desktop 1600px sequence stays within the same bitmap budget', async page => {
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await tests[0][1](page);
@@ -254,6 +319,87 @@ for (const name of ['local', 'saas', 'commerce']) {
     assert.equal(await page.$eval('[data-hero]', el => el.dataset.fallbackReason), 'context-lost');
     assert.equal(await page.$$eval('.pin-spacer', els => els.length), 0);
     assert.ok(await page.$eval('.hero__poster', el => Number(getComputedStyle(el).opacity) > 0));
+  });
+}
+
+const countGpuWork = () => {
+  window.gpuDraws = 0;
+  window.liveTextures = 0;
+  window.liveFramebuffers = 0;
+  const proto = WebGL2RenderingContext.prototype;
+  const wrap = (name, effect) => {
+    const original = proto[name];
+    proto[name] = function (...args) { effect(args); return original.apply(this, args); };
+  };
+  wrap('drawArrays', () => window.gpuDraws++);
+  wrap('drawElements', () => window.gpuDraws++);
+  wrap('createTexture', () => window.liveTextures++);
+  wrap('deleteTexture', ([t]) => { if (t) window.liveTextures--; });
+  wrap('createFramebuffer', () => window.liveFramebuffers++);
+  wrap('deleteFramebuffer', ([f]) => { if (f) window.liveFramebuffers--; });
+};
+
+for (const name of ['saas', 'commerce']) {
+  test(`${name}: an idle hero stops submitting GPU draws`, async page => {
+    await page.evaluateOnNewDocument(countGpuWork);
+    await page.goto(`${url}/examples/${name}/index.html`);
+    await ready(page);
+    // Vortex's intro, late ScrollTrigger refreshes after the page's images
+    // load, and a scrub easing out all legitimately draw. On a slow CI runner
+    // they land seconds later than locally, so wait for a full second with no
+    // draws. A scene that draws every frame never gets one and fails here.
+    const quiet = await page.evaluate(async () => {
+      const deadline = performance.now() + 15000;
+      let last = window.gpuDraws, since = performance.now();
+      while (performance.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (window.gpuDraws !== last) { last = window.gpuDraws; since = performance.now(); }
+        else if (performance.now() - since >= 1000) return { settled: true };
+      }
+      return { settled: false, draws: window.gpuDraws };
+    });
+    assert.ok(quiet.settled, `${name} never stopped drawing with nothing changing: ${JSON.stringify(quiet)}`);
+    const before = await page.evaluate(() => window.gpuDraws);
+    await page.evaluate(() => window.scrollBy(0, 300));
+    await page.waitForFunction(before => window.gpuDraws > before, {}, before);
+  });
+}
+
+for (const name of ['local', 'saas', 'commerce']) test(`${name}: re-initialising the hero does not leak GPU textures or framebuffers`, async page => {
+  await page.evaluateOnNewDocument(countGpuWork);
+  await page.goto(`${url}/examples/${name}/index.html`);
+  await ready(page);
+  const first = await page.evaluate(() => ({ textures: window.liveTextures, framebuffers: window.liveFramebuffers }));
+  const cycles = 3;
+  for (let cycle = 0; cycle < cycles; cycle++) {
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })));
+    await page.waitForFunction(() => document.querySelector('[data-hero]').dataset.motion === 'static');
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+    await ready(page);
+  }
+  const last = await page.evaluate(() => ({ textures: window.liveTextures, framebuffers: window.liveFramebuffers }));
+  // three r170's WebGLState creates four 1x1 placeholder textures per renderer
+  // and renderer.dispose() never deletes them. Anything beyond those is ours.
+  const placeholders = 4 * cycles;
+  assert.deepEqual(last, { textures: first.textures + placeholders, framebuffers: first.framebuffers },
+    'each cycle must release what it allocated');
+});
+
+for (const demo of ['local', 'saas', 'commerce']) {
+  test(`${demo}: an open menu stops the page scrolling behind it`, async page => {
+    await page.goto(`${url}/examples/${demo}/index.html`);
+    await ready(page);
+    await page.click('[data-menu-open]');
+    await page.waitForFunction(() => document.querySelector('[data-nav-menu]').classList.contains('is-open'));
+    const before = await page.evaluate(() => scrollY);
+    await page.mouse.move(195, 600);
+    await page.mouse.wheel({ deltaY: 800 });
+    await new Promise(resolve => setTimeout(resolve, 700));
+    assert.equal(await page.evaluate(() => scrollY), before, 'page scrolled behind the open menu');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.querySelector('[data-nav-menu]').hidden);
+    await page.mouse.wheel({ deltaY: 800 });
+    await page.waitForFunction(before => scrollY > before + 100, {}, before);
   });
 }
 
@@ -455,6 +601,78 @@ test('vgpu renders, reverses and falls back after device loss when available', a
   assert.ok(await page.$eval('.stage img', img => img.complete && img.naturalWidth > 0));
 });
 
+test('the landing hero and everything in it fit the viewport it is pinned in', async page => {
+  // A pinned hero taller than the viewport hides its own bottom for the whole
+  // sequence. On an iPhone (714px small viewport) the old 820px minimum cut the
+  // caption in half and put the bottom bar entirely off-screen.
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  for (const [width, height] of [[402, 714], [375, 560], [874, 402], [1280, 600], [1440, 900]]) {
+    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.goto(url);
+    const boxes = await page.evaluate(() => Object.fromEntries(['.hero', '.hero__actions', '.hero__caption', '.hero__bottom'].map(selector => {
+      const el = document.querySelector(selector);
+      const r = el.getBoundingClientRect();
+      return [selector, getComputedStyle(el).display === 'none' ? null : { top: r.top, bottom: r.bottom, left: r.left, right: r.right }];
+    })));
+    const size = `${width}x${height}`;
+    assert.ok(boxes['.hero'].bottom <= height + 0.5, `${size}: hero is ${boxes['.hero'].bottom - height}px taller than the viewport`);
+    for (const key of ['.hero__actions', '.hero__caption', '.hero__bottom']) {
+      if (boxes[key]) assert.ok(boxes[key].top >= 0 && boxes[key].bottom <= height + 0.5, `${size}: ${key} is outside the viewport`);
+    }
+    const overlap = (a, b) => a && b && a.top < b.bottom && b.top < a.bottom && a.left < b.right && b.left < a.right;
+    assert.ok(!overlap(boxes['.hero__actions'], boxes['.hero__bottom']), `${size}: actions overlap the bottom bar`);
+    assert.ok(!overlap(boxes['.hero__caption'], boxes['.hero__bottom']), `${size}: caption overlaps the bottom bar`);
+    assert.ok(!overlap(boxes['.hero__caption'], boxes['.hero__actions']), `${size}: caption overlaps the actions`);
+  }
+});
+
+// Every pinned hero must fit the viewport it is pinned in, at phone, landscape,
+// short-laptop, tablet and desktop sizes. Secondary pieces may step aside on
+// short screens; whatever is shown must sit inside the hero and not collide.
+const HERO_PARTS = {
+  local: ['.hero__headline', '.hero__sub', '.hero__ctas', '.hero__aside', '.hero__proximity', '.hero__status'],
+  saas: ['.hero__eyebrow', '.hero__headline', '.hero__lead', '.hero__sub', '.hero__ctas', '.hero__stats', '.hero__tags', '.hero__status'],
+  commerce: ['.hero__headline', '.hero__sub', '.hero__ctas', '.hero__status'],
+};
+for (const [name, parts] of Object.entries(HERO_PARTS)) {
+  test(`${name}: the hero and everything shown in it fit the viewport it is pinned in`, async page => {
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    for (const [width, height] of [[402, 714], [375, 560], [874, 402], [1024, 700], [1280, 600], [1440, 900], [820, 1180]]) {
+      await page.setViewport({ width, height, deviceScaleFactor: 1 });
+      await page.goto(`${url}/examples/${name}/index.html`);
+      const issues = await page.evaluate(selectors => {
+        const box = el => { const r = el.getBoundingClientRect(); return { t: r.top + scrollY, b: r.bottom + scrollY, l: r.left, r: r.right }; };
+        const hero = box(document.querySelector('[data-hero]'));
+        const found = [];
+        if (hero.b > innerHeight + 0.5) found.push(`hero is ${Math.round(hero.b - innerHeight)}px taller than the viewport`);
+        const shown = selectors.map(s => [s, document.querySelector(s)])
+          .filter(([, el]) => el && getComputedStyle(el).display !== 'none' && el.getClientRects().length)
+          .map(([s, el]) => [s, box(el), el]);
+        for (const [s, b] of shown) if (b.b > hero.b + 0.5 || b.t < hero.t - 0.5) found.push(`${s} is cut off by the hero's edge`);
+        for (let i = 0; i < shown.length; i++) for (let j = i + 1; j < shown.length; j++) {
+          const [sa, a, ea] = shown[i], [sb, b, eb] = shown[j];
+          if (ea.contains(eb) || eb.contains(ea)) continue;
+          if (a.t < b.b - 1 && b.t < a.b - 1 && a.l < b.r - 1 && b.l < a.r - 1) found.push(`${sa} overlaps ${sb}`);
+        }
+        return found;
+      }, parts);
+      assert.deepEqual(issues, [], `${name} at ${width}x${height}`);
+    }
+  });
+}
+
+test('Safari bar tint strips follow the dark hero and step aside for light sections', async page => {
+  // Only iOS WebKit renders the strips (see edge-tint.js); this checks the
+  // logic that decides when each edge is claimed and in what colour.
+  await page.goto(url);
+  const strips = () => page.$$eval('.edge-tint', els => els.map(el => el.hidden ? 'hidden' : el.style.backgroundColor));
+  await page.waitForFunction(() => document.querySelectorAll('.edge-tint').length === 2);
+  assert.deepEqual(await strips(), ['rgb(14, 19, 11)', 'rgb(14, 19, 11)']);
+  await page.evaluate(() => window.scrollTo({ top: document.querySelector('#start').offsetTop, behavior: 'instant' }));
+  await page.waitForFunction(() => [...document.querySelectorAll('.edge-tint')].every(el => el.hidden));
+  assert.equal(await page.$eval('.edge-tint', el => getComputedStyle(el).display), 'none');
+});
+
 test('docs remains readable without JavaScript and exposes real example links', async page => {
   await page.setViewport({ width: 320, height: 800, deviceScaleFactor: 1 });
   await page.setJavaScriptEnabled(false);
@@ -502,6 +720,17 @@ test('docs copy controls and catalog search, selection and config work', async p
   assert.deepEqual(await audit(), []);
 });
 
+test('falsy renderer guards never print as text', async page => {
+  await page.goto(`${url}/kit/preview.html?recipe=studio`);
+  const text = await page.evaluate(async () => {
+    const { compose } = await import('/kit/compose.js?v=13');
+    const host = document.createElement('div');
+    compose(host, [{ type: 'spotlight-stage', id: 's', headline: 'Stage', image: { src: 'x.webp', alt: '' }, thumbs: [] }], { warn: false });
+    return host.textContent.trim();
+  });
+  assert.equal(text, 'Stage');
+});
+
 test('recipe browser selects compositions, changes viewport and exports the selected brief', async page => {
   await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
   await page.evaluateOnNewDocument(() => Object.defineProperty(navigator, 'clipboard', {
@@ -511,7 +740,14 @@ test('recipe browser selects compositions, changes viewport and exports the sele
   await page.waitForSelector('#recipe-select option');
   for (const recipe of ['product', 'hospitality', 'exhibition', 'studio']) {
     await page.select('#recipe-select', recipe);
-    await page.waitForFunction(key => document.querySelector('#recipe-frame').contentDocument?.body.dataset.recipe === key, {}, recipe);
+    await page.waitForFunction(key => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === key, { timeout: 15000 }, recipe)
+      .catch(async error => {
+        const frame = await page.evaluate(() => {
+          const f = document.querySelector('#recipe-frame'), d = f.contentDocument;
+          return { src: f.getAttribute('src'), document: d?.URL, readyState: d?.readyState, shows: d?.body?.dataset.recipe, selected: document.querySelector('#recipe-select').value };
+        });
+        throw new Error(`preview never showed ${recipe}: ${JSON.stringify(frame)}`, { cause: error });
+      });
     await page.click('[data-copy-recipe]');
     await page.waitForFunction(() => window.copiedRecipe === document.querySelector('[data-recipe-source]').textContent);
     const exported = await page.evaluate(() => JSON.parse(window.copiedRecipe));
@@ -525,6 +761,20 @@ test('recipe browser selects compositions, changes viewport and exports the sele
   assert.equal(await page.$eval('[data-preview-width="mobile"]', el => el.getAttribute('aria-pressed')), 'true');
   await page.click('[data-preview-width="desktop"]');
   assert.ok(await page.$eval('#recipe-frame', el => el.clientWidth > 1000));
+});
+
+test('a recipe preview that loads the wrong recipe corrects itself', async page => {
+  // Chrome occasionally dropped a src change during the frame's first load and
+  // finished loading the previous recipe. Reproduce the end state directly:
+  // the select says one recipe, the frame loads another.
+  await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
+  await page.goto(`${url}/kit/index.html`);
+  await page.waitForSelector('#recipe-select option');
+  await page.select('#recipe-select', 'exhibition');
+  await page.waitForFunction(() => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === 'exhibition');
+  await page.evaluate(() => document.querySelector('#recipe-frame').contentWindow.location.replace('preview.html?recipe=product'));
+  await page.waitForFunction(() => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === 'exhibition'
+    && document.querySelector('#recipe-frame').contentWindow.location.search === '?recipe=exhibition', { timeout: 10000 });
 });
 
 test('story sections support keyboard comparison and project selection', async page => {

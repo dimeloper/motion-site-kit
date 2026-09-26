@@ -24,7 +24,7 @@ python3 skills/motion-website/scripts/optimize_frames.py \
   frames/raw-speaker --out template/frames --config motion.config.json
 ```
 
-This creates 640, 960 and 1600px ladders in AVIF and WebP, plus the manifest the browser reads. A phone downloads the rung selected for its rendered width and device pixel ratio; it does not fetch every size.
+This creates 640, 960 and 1600px ladders in AVIF and WebP, one poster per rung in `template/frames/poster/`, and the manifest the browser reads. A visitor downloads one rung, chosen from the viewport width and device pixel ratio: most phones fetch 960, which the budget holds to 1.5 MB. The page's poster `<img>` loads by fixed name, so it keeps working whatever frame count you choose.
 
 ## 3. Describe the page in one file
 
@@ -68,6 +68,7 @@ Before publishing:
 - Turn on reduced motion and confirm the poster, copy and CTA remain usable.
 - Enable Save-Data or emulate a 2G connection and confirm the short static layout appears.
 - Test at a real phone width; narrow screens still receive animation under normal connection and motion settings.
+- Hold a phone in portrait. The frames are landscape and cover-cropped, so only a centre strip about a quarter of the frame's width is visible. The speaker must stay readable in it.
 - Throttle to Slow 4G, reload, and confirm the poster remains visible while frames load.
 - Run the full [QA checklist](../skills/motion-website/references/qa.md).
 

@@ -1,4 +1,4 @@
-import { disposeTree, loadGlb } from '../../shared/lifecycle.js';
+import { createFrameDriver, disposeTree, loadGlb, releaseRenderer } from '../../shared/lifecycle.js';
 /**
  * Harbor Oven live WebGL hero — Meshy/Higgsfield loaf GLB under a glass cloche.
  * Camera orbit and cloche lift are driven by scroll progress (0–1).
@@ -13,8 +13,7 @@ const BG = 0x100e0c;
 const DEFAULT_MODEL = new URL('../models/loaf.glb', import.meta.url).href;
 
 /** Soft flour motes around the loaf — warm bakery dust, not a particle landscape. */
-function createFlourField(THREE, origin) {
-  const count = 980;
+function createFlourField(THREE, origin, count) {
   const positions = new Float32Array(count * 3);
   const seeds = new Float32Array(count);
   const sizes = new Float32Array(count);
@@ -159,14 +158,17 @@ export async function createHarborScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.055);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  const envScene = studioEnvironment();
+  const envTarget = pmrem.fromScene(envScene, 0.06);
+  scene.environment = envTarget.texture;
+  const lookupTextures = ['LTC_FLOAT_1', 'LTC_FLOAT_2', 'LTC_HALF_1', 'LTC_HALF_2'].map(key => THREE.UniformsLib[key]);
   let released = false;
   const release = () => {
     if (released) return;
     released = true;
-    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+    releaseRenderer({ renderer, scene, pmrem, envScene, envTarget, lookupTextures });
   };
   opts.signal?.addEventListener('abort', release, { once: true });
-  scene.environment = pmrem.fromScene(studioEnvironment(), 0.06).texture;
   scene.environmentIntensity = 1.2;
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
@@ -211,7 +213,6 @@ export async function createHarborScene(canvas, opts = {}) {
     const source = Array.isArray(obj.material) ? obj.material : [obj.material];
     const next = source.map((mat) => {
       const m = mat.clone();
-      m.envMapIntensity = m.envMapIntensity ?? 1.25;
       m.needsUpdate = true;
       return m;
     });
@@ -231,24 +232,26 @@ export async function createHarborScene(canvas, opts = {}) {
 
   onProgress(0.85);
 
-  const flour = createFlourField(THREE, loafHome);
+  const flour = createFlourField(THREE, loafHome, opts.motion?.flourCount ?? 980);
   scene.add(flour.points);
 
   const lookTarget = new THREE.Vector3(loafHome.x - 0.12, loafHome.y + 0.06, 0);
   let scrollProgress = 0;
-  let rafId = 0;
 
+  /** Returns true when the drawing buffer changed size. */
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
     const rect = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(rect.width * dpr));
     const h = Math.max(1, Math.round(rect.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
+    const changed = canvas.width !== w || canvas.height !== h;
+    if (changed) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
     flour.material.uniforms.uPixelRatio.value = dpr;
+    return changed;
   }
 
   function drawFrame() {
@@ -276,35 +279,24 @@ export async function createHarborScene(canvas, opts = {}) {
     renderer.render(scene, camera);
   }
 
+  // The motes drift on their own clock, so Harbor draws every visible frame.
+  // The driver still stops completely while the hero is offscreen or hidden.
+  const driver = createFrameDriver(drawFrame, { continuous: true });
+
   function render(progress) {
     scrollProgress = progress;
-    if (active) drawFrame();
+    driver.draw();
   }
 
-  let active = true;
   let disposed = false;
-  function loop() {
-    if (!active || disposed) return;
-    rafId = requestAnimationFrame(loop);
-    drawFrame();
-  }
-  function setActive(value) {
-    if (disposed || value === active) return;
-    active = value;
-    if (active) loop();
-    else cancelAnimationFrame(rafId);
-  }
-  loop();
-
   function dispose() {
     if (disposed) return;
     disposed = true;
-    active = false;
-    cancelAnimationFrame(rafId);
+    driver.dispose();
     opts.signal?.removeEventListener('abort', release);
     release();
   }
 
   onProgress(1);
-  return { resize, render, setActive, dispose };
+  return { resize, render, setActive: driver.setActive, dispose };
 }

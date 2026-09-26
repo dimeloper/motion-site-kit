@@ -36,6 +36,9 @@ export function inferFamily(section = {}) {
   if (section.claims?.length) return 'claim-stack';
   if (section.rows?.length) return 'hours-list';
   if (section.marks?.length) return 'client-marks';
+  // An aside turns labelled figures into a stat stack; without one they read
+  // as a list of hours or names, below.
+  if (section.aside && items.some((item) => item.value)) return 'stat-stack';
   if (items.length && items.every((item) => item.label && !item.image && !item.q && !item.body)) {
     return items[0]?.value ? 'hours-list' : 'client-marks';
   }
@@ -61,7 +64,6 @@ export function inferFamily(section = {}) {
   if (imaged.length === 3) return 'colonnade';
   if (imaged.length === 2 && section.overlap) return 'peek-overlap';
   if (imaged.length === 2) return 'pair-stills';
-  if (section.aside && items.some((item) => item.value)) return 'stat-stack';
   if (section.headline && section.body && section.voidLabel) return 'hero-cinematic';
   return null;
 }

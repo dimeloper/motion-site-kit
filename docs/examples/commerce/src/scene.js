@@ -1,4 +1,4 @@
-import { disposeTree, loadGlb } from '../../shared/lifecycle.js';
+import { createFrameDriver, disposeTree, loadGlb, releaseRenderer } from '../../shared/lifecycle.js';
 /**
  * Halo studio hero. Textured stone stays put.
  * Two rings of light lift off the body and seat on reverse.
@@ -163,14 +163,17 @@ export async function createHaloScene(canvas, opts = {}) {
   scene.fog = new THREE.FogExp2(BG, 0.028);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
+  const envScene = studioEnvironment();
+  const envTarget = pmrem.fromScene(envScene, 0.08);
+  scene.environment = envTarget.texture;
+  const lookupTextures = ['LTC_FLOAT_1', 'LTC_FLOAT_2', 'LTC_HALF_1', 'LTC_HALF_2'].map(key => THREE.UniformsLib[key]);
   let released = false;
   const release = () => {
     if (released) return;
     released = true;
-    disposeTree(scene); renderer.dispose(); pmrem.dispose();
+    releaseRenderer({ renderer, scene, pmrem, envScene, envTarget, lookupTextures });
   };
   opts.signal?.addEventListener('abort', release, { once: true });
-  scene.environment = pmrem.fromScene(studioEnvironment(), 0.08).texture;
   scene.environmentIntensity = 0.95;
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
@@ -216,7 +219,7 @@ export async function createHaloScene(canvas, opts = {}) {
     z: 0,
   };
   stone.position.set(stoneHome.x, stoneHome.y, stoneHome.z);
-  if (!stone.userData.billboard) stone.rotation.y = -0.22;
+  stone.rotation.y = -0.22;
   scene.add(stone);
 
   const size = fitted.getSize(new THREE.Vector3());
@@ -258,13 +261,12 @@ export async function createHaloScene(canvas, opts = {}) {
 
   const lookTarget = new THREE.Vector3(stoneHome.x - 0.06, midY, 0);
   let scrollProgress = 0;
-  let rafId = 0;
-  let layout = { mobile: false };
+  const layout = { mobile: false };
 
   onProgress(0.9);
 
   function layoutLock() {
-    const mobile = window.innerWidth < 768;
+    const mobile = opts.mobile?.matches ?? window.innerWidth < 768;
     layout.mobile = mobile;
     const x = mobile ? 0.06 : stoneHome.x;
     stone.position.set(x, stoneHome.y - (mobile ? 0.06 : 0), 0);
@@ -272,18 +274,21 @@ export async function createHaloScene(canvas, opts = {}) {
     bloom.strength = mobile ? 0.08 : 0.12;
   }
 
+  /** Returns true when the drawing buffer changed size. */
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
     const rect = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.round(rect.width * dpr));
     const h = Math.max(1, Math.round(rect.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) {
+    const changed = canvas.width !== w || canvas.height !== h;
+    if (changed) {
       renderer.setSize(w, h, false);
       composer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
     layoutLock();
+    return changed;
   }
 
   function applyRings(t) {
@@ -326,38 +331,32 @@ export async function createHaloScene(canvas, opts = {}) {
     composer.render();
   }
 
+  // Nothing in the studio animates on its own clock. A full bloom composite
+  // every frame would cost phones battery for pixels that never change, so
+  // Halo draws only when scroll, resize or visibility changes something.
+  const driver = createFrameDriver(drawFrame);
+
   function render(progress) {
     scrollProgress = progress;
-    if (active) drawFrame();
+    driver.draw();
   }
 
-  let active = true;
   let disposed = false;
-  function loop() {
-    if (!active || disposed) return;
-    rafId = requestAnimationFrame(loop);
-    drawFrame();
-  }
-  function setActive(value) {
-    if (disposed || value === active) return;
-    active = value;
-    if (active) loop();
-    else cancelAnimationFrame(rafId);
-  }
-  loop();
-
   function dispose() {
     if (disposed) return;
     disposed = true;
-    active = false;
-    cancelAnimationFrame(rafId);
+    driver.dispose();
     opts.signal?.removeEventListener('abort', release);
-    release();
+    // EffectComposer.dispose() frees only its own two targets and copy pass.
+    // The bloom pass owns a mip chain of render targets and must be freed
+    // itself, and both must go before the renderer that allocated them.
+    bloom.dispose();
     composer.dispose();
     glowTex.dispose();
     shaftTex.dispose();
+    release();
   }
 
   onProgress(1);
-  return { resize, render, setActive, dispose };
+  return { resize, render, setActive: driver.setActive, dispose };
 }

@@ -66,39 +66,6 @@
       "usage": "loaded by current scene",
       "rgbaBaseBytes": 12582912,
       "rgbaWithMipsBytes": 16777212
-    },
-    {
-      "path": "docs/examples/saas/models/ring.glb",
-      "modelBytes": 794548,
-      "images": [
-        {
-          "name": "normal",
-          "width": 1024,
-          "height": 1024,
-          "encodedBytes": 94092,
-          "rgbaBaseBytes": 4194304,
-          "rgbaWithMipsBytes": 5592404
-        },
-        {
-          "name": "base_color",
-          "width": 1024,
-          "height": 1024,
-          "encodedBytes": 119844,
-          "rgbaBaseBytes": 4194304,
-          "rgbaWithMipsBytes": 5592404
-        },
-        {
-          "name": "metallic_roughness",
-          "width": 1024,
-          "height": 1024,
-          "encodedBytes": 25650,
-          "rgbaBaseBytes": 4194304,
-          "rgbaWithMipsBytes": 5592404
-        }
-      ],
-      "usage": "unused legacy asset; Vortex uses a procedural CAD band",
-      "rgbaBaseBytes": 12582912,
-      "rgbaWithMipsBytes": 16777212
     }
   ]
 }

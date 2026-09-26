@@ -36,7 +36,7 @@ def inspect(path):
                            encodedBytes=view['byteLength'], rgbaBaseBytes=width * height * 4,
                            rgbaWithMipsBytes=mip_bytes))
     return dict(path=str(path.relative_to(ROOT)), modelBytes=len(data), images=images,
-                usage='unused legacy asset; Vortex uses a procedural CAD band' if path.parent.parent.name == 'saas' else 'loaded by current scene',
+                usage='loaded by current scene',
                 rgbaBaseBytes=sum(i['rgbaBaseBytes'] for i in images),
                 rgbaWithMipsBytes=sum(i['rgbaWithMipsBytes'] for i in images))
 

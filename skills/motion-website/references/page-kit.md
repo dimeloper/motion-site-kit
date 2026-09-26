@@ -1,37 +1,43 @@
 # Page kit (section families)
 
-The third vertical failed when it reused Vortex's page: numbered modules, a feel panel, three identical finish cards, about, CTA. Swapping nouns in `config.js` does not make a new site.
+A new page composes its sections from families chosen for its content.
+Copying another page's section list and swapping the nouns does not make a new
+site; it makes the same site twice.
 
-Layout lives in `docs/kit/`. Harbor and Vortex keep the HTML they earned. A new demo **composes** a sequence. It does not copy `docs/examples/saas/index.html`.
+The kit lives in the repository at
+[`docs/kit/`](https://github.com/dimeloper/motion-site-kit/tree/main/docs/kit),
+not in this skill. Serve `docs/` and open `/kit/` to browse every family and
+the four complete recipes.
 
-Specimen: serve `docs/` and open `/kit/`.
+## What to reuse from the examples
 
-## What you may copy from Harbor / Vortex
-
-Loader invariant, Lenis + hash scroll, menu dialog (focus trap, Escape), poster `<img>` under canvas, `data-motion="static"` until JS commits, reduced-motion / Save-Data / 2G / no-WebGL fallbacks.
-
-Not the section list. Not `modules` / `feel` / `builds` / `about` / `cta` with new labels.
+The runtime, not the page: the loader invariant, Lenis and in-page anchors, the
+menu dialog, the poster `<img>` under the canvas, `data-motion="static"` until
+JavaScript commits, and the fallbacks. All of it is in `docs/examples/shared/`.
+The section list is the part that must be new.
 
 ## Composition rules
 
 1. Start from a complete recipe in `docs/kit/recipes.js`. Describe content and use `page.order` to set its reading order; explicit family configurations remain available for authored compositions.
 2. Choose the section count from the content. Repetition is a review cue, not a hard failure; inspect the rhythm of the complete page.
-3. Do not ship the Vortex ids `modules`, `feel`, `builds`, `about`, `cta` together.
-4. Three equal cards and four equal stat cells are banned.
-5. Eyebrows (small uppercase tracking labels) at most once every three sections. Prefer none.
-6. One theme per page. `hero-editorial` is a light family. Do not drop it between dark sections.
+3. No three equal cards and no four equal stat cells.
+4. Eyebrows (small uppercase tracking labels) at most once every three sections. Prefer none.
+5. One theme per page. `hero-editorial` is a light family. Do not drop it between dark sections.
 
-`compose.js` warns in the console if a family repeats or the Vortex id list is present. `select.js` maps brief shape to families.
+`compose.js` warns in the console when a family repeats. `select.js` maps the
+shape of the brief to families, and `tests/test_kit.mjs` covers every rule it
+applies.
 
 ## Do not ship naked kit HTML
 
-Halo painted `ascent-steps` and `work-rail` as unstyled markup: browser `1. 2. 3.` next to `01`, and Grain at the image's intrinsic 1200px width. Featured looked fine because Halo already overrode that family. The other two only had kit CSS, and that file is easy to miss (stale cache, relative path, no version query).
-
-Rules that keep this from coming back:
+If `sections.css` fails to apply, whether from a stale cache or a wrong relative
+path, the families paint as raw HTML: browser list markers beside the designed
+numerals, and stills at their intrinsic width. These rules keep that from
+reaching a visitor:
 
 1. **Designed lists are not `<ol>` / `<ul>`.** `ascent-steps`, `faq-rule`, `rule-list`, `chapter-index`, `client-marks`, and `claim-stack` mount `div[role=list]`. A real list element draws markers the moment kit CSS loses.
 2. **The demo owns a safety net** in its own stylesheet: `[data-kit] img { max-width: 100% }`, list-style reset, and explicit rail flex + cell width. Do not rely on `sections.css` alone for any family on the live page.
-3. **Cache-bust `sections.css` with the JS** (`?v=` on both). Bumping `bind.js` and leaving the kit stylesheet unversioned is how a stale file wins.
+3. **One version for every kit URL.** Every import of a kit module, the `sections.css` link and its `@import` of `story-sections.css` carry the same `?v=`. Bump all of them together. `tests/test_kit.mjs` fails if any differs.
 4. **Look at every composed family after a hard reload**, not just the hero. Default list markers or a still wider than the viewport means the kit styles did not apply.
 
 ## How the planner chooses
@@ -56,13 +62,13 @@ Rules that keep this from coming back:
 | Quote | `quote-pull` |
 | Metrics, and `kind` is not `studio` | `stat-stack` |
 
-Studio (`kind: 'studio'`, or inferred from a featured still + stills) skips `stat-stack` and never inserts `hero-editorial` mid-page. Halo ships a studio brief with explicit order: projects → chapters → expansion → invite. Omitted IDs follow the listed ones.
+Studio (`kind: 'studio'`, or inferred from a featured still and stills) skips `stat-stack` and never inserts `hero-editorial` mid-page. `order` lists section ids in reading order; ids it omits follow the listed ones. Halo's brief is the studio example.
 
 A section with no `type` still mounts if `inferFamily()` can read its fields (`items[].q`, `steps`, `item.image`, and so on).
 
 ## Families
 
-Thirty-four families. A page uses a short sequence. The catalog is not a page.
+`FAMILIES` in `compose.js` is the list, derived from the renderers. A page uses a short sequence of them. The catalog is not a page.
 
 | Type | Use when | Not a substitute for |
 |---|---|---|
@@ -106,15 +112,17 @@ Thirty-four families. A page uses a short sequence. The catalog is not a page.
 ## Wire-up
 
 ```js
-import { compose, planPage } from '../../kit/compose.js';
+import { compose, planPage } from '../../kit/compose.js?v=13'; // the kit's current version
 
 compose(document.querySelector('[data-kit]'), planPage(CONFIG.page));
 ```
 
 `CONFIG.page` is `{ kind, content, order }`. Halo is the studio example. Specimens may still pass `{ sections: […] }` with explicit types.
 
-Styles: `docs/kit/sections.css`. Brand tokens (colors, fonts) override on `[data-theme]` in the demo's own CSS. Do not fork `sections.css` to restyle one card into Vortex.
+Styles: `docs/kit/sections.css`. Brand tokens (colours, fonts) override on `[data-theme]` in the page's own CSS. Do not fork `sections.css` to restyle one family for one page.
 
 ## 3D is a separate decision
 
-This kit is layout. The object still has to clear `webgl-model.md`. Untextured CAD primitives failed on Vortex (torus) and on the deleted Halo cups. Halo's stone is Meshy PBR. The next object is Meshy PBR or a licensed textured GLB, or it stays a poster.
+This kit is layout. The object in the hero still has to clear the gate in
+`webgl-model.md`. Untextured primitives read as placeholders; use a textured
+GLB, a CAD object with real materials, or a poster.
