@@ -651,7 +651,7 @@ test('docs copy controls and catalog search, selection and config work', async p
 test('falsy renderer guards never print as text', async page => {
   await page.goto(`${url}/kit/preview.html?recipe=studio`);
   const text = await page.evaluate(async () => {
-    const { compose } = await import('/kit/compose.js?v=12');
+    const { compose } = await import('/kit/compose.js?v=13');
     const host = document.createElement('div');
     compose(host, [{ type: 'spotlight-stage', id: 's', headline: 'Stage', image: { src: 'x.webp', alt: '' }, thumbs: [] }], { warn: false });
     return host.textContent.trim();
@@ -668,7 +668,14 @@ test('recipe browser selects compositions, changes viewport and exports the sele
   await page.waitForSelector('#recipe-select option');
   for (const recipe of ['product', 'hospitality', 'exhibition', 'studio']) {
     await page.select('#recipe-select', recipe);
-    await page.waitForFunction(key => document.querySelector('#recipe-frame').contentDocument?.body.dataset.recipe === key, {}, recipe);
+    await page.waitForFunction(key => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === key, { timeout: 15000 }, recipe)
+      .catch(async error => {
+        const frame = await page.evaluate(() => {
+          const f = document.querySelector('#recipe-frame'), d = f.contentDocument;
+          return { src: f.getAttribute('src'), document: d?.URL, readyState: d?.readyState, shows: d?.body?.dataset.recipe, selected: document.querySelector('#recipe-select').value };
+        });
+        throw new Error(`preview never showed ${recipe}: ${JSON.stringify(frame)}`, { cause: error });
+      });
     await page.click('[data-copy-recipe]');
     await page.waitForFunction(() => window.copiedRecipe === document.querySelector('[data-recipe-source]').textContent);
     const exported = await page.evaluate(() => JSON.parse(window.copiedRecipe));
@@ -682,6 +689,20 @@ test('recipe browser selects compositions, changes viewport and exports the sele
   assert.equal(await page.$eval('[data-preview-width="mobile"]', el => el.getAttribute('aria-pressed')), 'true');
   await page.click('[data-preview-width="desktop"]');
   assert.ok(await page.$eval('#recipe-frame', el => el.clientWidth > 1000));
+});
+
+test('a recipe preview that loads the wrong recipe corrects itself', async page => {
+  // Chrome occasionally dropped a src change during the frame's first load and
+  // finished loading the previous recipe. Reproduce the end state directly:
+  // the select says one recipe, the frame loads another.
+  await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
+  await page.goto(`${url}/kit/index.html`);
+  await page.waitForSelector('#recipe-select option');
+  await page.select('#recipe-select', 'exhibition');
+  await page.waitForFunction(() => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === 'exhibition');
+  await page.evaluate(() => document.querySelector('#recipe-frame').contentWindow.location.replace('preview.html?recipe=product'));
+  await page.waitForFunction(() => document.querySelector('#recipe-frame').contentDocument?.body?.dataset.recipe === 'exhibition'
+    && document.querySelector('#recipe-frame').contentWindow.location.search === '?recipe=exhibition', { timeout: 10000 });
 });
 
 test('story sections support keyboard comparison and project selection', async page => {

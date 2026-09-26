@@ -4,9 +4,9 @@
  * Prefer planPage() when the brief is content, not types.
  */
 
-import { renderChapters, renderExpand, renderProjectIndex, renderComparison, disposeStory } from './story-sections.js?v=12';
+import { renderChapters, renderExpand, renderProjectIndex, renderComparison, disposeStory } from './story-sections.js?v=13';
 
-import { inferFamily, inferKind, planPage } from './select.js?v=12';
+import { inferFamily, inferKind, planPage } from './select.js?v=13';
 
 export { inferFamily, inferKind, planPage };
 

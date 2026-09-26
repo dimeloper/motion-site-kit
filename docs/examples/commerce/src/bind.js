@@ -3,7 +3,7 @@
  */
 
 import { CONFIG } from '../config.js?v=12';
-import { compose, planPage } from '../../../kit/compose.js?v=12';
+import { compose, planPage } from '../../../kit/compose.js?v=13';
 
 const SYSTEM_FONTS = new Set([
   'georgia', 'serif', 'sans-serif', 'monospace', 'system-ui',

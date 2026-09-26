@@ -64,7 +64,7 @@ Thirty-four families. A page uses a short sequence. The catalog is not a page.
 ## Use
 
 ```js
-import { compose, planPage } from '../../kit/compose.js?v=12'; // the kit's current version
+import { compose, planPage } from '../../kit/compose.js?v=13'; // the kit's current version
 
 compose(document.querySelector('[data-kit]'), planPage({
   kind: 'studio',

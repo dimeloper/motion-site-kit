@@ -1,4 +1,4 @@
-import { RECIPES } from './recipes.js?v=12';
+import { RECIPES } from './recipes.js?v=13';
 const select = document.querySelector('#recipe-select');
 const frame = document.querySelector('#recipe-frame');
 for (const [key, recipe] of Object.entries(RECIPES)) {
@@ -10,6 +10,14 @@ function show() {
   document.querySelector('[data-open-recipe]').href = frame.src;
 }
 select.addEventListener('change', show); show();
+// If a navigation was dropped, the frame finishes loading the previous recipe
+// while the select names another. Seen in Chrome on a cold load when the
+// recipe changed during the frame's first load; reload rather than show the
+// wrong composition.
+frame.addEventListener('load', () => {
+  const shown = new URLSearchParams(frame.contentWindow?.location.search ?? '').get('recipe');
+  if (shown && shown !== select.value) show();
+});
 for (const button of document.querySelectorAll('[data-preview-width]')) button.addEventListener('click', () => {
   frame.style.width = button.dataset.previewWidth === 'mobile' ? '390px' : '100%';
   document.querySelectorAll('[data-preview-width]').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));

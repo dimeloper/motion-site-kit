@@ -133,6 +133,17 @@ test('the published family count matches the renderers', () => {
   assert.match(readFileSync(join(kit, 'catalog.js'), 'utf8'), new RegExp(`value: '${count}', label: 'layout families'`));
 });
 
+test('the recipe preview iframe is not lazy-loaded', () => {
+  // With loading="lazy", Chrome dropped a src change made while the frame's
+  // deferred first load was pending: 4 of 60 cold loads kept showing the old
+  // recipe, against 0 of 180 without it. The browser test catches it only
+  // about one run in eight, so guard the attribute directly.
+  const html = readFileSync(join(kit, 'index.html'), 'utf8');
+  const frame = html.match(/<iframe[^>]*id="recipe-frame"[^>]*>/);
+  assert.ok(frame, 'recipe-frame iframe not found');
+  assert.doesNotMatch(frame[0], /loading=["']?lazy/);
+});
+
 test('every kit asset URL carries the same cache-busting version', () => {
   // Bug 5 in CLAUDE.md: a stale sections.css next to fresh JS painted raw
   // HTML. One version for every kit file means one bump refreshes all of it.
