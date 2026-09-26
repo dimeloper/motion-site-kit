@@ -31,7 +31,7 @@ Still open, and yours to do:
 
 1. **Real-phone QA on cellular** (7.2): portrait crop, URL-bar collapse, fling feel, battery. Nothing automated covers these.
 2. ~~**Physical iPhone Safari run.**~~ Done 2026-09-26 on an iPhone 17, iOS 26.6.2 (Safari reports 26.6.1), over Wi-Fi with `SAFARI_LAN_HOST`: all 7 checks pass, including the late pin at 0px moved. Control: `main`'s engine moved the page 2499px on the same phone, so the check can fail there. Fold stayed on its poster, as expected over plain HTTP.
-3. **Asset provenance:** `docs/examples/ASSETS.md` marks the Unsplash photographers, the Halo images and the Meshy and Recraft plan terms as not recorded. Fill them in or replace the files before calling the assets reusable.
+3. ~~**Asset provenance.**~~ Done 2026-09-26: every row in `docs/examples/ASSETS.md` has a source and terms. The two Harbor photos were traced to their Unsplash pages by image hash. Everything generated came from a paid Higgsfield plan and was matched to its generation ID in the account history, including the Vortex ring (Recraft V4.1 run on Higgsfield, not a Recraft free-tier account).
 4. ~~**Push, let CI run, merge.**~~ Done: PR #1 merged 2026-09-26. Still to do: tag `v1.0.0` and delete this file in the same commit (7.6).
 5. **v1.1 candidates:** a portrait 9:16 ladder, and starting the scrub before every frame has downloaded.
 
